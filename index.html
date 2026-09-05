@@ -193,7 +193,6 @@
     .secondary-btn,
     .danger-btn {
       width: 100%;
-      border: 0;
       border-radius: 14px;
       padding: 14px;
       font-weight: 800;
@@ -201,6 +200,7 @@
     }
 
     .primary-btn {
+      border: 0;
       background: linear-gradient(135deg, var(--primary), var(--primary2));
       color: white;
     }
@@ -212,12 +212,18 @@
     }
 
     .danger-btn {
+      border: 0;
       background: rgba(239,68,68,.12);
       color: var(--danger);
     }
 
     button:active {
       transform: scale(.98);
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
     }
 
     .auth-message {
@@ -228,6 +234,40 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
+    }
+
+    /* =========================
+       RESEND EMAIL
+    ========================= */
+
+    .resend-box {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .resend-btn {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      border-radius: 13px;
+      padding: 12px;
+      font-weight: 750;
+      transition: .2s;
+    }
+
+    .resend-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .resend-info {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      text-align: center;
+      margin-top: 7px;
     }
 
     /* =========================
@@ -288,6 +328,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    /* =========================
+       ADMIN BADGE
+    ========================= */
+
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      box-shadow: 0 5px 18px rgba(245,158,11,.25);
+    }
+
+    .admin-badge.hidden {
+      display: none !important;
     }
 
     /* =========================
@@ -784,6 +847,24 @@
         Giriş Yap
       </button>
 
+      <!-- TEKRAR MAIL GÖNDER -->
+      <div id="resendBox" class="resend-box hidden">
+
+        <button
+          id="resendEmailBtn"
+          class="resend-btn"
+          type="button"
+          onclick="resendVerificationEmail()">
+          📩 Doğrulama e-postasını tekrar gönder
+        </button>
+
+        <div class="resend-info">
+          Mail gelmediyse önce e-posta adresini kontrol et.
+          Spam/Gereksiz klasörüne de bakabilirsin.
+        </div>
+
+      </div>
+
       <div id="authMessage" class="auth-message hidden"></div>
 
     </div>
@@ -797,11 +878,24 @@
       <!-- TOPBAR -->
       <div class="topbar">
         <div class="hello">
+
           <small>YKS Koçum</small>
-          <h1 id="helloName">Merhaba 👋</h1>
+
+          <h1 id="helloName">
+            Merhaba 👋
+          </h1>
+
+          <!-- ADMIN ROZETİ -->
+          <div
+            id="adminBadge"
+            class="admin-badge hidden">
+            👑 ADMIN
+          </div>
+
         </div>
 
         <div class="top-actions">
+
           <button
             class="icon-btn"
             onclick="toggleTheme()"
@@ -815,6 +909,7 @@
             title="Çıkış">
             ↪
           </button>
+
         </div>
       </div>
 
@@ -822,57 +917,117 @@
       <section id="page-home">
 
         <div class="card hero">
-          <div class="hero-title">Bugünkü hedefin</div>
-          <div class="hero-value" id="heroQuestions">0 soru</div>
-          <div class="hero-sub" id="heroHours">
+
+          <div class="hero-title">
+            Bugünkü hedefin
+          </div>
+
+          <div
+            class="hero-value"
+            id="heroQuestions">
+            0 soru
+          </div>
+
+          <div
+            class="hero-sub"
+            id="heroHours">
             Hedeflerini profilinden ayarlayabilirsin.
           </div>
+
         </div>
 
         <div class="section-title">
+
           <h2>Genel durum</h2>
-          <span id="streakText">0 gün seri</span>
+
+          <span id="streakText">
+            0 gün seri
+          </span>
+
         </div>
 
         <div class="stats">
 
           <div class="stat">
-            <div class="stat-label">Toplam Soru</div>
-            <div class="stat-value" id="totalQuestions">0</div>
+            <div class="stat-label">
+              Toplam Soru
+            </div>
+
+            <div
+              class="stat-value"
+              id="totalQuestions">
+              0
+            </div>
           </div>
 
           <div class="stat">
-            <div class="stat-label">Toplam Net</div>
-            <div class="stat-value" id="totalNet">0</div>
+            <div class="stat-label">
+              Toplam Net
+            </div>
+
+            <div
+              class="stat-value"
+              id="totalNet">
+              0
+            </div>
           </div>
 
           <div class="stat">
-            <div class="stat-label">Deneme</div>
-            <div class="stat-value" id="totalExams">0</div>
+            <div class="stat-label">
+              Deneme
+            </div>
+
+            <div
+              class="stat-value"
+              id="totalExams">
+              0
+            </div>
           </div>
 
           <div class="stat">
-            <div class="stat-label">Çalışma</div>
-            <div class="stat-value" id="totalMinutes">0 dk</div>
+            <div class="stat-label">
+              Çalışma
+            </div>
+
+            <div
+              class="stat-value"
+              id="totalMinutes">
+              0 dk
+            </div>
           </div>
 
         </div>
 
         <div class="section-title">
+
           <h2>Bugünkü plan</h2>
-          <span id="todayPlanProgress">0%</span>
+
+          <span id="todayPlanProgress">
+            0%
+          </span>
+
         </div>
 
         <div class="card">
-          <div class="progress">
-            <div id="todayProgressBar" style="width:0%"></div>
-          </div>
 
-          <div id="todayTasks" style="margin-top:10px">
-            <div style="color:var(--muted);font-size:13px">
-              Bugün için görev yok.
+          <div class="progress">
+            <div
+              id="todayProgressBar"
+              style="width:0%">
             </div>
           </div>
+
+          <div
+            id="todayTasks"
+            style="margin-top:10px">
+
+            <div
+              style="color:var(--muted);font-size:13px">
+              Bugün için görev yok.
+            </div>
+
+          </div>
+
         </div>
 
       </section>
@@ -891,20 +1046,34 @@
 
             <div class="field">
               <label>Çalışma saati</label>
-              <input id="planHours" class="input" type="number" min="0" step=".5">
+              <input
+                id="planHours"
+                class="input"
+                type="number"
+                min="0"
+                step=".5">
             </div>
 
             <div class="field">
               <label>Başlangıç</label>
-              <input id="planStart" class="input" type="time">
+              <input
+                id="planStart"
+                class="input"
+                type="time">
             </div>
 
           </div>
 
           <div class="field">
+
             <label>Dersler</label>
 
-            <select id="planSubjects" class="input" multiple size="5">
+            <select
+              id="planSubjects"
+              class="input"
+              multiple
+              size="5">
+
               <option>TYT Türkçe</option>
               <option>TYT Matematik</option>
               <option>TYT Fen</option>
@@ -916,7 +1085,9 @@
               <option>AYT Edebiyat</option>
               <option>AYT Tarih</option>
               <option>AYT Coğrafya</option>
+
             </select>
+
           </div>
 
           <button
@@ -928,11 +1099,18 @@
         </div>
 
         <div class="section-title">
+
           <h2>Görevler</h2>
-          <span id="planProgressText">0 / 0</span>
+
+          <span id="planProgressText">
+            0 / 0
+          </span>
+
         </div>
 
-        <div class="card" id="planTaskList">
+        <div
+          class="card"
+          id="planTaskList">
           Görev bulunmuyor.
         </div>
 
@@ -950,9 +1128,11 @@
           <div class="form-grid">
 
             <div class="field full">
+
               <label>Ders</label>
 
               <select id="qSubject">
+
                 <option>TYT Türkçe</option>
                 <option>TYT Matematik</option>
                 <option>TYT Fen</option>
@@ -964,55 +1144,72 @@
                 <option>AYT Edebiyat</option>
                 <option>AYT Tarih</option>
                 <option>AYT Coğrafya</option>
+
               </select>
+
             </div>
 
             <div class="field full">
+
               <label>Konu</label>
+
               <input
                 id="qTopic"
                 class="input"
                 placeholder="Örn. Problemler">
+
             </div>
 
             <div class="field">
+
               <label>Toplam</label>
+
               <input
                 id="qTotal"
                 class="input"
                 type="number"
                 min="0"
                 value="20">
+
             </div>
 
             <div class="field">
+
               <label>Doğru</label>
+
               <input
                 id="qCorrect"
                 class="input"
                 type="number"
                 min="0"
                 value="15">
+
             </div>
 
             <div class="field">
+
               <label>Yanlış</label>
+
               <input
                 id="qWrong"
                 class="input"
                 type="number"
                 min="0"
                 value="3">
+
             </div>
 
             <div class="field">
+
               <label>Boş</label>
+
               <input
                 id="qBlank"
                 class="input"
                 type="number"
                 min="0"
                 value="2">
+
             </div>
 
           </div>
@@ -1029,7 +1226,9 @@
           <h2>Son Kayıtlar</h2>
         </div>
 
-        <div class="card" id="questionList">
+        <div
+          class="card"
+          id="questionList">
           Henüz kayıt yok.
         </div>
 
@@ -1045,69 +1244,90 @@
         <div class="card">
 
           <div class="field">
+
             <label>Deneme adı</label>
+
             <input
               id="examName"
               class="input"
               placeholder="TYT Denemesi #1">
+
           </div>
 
           <div class="form-grid">
 
             <div class="field">
+
               <label>Tür</label>
+
               <select id="examType">
                 <option>TYT</option>
                 <option>AYT</option>
               </select>
+
             </div>
 
             <div class="field">
+
               <label>Tarih</label>
+
               <input
                 id="examDate"
                 class="input"
                 type="date">
+
             </div>
 
             <div class="field">
+
               <label>Türkçe</label>
+
               <input
                 id="examTurkish"
                 class="input"
                 type="number"
                 step=".01"
                 value="0">
+
             </div>
 
             <div class="field">
+
               <label>Matematik</label>
+
               <input
                 id="examMath"
                 class="input"
                 type="number"
                 step=".01"
                 value="0">
+
             </div>
 
             <div class="field">
+
               <label>Fen</label>
+
               <input
                 id="examScience"
                 class="input"
                 type="number"
                 step=".01"
                 value="0">
+
             </div>
 
             <div class="field">
+
               <label>Sosyal</label>
+
               <input
                 id="examSocial"
                 class="input"
                 type="number"
                 step=".01"
                 value="0">
+
             </div>
 
           </div>
@@ -1124,7 +1344,9 @@
           <h2>Deneme geçmişi</h2>
         </div>
 
-        <div class="card" id="examList">
+        <div
+          class="card"
+          id="examList">
           Henüz deneme yok.
         </div>
 
@@ -1134,8 +1356,13 @@
       <section id="page-focus" class="hidden">
 
         <div class="section-title">
+
           <h2>Odaklan</h2>
-          <span>25 dakika</span>
+
+          <span>
+            25 dakika
+          </span>
+
         </div>
 
         <div class="card focus-card">
@@ -1144,7 +1371,9 @@
             Telefonu bırak, derse odaklan.
           </div>
 
-          <div id="timer" class="timer">
+          <div
+            id="timer"
+            class="timer">
             25:00
           </div>
 
@@ -1173,11 +1402,19 @@
       <section id="page-badges" class="hidden">
 
         <div class="section-title">
+
           <h2>Rozetler</h2>
-          <span id="badgeCount">0 / 8</span>
+
+          <span id="badgeCount">
+            0 / 8
+          </span>
+
         </div>
 
-        <div class="badges" id="badgeList"></div>
+        <div
+          class="badges"
+          id="badgeList">
+        </div>
 
       </section>
 
@@ -1191,73 +1428,100 @@
         <div class="card">
 
           <div class="field">
+
             <label>Kullanıcı adı</label>
-            <input id="profileUsername" class="input">
+
+            <input
+              id="profileUsername"
+              class="input">
+
           </div>
 
           <div class="form-grid">
 
             <div class="field">
+
               <label>Alan</label>
 
               <select id="profileField">
+
                 <option>Sayısal</option>
                 <option>Eşit Ağırlık</option>
                 <option>Sözel</option>
                 <option>Dil</option>
+
               </select>
+
             </div>
 
             <div class="field">
+
               <label>Hedef sıralama</label>
+
               <input
                 id="profileRank"
                 class="input"
                 type="number"
                 placeholder="10000">
+
             </div>
 
             <div class="field">
+
               <label>Günlük saat</label>
+
               <input
                 id="profileHours"
                 class="input"
                 type="number"
                 min="0"
                 step=".5">
+
             </div>
 
             <div class="field">
+
               <label>Günlük soru</label>
+
               <input
                 id="profileQuestions"
                 class="input"
                 type="number"
                 min="0">
+
             </div>
 
             <div class="field full">
+
               <label>Hedef üniversite</label>
+
               <input
                 id="profileUniversity"
                 class="input"
                 placeholder="Üniversite">
+
             </div>
 
             <div class="field full">
+
               <label>Hedef bölüm</label>
+
               <input
                 id="profileDepartment"
                 class="input"
                 placeholder="Bölüm">
+
             </div>
 
             <div class="field full">
+
               <label>Sınav tarihi</label>
+
               <input
                 id="profileExamDate"
                 class="input"
                 type="date">
+
             </div>
 
           </div>
@@ -1272,8 +1536,12 @@
 
         <div class="card">
 
-          <div class="section-title" style="margin-top:0">
+          <div
+            class="section-title"
+            style="margin-top:0">
+
             <h2>Veriler</h2>
+
           </div>
 
           <div class="row-buttons">
@@ -1301,36 +1569,77 @@
 
         </div>
 
+        <!-- ADMIN PANEL -->
         <div
           id="adminSection"
           class="hidden">
 
           <div class="section-title">
-            <h2>Admin Paneli</h2>
+
+            <h2>👑 Admin Paneli</h2>
+
           </div>
 
           <div class="card">
 
             <div class="stats">
+
               <div class="stat">
-                <div class="stat-label">Kullanıcı</div>
-                <div id="adminUsers" class="stat-value">0</div>
+
+                <div class="stat-label">
+                  Kullanıcı
+                </div>
+
+                <div
+                  id="adminUsers"
+                  class="stat-value">
+                  0
+                </div>
+
               </div>
 
               <div class="stat">
-                <div class="stat-label">Soru</div>
-                <div id="adminQuestions" class="stat-value">0</div>
+
+                <div class="stat-label">
+                  Soru
+                </div>
+
+                <div
+                  id="adminQuestions"
+                  class="stat-value">
+                  0
+                </div>
+
               </div>
 
               <div class="stat">
-                <div class="stat-label">Deneme</div>
-                <div id="adminExams" class="stat-value">0</div>
+
+                <div class="stat-label">
+                  Deneme
+                </div>
+
+                <div
+                  id="adminExams"
+                  class="stat-value">
+                  0
+                </div>
+
               </div>
 
               <div class="stat">
-                <div class="stat-label">Çalışma</div>
-                <div id="adminMinutes" class="stat-value">0</div>
+
+                <div class="stat-label">
+                  Çalışma
+                </div>
+
+                <div
+                  id="adminMinutes"
+                  class="stat-value">
+                  0
+                </div>
+
               </div>
+
             </div>
 
             <button
@@ -1355,48 +1664,60 @@
         class="nav-btn active"
         data-page="home"
         onclick="showPage('home')">
+
         <span>⌂</span>
         Ana Sayfa
+
       </button>
 
       <button
         class="nav-btn"
         data-page="plan"
         onclick="showPage('plan')">
+
         <span>📅</span>
         Plan
+
       </button>
 
       <button
         class="nav-btn"
         data-page="questions"
         onclick="showPage('questions')">
+
         <span>✏️</span>
         Soru
+
       </button>
 
       <button
         class="nav-btn"
         data-page="exams"
         onclick="showPage('exams')">
+
         <span>📊</span>
         Deneme
+
       </button>
 
       <button
         class="nav-btn"
         data-page="focus"
         onclick="showPage('focus')">
+
         <span>⏱️</span>
         Odak
+
       </button>
 
       <button
         class="nav-btn"
         data-page="profile"
         onclick="showPage('profile')">
+
         <span>👤</span>
         Profil
+
       </button>
 
     </nav>
@@ -1564,7 +1885,9 @@
     }
 
     function saveLocal(){
+
       try{
+
         localStorage.setItem(
           localKey("cache"),
           JSON.stringify({
@@ -1578,29 +1901,53 @@
             badges
           })
         );
+
       }catch(e){}
     }
 
+
     function loadLocal(){
+
       try{
+
         const raw =
-          localStorage.getItem(localKey("cache"));
+          localStorage.getItem(
+            localKey("cache")
+          );
 
         if(!raw) return;
 
-        const data = JSON.parse(raw);
+        const data =
+          JSON.parse(raw);
 
-        profile = data.profile || null;
-        questions = data.questions || [];
-        exams = data.exams || [];
-        wrongs = data.wrongs || [];
-        topics = data.topics || {};
-        studySessions = data.studySessions || [];
-        dailyPlan = data.dailyPlan || null;
-        badges = data.badges || [];
+        profile =
+          data.profile || null;
+
+        questions =
+          data.questions || [];
+
+        exams =
+          data.exams || [];
+
+        wrongs =
+          data.wrongs || [];
+
+        topics =
+          data.topics || {};
+
+        studySessions =
+          data.studySessions || [];
+
+        dailyPlan =
+          data.dailyPlan || null;
+
+        badges =
+          data.badges || [];
 
       }catch(e){
+
         console.error(e);
+
       }
     }
 
@@ -1616,17 +1963,26 @@
       document
         .getElementById("loginTab")
         .classList
-        .toggle("active", mode === "login");
+        .toggle(
+          "active",
+          mode === "login"
+        );
 
       document
         .getElementById("registerTab")
         .classList
-        .toggle("active", mode === "register");
+        .toggle(
+          "active",
+          mode === "register"
+        );
 
       document
         .getElementById("usernameField")
         .classList
-        .toggle("hidden", mode !== "register");
+        .toggle(
+          "hidden",
+          mode !== "register"
+        );
 
       document
         .getElementById("authButton")
@@ -1634,6 +1990,14 @@
           mode === "register"
             ? "Kayıt Ol"
             : "Giriş Yap";
+
+      document
+        .getElementById("resendBox")
+        .classList
+        .toggle(
+          "hidden",
+          mode !== "register"
+        );
 
       document
         .getElementById("authMessage")
@@ -1645,10 +2009,93 @@
     function showAuthMessage(message){
 
       const el =
-        document.getElementById("authMessage");
+        document.getElementById(
+          "authMessage"
+        );
 
       el.textContent = message;
-      el.classList.remove("hidden");
+
+      el.classList.remove(
+        "hidden"
+      );
+    }
+
+
+    /* =====================================================
+       RESEND VERIFICATION EMAIL
+    ===================================================== */
+
+    async function resendVerificationEmail(){
+
+      const email =
+        document
+          .getElementById("authEmail")
+          .value
+          .trim();
+
+      if(!email){
+
+        showAuthMessage(
+          "Önce e-posta adresini yaz kankam."
+        );
+
+        return;
+      }
+
+      const button =
+        document.getElementById(
+          "resendEmailBtn"
+        );
+
+      button.disabled = true;
+
+      button.textContent =
+        "📨 Gönderiliyor...";
+
+      try{
+
+        const {
+          error
+        } =
+          await supabaseClient.auth.resend({
+            type:"signup",
+            email:email,
+            options:{
+              emailRedirectTo:SITE_URL
+            }
+          });
+
+        if(error)
+          throw error;
+
+        showAuthMessage(
+          "✅ Doğrulama e-postası tekrar gönderildi. Gelen kutunu ve Spam/Gereksiz klasörünü kontrol et."
+        );
+
+        toast(
+          "Doğrulama maili tekrar gönderildi 📩"
+        );
+
+      }catch(error){
+
+        console.error(error);
+
+        showAuthMessage(
+          "❌ Mail tekrar gönderilemedi: " +
+          (
+            error?.message ||
+            "Bilinmeyen hata"
+          )
+        );
+
+      }finally{
+
+        button.disabled = false;
+
+        button.textContent =
+          "📩 Doğrulama e-postasını tekrar gönder";
+
+      }
     }
 
 
@@ -1694,14 +2141,21 @@
       }
 
       const button =
-        document.getElementById("authButton");
+        document.getElementById(
+          "authButton"
+        );
 
       button.disabled = true;
-      button.textContent = "Bekleyin...";
+
+      button.textContent =
+        "Bekleyin...";
 
       try{
 
-        if(currentAuthMode === "register"){
+        if(
+          currentAuthMode ===
+          "register"
+        ){
 
           if(!username){
 
@@ -1709,14 +2163,14 @@
               "Kullanıcı adı gir."
             );
 
+            button.disabled = false;
+
+            button.textContent =
+              "Kayıt Ol";
+
             return;
           }
 
-          /*
-           * ÖNEMLİ:
-           * E-posta doğrulama linki doğrudan
-           * GitHub Pages ana sayfasına döner.
-           */
           const result =
             await supabaseClient.auth.signUp({
               email,
@@ -1733,10 +2187,16 @@
             throw result.error;
 
           showAuthMessage(
-            "Kayıt başarılı! 📩 E-posta adresine doğrulama bağlantısı gönderildi. E-postadaki bağlantıya tıkla."
+            "Kayıt başarılı! 📩 E-posta adresine doğrulama bağlantısı gönderildi. Mail gelmezse aşağıdaki butondan tekrar gönderebilirsin."
           );
 
-          button.textContent = "E-posta Gönderildi";
+          document
+            .getElementById("resendBox")
+            .classList
+            .remove("hidden");
+
+          button.textContent =
+            "E-posta Gönderildi";
 
         }else{
 
@@ -1749,7 +2209,8 @@
           if(result.error)
             throw result.error;
 
-          currentUser = result.data.user;
+          currentUser =
+            result.data.user;
 
           await bootApp();
 
@@ -1765,11 +2226,17 @@
 
       }finally{
 
-        if(currentAuthMode === "login"){
-          button.disabled = false;
-          button.textContent = "Giriş Yap";
-        }
+        if(
+          currentAuthMode ===
+          "login"
+        ){
 
+          button.disabled = false;
+
+          button.textContent =
+            "Giriş Yap";
+
+        }
       }
     }
 
@@ -1779,25 +2246,52 @@
       const message =
         error?.message || "";
 
+      const lower =
+        message.toLowerCase();
+
       if(
-        message.toLowerCase().includes("email not confirmed")
+        lower.includes(
+          "email not confirmed"
+        )
       ){
-        return "E-posta adresin henüz doğrulanmamış. Gelen kutundaki doğrulama bağlantısına tıkla.";
+
+        document
+          .getElementById("resendBox")
+          .classList
+          .remove("hidden");
+
+        return "E-posta adresin henüz doğrulanmamış. Doğrulama mailini tekrar gönderebilirsin.";
       }
 
       if(
-        message.toLowerCase().includes("invalid login credentials")
+        lower.includes(
+          "invalid login credentials"
+        )
       ){
+
         return "E-posta veya şifre hatalı.";
+
       }
 
       if(
-        message.toLowerCase().includes("user already registered")
+        lower.includes(
+          "user already registered"
+        )
       ){
-        return "Bu e-posta zaten kayıtlı. Giriş yapmayı dene.";
+
+        document
+          .getElementById("resendBox")
+          .classList
+          .remove("hidden");
+
+        return "Bu e-posta zaten kayıtlı. Giriş yapmayı dene veya doğrulama mailini tekrar gönder.";
+
       }
 
-      return message || "Bir hata oluştu.";
+      return (
+        message ||
+        "Bir hata oluştu."
+      );
     }
 
 
@@ -1806,6 +2300,8 @@
       await supabaseClient.auth.signOut();
 
       currentUser = null;
+
+      currentRole = "user";
 
       document
         .getElementById("appScreen")
@@ -1816,6 +2312,18 @@
         .getElementById("authScreen")
         .classList
         .remove("hidden");
+
+      document
+        .getElementById("adminBadge")
+        .classList
+        .add("hidden");
+
+      document
+        .getElementById("adminSection")
+        .classList
+        .add("hidden");
+
+      switchAuth("login");
     }
 
 
@@ -1834,12 +2342,14 @@
         await supabaseClient
           .from("profiles")
           .select("*")
-          .eq("id", currentUser.id)
+          .eq(
+            "id",
+            currentUser.id
+          )
           .maybeSingle();
 
-      if(error){
+      if(error)
         console.error(error);
-      }
 
       if(data){
 
@@ -1860,8 +2370,9 @@
             .upsert(profile);
 
         if(insertError)
-          console.error(insertError);
-
+          console.error(
+            insertError
+          );
       }
 
       fillProfileUI();
@@ -1881,8 +2392,13 @@
         "helloName"
       ).textContent =
         "Merhaba, " +
-        (profile.username || "Öğrenci") +
+        (
+          profile.username ||
+          "Öğrenci"
+        ) +
         " 👋";
+
+      updateAdminBadge();
 
       document.getElementById(
         "profileUsername"
@@ -1892,102 +2408,181 @@
       document.getElementById(
         "profileField"
       ).value =
-        profile.field || "Sayısal";
+        profile.field ||
+        "Sayısal";
 
       document.getElementById(
         "profileRank"
       ).value =
-        profile.target_rank || "";
+        profile.target_rank ||
+        "";
 
       document.getElementById(
         "profileHours"
       ).value =
-        profile.daily_hours ?? 4;
+        profile.daily_hours ??
+        4;
 
       document.getElementById(
         "profileQuestions"
       ).value =
-        profile.daily_questions ?? 100;
+        profile.daily_questions ??
+        100;
 
       document.getElementById(
         "profileUniversity"
       ).value =
-        profile.university || "";
+        profile.university ||
+        "";
 
       document.getElementById(
         "profileDepartment"
       ).value =
-        profile.department || "";
+        profile.department ||
+        "";
 
       document.getElementById(
         "profileExamDate"
       ).value =
-        profile.exam_date || "";
+        profile.exam_date ||
+        "";
 
       document.getElementById(
         "heroQuestions"
       ).textContent =
-        (profile.daily_questions || 0) +
+        (
+          profile.daily_questions ||
+          0
+        ) +
         " soru";
 
       document.getElementById(
         "heroHours"
       ).textContent =
         "Günlük hedef: " +
-        (profile.daily_hours || 0) +
+        (
+          profile.daily_hours ||
+          0
+        ) +
         " saat";
+    }
+
+
+    /* =====================================================
+       ADMIN BADGE
+    ===================================================== */
+
+    function updateAdminBadge(){
+
+      const badge =
+        document.getElementById(
+          "adminBadge"
+        );
+
+      const section =
+        document.getElementById(
+          "adminSection"
+        );
+
+      if(
+        currentRole === "admin" ||
+        currentRole === "coach"
+      ){
+
+        badge.classList.remove(
+          "hidden"
+        );
+
+        section.classList.remove(
+          "hidden"
+        );
+
+      }else{
+
+        badge.classList.add(
+          "hidden"
+        );
+
+        section.classList.add(
+          "hidden"
+        );
+      }
     }
 
 
     async function saveProfile(){
 
       const updated = {
-        id: currentUser.id,
+
+        id:
+          currentUser.id,
+
         username:
-          document.getElementById(
-            "profileUsername"
-          ).value.trim() || "Öğrenci",
+          document
+            .getElementById(
+              "profileUsername"
+            )
+            .value
+            .trim() ||
+          "Öğrenci",
 
         field:
-          document.getElementById(
-            "profileField"
-          ).value,
+          document
+            .getElementById(
+              "profileField"
+            )
+            .value,
 
         target_rank:
           Number(
-            document.getElementById(
-              "profileRank"
-            ).value
+            document
+              .getElementById(
+                "profileRank"
+              )
+              .value
           ) || null,
 
         daily_hours:
           Number(
-            document.getElementById(
-              "profileHours"
-            ).value
+            document
+              .getElementById(
+                "profileHours"
+              )
+              .value
           ) || 0,
 
         daily_questions:
           Number(
-            document.getElementById(
-              "profileQuestions"
-            ).value
+            document
+              .getElementById(
+                "profileQuestions"
+              )
+              .value
           ) || 0,
 
         university:
-          document.getElementById(
-            "profileUniversity"
-          ).value.trim(),
+          document
+            .getElementById(
+              "profileUniversity"
+            )
+            .value
+            .trim(),
 
         department:
-          document.getElementById(
-            "profileDepartment"
-          ).value.trim(),
+          document
+            .getElementById(
+              "profileDepartment"
+            )
+            .value
+            .trim(),
 
         exam_date:
-          document.getElementById(
-            "profileExamDate"
-          ).value || null
+          document
+            .getElementById(
+              "profileExamDate"
+            )
+            .value ||
+          null
       };
 
       const {
@@ -2000,9 +2595,10 @@
       if(error){
 
         console.error(error);
-        toast(error.message);
-        return;
 
+        toast(error.message);
+
+        return;
       }
 
       profile = {
@@ -2011,9 +2607,13 @@
       };
 
       saveLocal();
+
       fillProfileUI();
 
-      toast("Profil kaydedildi ✅");
+      toast(
+        "Profil kaydedildi ✅"
+      );
+
       renderHome();
     }
 
@@ -2042,62 +2642,114 @@
             supabaseClient
               .from("questions")
               .select("*")
-              .eq("user_id", currentUser.id)
-              .order("date", {ascending:false}),
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .order(
+                "date",
+                {
+                  ascending:false
+                }
+              ),
 
             supabaseClient
               .from("exams")
               .select("*")
-              .eq("user_id", currentUser.id)
-              .order("date", {ascending:false}),
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .order(
+                "date",
+                {
+                  ascending:false
+                }
+              ),
 
             supabaseClient
               .from("wrongs")
               .select("*")
-              .eq("user_id", currentUser.id)
-              .order("date", {ascending:false}),
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .order(
+                "date",
+                {
+                  ascending:false
+                }
+              ),
 
             supabaseClient
               .from("topics")
               .select("*")
-              .eq("user_id", currentUser.id),
+              .eq(
+                "user_id",
+                currentUser.id
+              ),
 
             supabaseClient
               .from("study_sessions")
               .select("*")
-              .eq("user_id", currentUser.id)
-              .order("date", {ascending:false}),
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .order(
+                "date",
+                {
+                  ascending:false
+                }
+              ),
 
             supabaseClient
               .from("daily_plans")
               .select("*")
-              .eq("user_id", currentUser.id)
-              .eq("plan_date", today())
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .eq(
+                "plan_date",
+                today()
+              )
               .maybeSingle(),
 
             supabaseClient
               .from("badges")
               .select("*")
-              .eq("user_id", currentUser.id)
-
+              .eq(
+                "user_id",
+                currentUser.id
+              )
           ]);
 
-        if(q.data) questions = q.data;
-        if(e.data) exams = e.data;
-        if(w.data) wrongs = w.data;
+        if(q.data)
+          questions = q.data;
+
+        if(e.data)
+          exams = e.data;
+
+        if(w.data)
+          wrongs = w.data;
 
         if(t.data){
 
           topics = {};
 
-          t.data.forEach(row => {
+          t.data.forEach(
+            row => {
 
-            topics[
-              row.subject + "::" + row.topic
-            ] = row.state;
+              topics[
+                row.subject +
+                "::" +
+                row.topic
+              ] =
+                row.state;
 
-          });
-
+            }
+          );
         }
 
         if(s.data)
@@ -2128,6 +2780,8 @@
 
     async function getRole(){
 
+      currentRole = "user";
+
       try{
 
         const {
@@ -2137,26 +2791,29 @@
           await supabaseClient
             .rpc("my_role");
 
-        if(!error && data)
-          currentRole = data;
+        if(
+          !error &&
+          data
+        ){
+
+          currentRole =
+            String(data)
+              .toLowerCase()
+              .trim();
+
+        }
 
       }catch(e){
 
+        console.error(
+          "Rol alınamadı:",
+          e
+        );
+
         currentRole = "user";
-
       }
 
-      if(
-        currentRole === "admin" ||
-        currentRole === "coach"
-      ){
-
-        document
-          .getElementById("adminSection")
-          .classList
-          .remove("hidden");
-
-      }
+      updateAdminBadge();
     }
 
 
@@ -2190,10 +2847,27 @@
 
         renderAll();
 
+        /*
+         * Admin istatistiklerini ilk açılışta
+         * otomatik getir.
+         */
+        if(
+          currentRole === "admin" ||
+          currentRole === "coach"
+        ){
+
+          await loadAdminStats(
+            false
+          );
+        }
+
       }catch(error){
 
         console.error(error);
-        toast("Uygulama yüklenirken hata oluştu.");
+
+        toast(
+          "Uygulama yüklenirken hata oluştu."
+        );
 
       }finally{
 
@@ -2201,7 +2875,6 @@
           .getElementById("loading")
           .classList
           .add("hidden");
-
       }
     }
 
@@ -2222,30 +2895,39 @@
         "profile"
       ];
 
-      pages.forEach(p => {
+      pages.forEach(
+        p => {
 
-        const element =
-          document.getElementById(
-            "page-" + p
-          );
+          const element =
+            document.getElementById(
+              "page-" + p
+            );
 
-        if(element)
-          element.classList.toggle(
-            "hidden",
-            p !== page
-          );
-      });
+          if(element){
+
+            element.classList.toggle(
+              "hidden",
+              p !== page
+            );
+          }
+
+        }
+      );
 
       document
-        .querySelectorAll(".nav-btn")
-        .forEach(btn => {
+        .querySelectorAll(
+          ".nav-btn"
+        )
+        .forEach(
+          btn => {
 
-          btn.classList.toggle(
-            "active",
-            btn.dataset.page === page
-          );
+            btn.classList.toggle(
+              "active",
+              btn.dataset.page === page
+            );
 
-        });
+          }
+        );
 
       window.scrollTo({
         top:0,
@@ -2266,6 +2948,19 @@
 
       if(page === "badges")
         renderBadges();
+
+      if(
+        page === "profile" &&
+        (
+          currentRole === "admin" ||
+          currentRole === "coach"
+        )
+      ){
+
+        loadAdminStats(
+          false
+        );
+      }
     }
 
 
@@ -2278,14 +2973,20 @@
       const totalQuestions =
         questions.reduce(
           (sum,q) =>
-            sum + Number(q.total || 0),
+            sum +
+            Number(
+              q.total || 0
+            ),
           0
         );
 
       const totalNet =
         questions.reduce(
           (sum,q) =>
-            sum + Number(q.net || 0),
+            sum +
+            Number(
+              q.net || 0
+            ),
           0
         );
 
@@ -2293,8 +2994,12 @@
         studySessions.reduce(
           (sum,s) =>
             sum +
-            Number(s.minutes || 0) +
-            Number(s.seconds || 0) / 60,
+            Number(
+              s.minutes || 0
+            ) +
+            Number(
+              s.seconds || 0
+            ) / 60,
           0
         );
 
@@ -2316,7 +3021,9 @@
       document.getElementById(
         "totalMinutes"
       ).textContent =
-        Math.round(totalMinutes) +
+        Math.round(
+          totalMinutes
+        ) +
         " dk";
 
       const streak =
@@ -2325,7 +3032,8 @@
       document.getElementById(
         "streakText"
       ).textContent =
-        streak + " gün seri";
+        streak +
+        " gün seri";
 
       renderTodayTasks();
     }
@@ -2333,33 +3041,51 @@
 
     function calculateStreak(){
 
-      const days = new Set();
+      const days =
+        new Set();
 
-      questions.forEach(q => {
-        if(q.date)
-          days.add(q.date);
-      });
+      questions.forEach(
+        q => {
 
-      studySessions.forEach(s => {
-        if(s.date)
-          days.add(s.date);
-      });
+          if(q.date)
+            days.add(q.date);
 
-      exams.forEach(e => {
-        if(e.date)
-          days.add(e.date);
-      });
+        }
+      );
+
+      studySessions.forEach(
+        s => {
+
+          if(s.date)
+            days.add(s.date);
+
+        }
+      );
+
+      exams.forEach(
+        e => {
+
+          if(e.date)
+            days.add(e.date);
+
+        }
+      );
 
       let count = 0;
 
-      let cursor = new Date();
+      let cursor =
+        new Date();
 
       while(true){
 
         const key =
-          cursor.toISOString().slice(0,10);
+          cursor
+            .toISOString()
+            .slice(0,10);
 
-        if(days.has(key)){
+        if(
+          days.has(key)
+        ){
 
           count++;
 
@@ -2370,8 +3096,8 @@
         }else{
 
           break;
-        }
 
+        }
       }
 
       return count;
@@ -2384,43 +3110,68 @@
 
     async function createTodayPlanIfNeeded(){
 
-      if(!currentUser) return;
+      if(!currentUser)
+        return;
 
-      if(dailyPlan) return;
+      if(dailyPlan)
+        return;
 
       const subjects = [
         "TYT Matematik",
         "TYT Türkçe"
       ];
 
-      const tasks = subjects.map(
-        (subject,index) => ({
-          id:
-            "task_" +
-            Date.now() +
-            "_" +
-            index,
+      const tasks =
+        subjects.map(
+          (
+            subject,
+            index
+          ) => ({
 
-          date: today(),
-          time:
-            index === 0
-              ? "18:00"
-              : "19:00",
+            id:
+              "task_" +
+              Date.now() +
+              "_" +
+              index,
 
-          subject,
-          topic:"",
-          minutes:60,
-          done:false
-        })
-      );
+            date:
+              today(),
+
+            time:
+              index === 0
+                ? "18:00"
+                : "19:00",
+
+            subject,
+
+            topic:"",
+
+            minutes:60,
+
+            done:false
+
+          })
+        );
 
       dailyPlan = {
-        user_id: currentUser.id,
-        plan_date: today(),
-        hours: profile?.daily_hours || 4,
-        start_time:"18:00",
+
+        user_id:
+          currentUser.id,
+
+        plan_date:
+          today(),
+
+        hours:
+          profile?.daily_hours ||
+          4,
+
+        start_time:
+          "18:00",
+
         subjects,
+
         tasks
+
       };
 
       await supabaseClient
@@ -2442,9 +3193,10 @@
       document.getElementById(
         "planDateLabel"
       ).textContent =
-        new Date().toLocaleDateString(
-          "tr-TR"
-        );
+        new Date()
+          .toLocaleDateString(
+            "tr-TR"
+          );
 
       if(!dailyPlan){
 
@@ -2459,26 +3211,35 @@
       document.getElementById(
         "planHours"
       ).value =
-        dailyPlan.hours || 0;
+        dailyPlan.hours ||
+        0;
 
       document.getElementById(
         "planStart"
       ).value =
-        dailyPlan.start_time || "18:00";
+        dailyPlan.start_time ||
+        "18:00";
 
       const selected =
-        dailyPlan.subjects || [];
+        dailyPlan.subjects ||
+        [];
 
       Array.from(
         document
-          .getElementById("planSubjects")
+          .getElementById(
+            "planSubjects"
+          )
           .options
-      ).forEach(option => {
+      ).forEach(
+        option => {
 
-        option.selected =
-          selected.includes(option.value);
+          option.selected =
+            selected.includes(
+              option.value
+            );
 
-      });
+        }
+      );
 
       renderPlanTasks();
     }
@@ -2492,7 +3253,8 @@
         );
 
       const tasks =
-        dailyPlan?.tasks || [];
+        dailyPlan?.tasks ||
+        [];
 
       if(!tasks.length){
 
@@ -2505,38 +3267,62 @@
       }
 
       const done =
-        tasks.filter(t => t.done).length;
+        tasks.filter(
+          t => t.done
+        ).length;
 
       document.getElementById(
         "planProgressText"
       ).textContent =
-        done + " / " + tasks.length;
+        done +
+        " / " +
+        tasks.length;
 
       list.innerHTML =
-        tasks.map(task => `
+        tasks.map(
+          task => `
 
           <div
-            class="task ${task.done ? "done" : ""}"
+            class="task ${
+              task.done
+                ? "done"
+                : ""
+            }"
             onclick="toggleTask('${escapeAttr(task.id)}')">
 
             <div class="task-check">
-              ${task.done ? "✓" : ""}
+              ${
+                task.done
+                  ? "✓"
+                  : ""
+              }
             </div>
 
             <div class="task-info">
 
               <div class="task-name">
-                ${escapeHtml(
-                  task.subject || "Ders"
-                )}
+                ${
+                  escapeHtml(
+                    task.subject ||
+                    "Ders"
+                  )
+                }
               </div>
 
               <div class="task-meta">
-                ${escapeHtml(
-                  task.time || ""
-                )}
+                ${
+                  escapeHtml(
+                    task.time ||
+                    ""
+                  )
+                }
                 ·
-                ${Number(task.minutes || 0)}
+                ${
+                  Number(
+                    task.minutes ||
+                    0
+                  )
+                }
                 dakika
               </div>
 
@@ -2544,7 +3330,8 @@
 
           </div>
 
-        `).join("");
+        `
+        ).join("");
     }
 
 
@@ -2556,7 +3343,8 @@
         );
 
       const tasks =
-        dailyPlan?.tasks || [];
+        dailyPlan?.tasks ||
+        [];
 
       if(!tasks.length){
 
@@ -2567,63 +3355,95 @@
 
         document.getElementById(
           "todayProgressBar"
-        ).style.width = "0%";
+        ).style.width =
+          "0%";
 
         document.getElementById(
           "todayPlanProgress"
-        ).textContent = "0%";
+        ).textContent =
+          "0%";
 
         return;
       }
 
       const done =
-        tasks.filter(t => t.done).length;
+        tasks.filter(
+          t => t.done
+        ).length;
 
       const percent =
         Math.round(
-          done / tasks.length * 100
+          done /
+          tasks.length *
+          100
         );
 
       document.getElementById(
         "todayProgressBar"
       ).style.width =
-        percent + "%";
+        percent +
+        "%";
 
       document.getElementById(
         "todayPlanProgress"
       ).textContent =
-        percent + "%";
+        percent +
+        "%";
 
       container.innerHTML =
-        tasks.slice(0,4).map(task => `
+        tasks
+          .slice(0,4)
+          .map(
+            task => `
 
           <div
-            class="task ${task.done ? "done" : ""}"
+            class="task ${
+              task.done
+                ? "done"
+                : ""
+            }"
             onclick="toggleTask('${escapeAttr(task.id)}')">
 
             <div class="task-check">
-              ${task.done ? "✓" : ""}
+              ${
+                task.done
+                  ? "✓"
+                  : ""
+              }
             </div>
 
             <div class="task-info">
 
               <div class="task-name">
-                ${escapeHtml(
-                  task.subject || "Ders"
-                )}
+                ${
+                  escapeHtml(
+                    task.subject ||
+                    "Ders"
+                  )
+                }
               </div>
 
               <div class="task-meta">
-                ${task.time || ""}
+                ${
+                  escapeHtml(
+                    task.time ||
+                    ""
+                  )
+                }
                 ·
-                ${task.minutes || 0} dk
+                ${
+                  task.minutes ||
+                  0
+                } dk
               </div>
 
             </div>
 
           </div>
 
-        `).join("");
+        `
+          )
+          .join("");
     }
 
 
@@ -2635,12 +3455,20 @@
         );
 
       const subjects =
-        Array.from(select.selectedOptions)
-          .map(option => option.value);
+        Array.from(
+          select.selectedOptions
+        )
+        .map(
+          option =>
+            option.value
+        );
 
       if(!subjects.length){
 
-        toast("En az bir ders seç.");
+        toast(
+          "En az bir ders seç."
+        );
+
         return;
       }
 
@@ -2654,14 +3482,16 @@
       const start =
         document.getElementById(
           "planStart"
-        ).value || "18:00";
+        ).value ||
+        "18:00";
 
       const minutesPerSubject =
         subjects.length
           ? Math.max(
               15,
               Math.floor(
-                hours * 60 /
+                hours *
+                60 /
                 subjects.length
               )
             )
@@ -2669,20 +3499,28 @@
 
       const tasks =
         subjects.map(
-          (subject,index) => {
+          (
+            subject,
+            index
+          ) => {
 
             const startMinutes =
-              timeToMinutes(start) +
-              index * minutesPerSubject;
+              timeToMinutes(
+                start
+              ) +
+              index *
+              minutesPerSubject;
 
             return {
+
               id:
                 "task_" +
                 Date.now() +
                 "_" +
                 index,
 
-              date:today(),
+              date:
+                today(),
 
               time:
                 minutesToTime(
@@ -2697,18 +3535,33 @@
                 minutesPerSubject,
 
               done:false
+
             };
+
           }
         );
 
       dailyPlan = {
-        user_id:currentUser.id,
-        plan_date:today(),
+
+        user_id:
+          currentUser.id,
+
+        plan_date:
+          today(),
+
         hours,
-        start_time:start,
+
+        start_time:
+          start,
+
         subjects,
+
         tasks,
-        updated_at:new Date().toISOString()
+
+        updated_at:
+          new Date()
+            .toISOString()
+
       };
 
       const {
@@ -2727,31 +3580,43 @@
       if(error){
 
         console.error(error);
-        toast(error.message);
+
+        toast(
+          error.message
+        );
+
         return;
       }
 
       saveLocal();
 
       renderPlan();
+
       renderHome();
 
-      toast("Plan kaydedildi 📅");
+      toast(
+        "Plan kaydedildi 📅"
+      );
     }
 
 
     async function toggleTask(id){
 
-      if(!dailyPlan?.tasks) return;
+      if(!dailyPlan?.tasks)
+        return;
 
       const task =
         dailyPlan.tasks.find(
-          t => String(t.id) === String(id)
+          t =>
+            String(t.id) ===
+            String(id)
         );
 
-      if(!task) return;
+      if(!task)
+        return;
 
-      task.done = !task.done;
+      task.done =
+        !task.done;
 
       await supabaseClient
         .from("daily_plans")
@@ -2759,7 +3624,8 @@
           {
             ...dailyPlan,
             updated_at:
-              new Date().toISOString()
+              new Date()
+                .toISOString()
           },
           {
             onConflict:
@@ -2770,6 +3636,7 @@
       saveLocal();
 
       renderPlanTasks();
+
       renderTodayTasks();
     }
 
@@ -2820,23 +3687,42 @@
 
       if(total <= 0){
 
-        toast("Toplam soru sayısını gir.");
+        toast(
+          "Toplam soru sayısını gir."
+        );
+
         return;
       }
 
       const net =
-        correct - wrong / 4;
+        correct -
+        wrong / 4;
 
       const row = {
-        user_id:currentUser.id,
-        date:today(),
+
+        user_id:
+          currentUser.id,
+
+        date:
+          today(),
+
         subject,
+
         topic,
+
         total,
+
         correct,
+
         wrong,
+
         blank,
-        net:Number(net.toFixed(2))
+
+        net:
+          Number(
+            net.toFixed(2)
+          )
+
       };
 
       const {
@@ -2852,11 +3738,17 @@
       if(error){
 
         console.error(error);
-        toast(error.message);
+
+        toast(
+          error.message
+        );
+
         return;
       }
 
-      questions.unshift(data);
+      questions.unshift(
+        data
+      );
 
       saveLocal();
 
@@ -2867,6 +3759,7 @@
       checkBadges();
 
       renderQuestions();
+
       renderHome();
 
       toast(
@@ -2895,7 +3788,8 @@
       container.innerHTML =
         questions
           .slice(0,15)
-          .map(q => `
+          .map(
+            q => `
 
             <div class="list-item">
 
@@ -2904,39 +3798,59 @@
                 <div>
 
                   <div class="list-title">
-                    ${escapeHtml(
-                      q.subject
-                    )}
+                    ${
+                      escapeHtml(
+                        q.subject
+                      )
+                    }
                   </div>
 
                   <div class="list-meta">
-                    ${escapeHtml(
-                      q.topic || "Konu belirtilmedi"
-                    )}
+                    ${
+                      escapeHtml(
+                        q.topic ||
+                        "Konu belirtilmedi"
+                      )
+                    }
                     ·
-                    ${q.date || ""}
+                    ${
+                      q.date ||
+                      ""
+                    }
                   </div>
 
                 </div>
 
                 <div class="net">
-                  ${Number(
-                    q.net || 0
-                  ).toFixed(2)}
+                  ${
+                    Number(
+                      q.net ||
+                      0
+                    ).toFixed(2)
+                  }
                 </div>
 
               </div>
 
               <div class="list-meta">
-                ${q.total} soru
-                · ${q.correct} doğru
-                · ${q.wrong} yanlış
-                · ${q.blank} boş
+                ${
+                  q.total
+                } soru
+                · ${
+                  q.correct
+                } doğru
+                · ${
+                  q.wrong
+                } yanlış
+                · ${
+                  q.blank
+                } boş
               </div>
 
             </div>
 
-          `)
+          `
+          )
           .join("");
     }
 
@@ -2955,7 +3869,8 @@
       const date =
         document.getElementById(
           "examDate"
-        ).value || today();
+        ).value ||
+        today();
 
       const type =
         document.getElementById(
@@ -2992,7 +3907,10 @@
 
       if(!name){
 
-        toast("Deneme adı gir.");
+        toast(
+          "Deneme adı gir."
+        );
+
         return;
       }
 
@@ -3003,15 +3921,29 @@
         social;
 
       const row = {
-        user_id:currentUser.id,
+
+        user_id:
+          currentUser.id,
+
         name,
+
         date,
+
         type,
+
         turkish,
+
         math,
+
         science,
+
         social,
-        net:Number(net.toFixed(2))
+
+        net:
+          Number(
+            net.toFixed(2)
+          )
+
       };
 
       const {
@@ -3027,11 +3959,17 @@
       if(error){
 
         console.error(error);
-        toast(error.message);
+
+        toast(
+          error.message
+        );
+
         return;
       }
 
-      exams.unshift(data);
+      exams.unshift(
+        data
+      );
 
       saveLocal();
 
@@ -3042,9 +3980,12 @@
       checkBadges();
 
       renderExams();
+
       renderHome();
 
-      toast("Deneme kaydedildi 📊");
+      toast(
+        "Deneme kaydedildi 📊"
+      );
     }
 
 
@@ -3066,7 +4007,9 @@
       }
 
       container.innerHTML =
-        exams.map(e => `
+        exams
+          .map(
+            e => `
 
           <div class="list-item">
 
@@ -3075,37 +4018,62 @@
               <div>
 
                 <div class="list-title">
-                  ${escapeHtml(
-                    e.name
-                  )}
+                  ${
+                    escapeHtml(
+                      e.name
+                    )
+                  }
                 </div>
 
                 <div class="list-meta">
-                  ${e.type || ""}
+                  ${
+                    e.type ||
+                    ""
+                  }
                   ·
-                  ${e.date || ""}
+                  ${
+                    e.date ||
+                    ""
+                  }
                 </div>
 
               </div>
 
               <div class="net">
-                ${Number(
-                  e.net || 0
-                ).toFixed(2)}
+                ${
+                  Number(
+                    e.net ||
+                    0
+                  ).toFixed(2)
+                }
               </div>
 
             </div>
 
             <div class="list-meta">
-              Türkçe ${e.turkish || 0}
-              · Mat ${e.math || 0}
-              · Fen ${e.science || 0}
-              · Sosyal ${e.social || 0}
+              Türkçe ${
+                e.turkish ||
+                0
+              }
+              · Mat ${
+                e.math ||
+                0
+              }
+              · Fen ${
+                e.science ||
+                0
+              }
+              · Sosyal ${
+                e.social ||
+                0
+              }
             </div>
 
           </div>
 
-        `).join("");
+        `
+          )
+          .join("");
     }
 
 
@@ -3137,21 +4105,27 @@
         "Durdur";
 
       focusInterval =
-        setInterval(() => {
+        setInterval(
+          () => {
 
-          if(focusSeconds > 0){
+            if(
+              focusSeconds >
+              0
+            ){
 
-            focusSeconds--;
+              focusSeconds--;
 
-            updateTimer();
+              updateTimer();
 
-          }else{
+            }else{
 
-            finishFocus();
+              finishFocus();
 
-          }
+            }
 
-        },1000);
+          },
+          1000
+        );
     }
 
 
@@ -3174,7 +4148,8 @@
 
       pauseFocus();
 
-      focusSeconds = 1500;
+      focusSeconds =
+        1500;
 
       updateTimer();
     }
@@ -3184,17 +4159,28 @@
 
       pauseFocus();
 
-      focusSeconds = 1500;
+      focusSeconds =
+        1500;
 
       updateTimer();
 
       const row = {
-        user_id:currentUser.id,
-        date:today(),
+
+        user_id:
+          currentUser.id,
+
+        date:
+          today(),
+
         minutes:25,
+
         seconds:0,
+
         task_id:null,
-        label:"Odak çalışması"
+
+        label:
+          "Odak çalışması"
+
       };
 
       const {
@@ -3207,8 +4193,13 @@
           .select()
           .single();
 
-      if(!error && data)
-        studySessions.unshift(data);
+      if(
+        !error &&
+        data
+      )
+        studySessions.unshift(
+          data
+        );
 
       saveLocal();
 
@@ -3226,22 +4217,32 @@
 
       const minutes =
         Math.floor(
-          focusSeconds / 60
+          focusSeconds /
+          60
         )
         .toString()
-        .padStart(2,"0");
+        .padStart(
+          2,
+          "0"
+        );
 
       const seconds =
         (
-          focusSeconds % 60
+          focusSeconds %
+          60
         )
         .toString()
-        .padStart(2,"0");
+        .padStart(
+          2,
+          "0"
+        );
 
       document.getElementById(
         "timer"
       ).textContent =
-        minutes + ":" + seconds;
+        minutes +
+        ":" +
+        seconds;
     }
 
 
@@ -3254,7 +4255,11 @@
       const totalQuestions =
         questions.reduce(
           (sum,q) =>
-            sum + Number(q.total || 0),
+            sum +
+            Number(
+              q.total ||
+              0
+            ),
           0
         );
 
@@ -3275,35 +4280,52 @@
       if(exams.length >= 1)
         keys.push("exam");
 
-      if(calculateStreak() >= 7)
+      if(
+        calculateStreak() >= 7
+      )
         keys.push("streak7");
 
       const doneTopics =
         Object.values(topics)
           .filter(
-            state => state === "done"
-          ).length;
+            state =>
+              state ===
+              "done"
+          )
+          .length;
 
-      if(doneTopics >= 25)
+      if(
+        doneTopics >= 25
+      )
         keys.push("topics25");
 
       if(
         exams.some(
           exam =>
-            Number(exam.net || 0) >= 100
+            Number(
+              exam.net ||
+              0
+            ) >= 100
         )
       ){
+
         keys.push("net100");
+
       }
 
-      for(const key of keys){
+      for(
+        const key of keys
+      ){
 
         const exists =
           badges.some(
-            b => b.badge_key === key
+            b =>
+              b.badge_key ===
+              key
           );
 
-        if(exists) continue;
+        if(exists)
+          continue;
 
         const {
           data,
@@ -3312,14 +4334,21 @@
           await supabaseClient
             .from("badges")
             .insert({
-              user_id:currentUser.id,
-              badge_key:key
+              user_id:
+                currentUser.id,
+              badge_key:
+                key
             })
             .select()
             .single();
 
-        if(!error && data)
-          badges.push(data);
+        if(
+          !error &&
+          data
+        )
+          badges.push(
+            data
+          );
       }
 
       saveLocal();
@@ -3338,7 +4367,8 @@
       const earned =
         new Set(
           badges.map(
-            b => b.badge_key
+            b =>
+              b.badge_key
           )
         );
 
@@ -3351,14 +4381,15 @@
 
       container.innerHTML =
         BADGE_DEFINITIONS
-          .map(badge => {
+          .map(
+            badge => {
 
-            const unlocked =
-              earned.has(
-                badge.key
-              );
+              const unlocked =
+                earned.has(
+                  badge.key
+                );
 
-            return `
+              return `
 
               <div
                 class="badge ${
@@ -3368,11 +4399,15 @@
                 }">
 
                 <div class="badge-icon">
-                  ${badge.icon}
+                  ${
+                    badge.icon
+                  }
                 </div>
 
                 <div class="badge-name">
-                  ${badge.name}
+                  ${
+                    badge.name
+                  }
                 </div>
 
                 <div
@@ -3382,7 +4417,9 @@
                     font-size:10px;
                   ">
 
-                  ${badge.description}
+                  ${
+                    badge.description
+                  }
 
                 </div>
 
@@ -3390,7 +4427,8 @@
 
             `;
 
-          })
+            }
+          )
           .join("");
     }
 
@@ -3399,14 +4437,20 @@
        ADMIN
     ===================================================== */
 
-    async function loadAdminStats(){
+    async function loadAdminStats(
+      showMessage = true
+    ){
 
       if(
         currentRole !== "admin" &&
         currentRole !== "coach"
       ){
 
-        toast("Yetkin yok.");
+        if(showMessage)
+          toast(
+            "Yetkin yok."
+          );
+
         return;
       }
 
@@ -3434,46 +4478,95 @@
 
             supabaseClient
               .from("study_sessions")
-              .select("minutes,seconds")
+              .select(
+                "minutes,seconds"
+              )
 
           ]);
+
+        if(
+          profilesResult.error
+        )
+          throw profilesResult.error;
+
+        if(
+          questionsResult.error
+        )
+          throw questionsResult.error;
+
+        if(
+          examsResult.error
+        )
+          throw examsResult.error;
+
+        if(
+          sessionsResult.error
+        )
+          throw sessionsResult.error;
 
         document.getElementById(
           "adminUsers"
         ).textContent =
-          profilesResult.data?.length || 0;
+          profilesResult.data
+            ?.length ||
+          0;
 
         document.getElementById(
           "adminQuestions"
         ).textContent =
-          questionsResult.data?.length || 0;
+          questionsResult.data
+            ?.length ||
+          0;
 
         document.getElementById(
           "adminExams"
         ).textContent =
-          examsResult.data?.length || 0;
+          examsResult.data
+            ?.length ||
+          0;
 
         const minutes =
-          (sessionsResult.data || [])
-            .reduce(
-              (sum,s) =>
-                sum +
-                Number(s.minutes || 0) +
-                Number(s.seconds || 0) / 60,
-              0
-            );
+          (
+            sessionsResult.data ||
+            []
+          )
+          .reduce(
+            (
+              sum,
+              s
+            ) =>
+              sum +
+              Number(
+                s.minutes ||
+                0
+              ) +
+              Number(
+                s.seconds ||
+                0
+              ) / 60,
+            0
+          );
 
         document.getElementById(
           "adminMinutes"
         ).textContent =
-          Math.round(minutes);
+          Math.round(
+            minutes
+          );
 
-        toast("Admin istatistikleri güncellendi.");
+        if(showMessage)
+          toast(
+            "Admin istatistikleri güncellendi."
+          );
 
       }catch(error){
 
         console.error(error);
-        toast(error.message);
+
+        if(showMessage)
+          toast(
+            error.message
+          );
       }
     }
 
@@ -3485,18 +4578,29 @@
     function exportData(){
 
       const data = {
+
         version:6,
+
         exportedAt:
-          new Date().toISOString(),
+          new Date()
+            .toISOString(),
 
         profile,
+
         questions,
+
         exams,
+
         wrongs,
+
         topics,
+
         studySessions,
+
         dailyPlan,
+
         badges
+
       };
 
       const blob =
@@ -3509,15 +4613,20 @@
             )
           ],
           {
-            type:"application/json"
+            type:
+              "application/json"
           }
         );
 
       const url =
-        URL.createObjectURL(blob);
+        URL.createObjectURL(
+          blob
+        );
 
       const a =
-        document.createElement("a");
+        document.createElement(
+          "a"
+        );
 
       a.href = url;
 
@@ -3526,18 +4635,25 @@
 
       a.click();
 
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(
+        url
+      );
 
-      toast("Yedek dışa aktarıldı.");
+      toast(
+        "Yedek dışa aktarıldı."
+      );
     }
 
 
-    async function importData(event){
+    async function importData(
+      event
+    ){
 
       const file =
         event.target.files?.[0];
 
-      if(!file) return;
+      if(!file)
+        return;
 
       try{
 
@@ -3548,32 +4664,61 @@
           JSON.parse(text);
 
         if(data.profile)
-          profile = data.profile;
+          profile =
+            data.profile;
 
-        if(Array.isArray(data.questions))
-          questions = data.questions;
+        if(
+          Array.isArray(
+            data.questions
+          )
+        )
+          questions =
+            data.questions;
 
-        if(Array.isArray(data.exams))
-          exams = data.exams;
+        if(
+          Array.isArray(
+            data.exams
+          )
+        )
+          exams =
+            data.exams;
 
-        if(Array.isArray(data.wrongs))
-          wrongs = data.wrongs;
+        if(
+          Array.isArray(
+            data.wrongs
+          )
+        )
+          wrongs =
+            data.wrongs;
 
         if(data.topics)
-          topics = data.topics;
+          topics =
+            data.topics;
 
-        if(Array.isArray(data.studySessions))
-          studySessions = data.studySessions;
+        if(
+          Array.isArray(
+            data.studySessions
+          )
+        )
+          studySessions =
+            data.studySessions;
 
         if(data.dailyPlan)
-          dailyPlan = data.dailyPlan;
+          dailyPlan =
+            data.dailyPlan;
 
-        if(Array.isArray(data.badges))
-          badges = data.badges;
+        if(
+          Array.isArray(
+            data.badges
+          )
+        )
+          badges =
+            data.badges;
 
         saveLocal();
 
         fillProfileUI();
+
         renderAll();
 
         toast(
@@ -3587,6 +4732,7 @@
         toast(
           "Geçersiz JSON dosyası."
         );
+
       }
 
       event.target.value = "";
@@ -3632,7 +4778,9 @@
        HELPERS
     ===================================================== */
 
-    function timeToMinutes(time){
+    function timeToMinutes(
+      time
+    ){
 
       const parts =
         String(time)
@@ -3640,77 +4788,130 @@
           .map(Number);
 
       return (
-        (parts[0] || 0) * 60 +
+        (parts[0] || 0) *
+        60 +
         (parts[1] || 0)
       );
     }
 
 
-    function minutesToTime(total){
+    function minutesToTime(
+      total
+    ){
 
       total =
-        total % 1440;
+        total %
+        1440;
 
       const h =
         Math.floor(
           total / 60
         )
         .toString()
-        .padStart(2,"0");
+        .padStart(
+          2,
+          "0"
+        );
 
       const m =
         (
-          total % 60
+          total %
+          60
         )
         .toString()
-        .padStart(2,"0");
+        .padStart(
+          2,
+          "0"
+        );
 
-      return h + ":" + m;
+      return h +
+        ":" +
+        m;
     }
 
 
-    function escapeHtml(value){
+    function escapeHtml(
+      value
+    ){
 
-      return String(value ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+      return String(
+        value ?? ""
+      )
+        .replaceAll(
+          "&",
+          "&amp;"
+        )
+        .replaceAll(
+          "<",
+          "&lt;"
+        )
+        .replaceAll(
+          ">",
+          "&gt;"
+        )
+        .replaceAll(
+          '"',
+          "&quot;"
+        )
+        .replaceAll(
+          "'",
+          "&#039;"
+        );
     }
 
 
-    function escapeAttr(value){
+    function escapeAttr(
+      value
+    ){
 
-      return String(value ?? "")
-        .replaceAll("\\","\\\\")
-        .replaceAll("'","\\'");
+      return String(
+        value ?? ""
+      )
+        .replaceAll(
+          "\\",
+          "\\\\"
+        )
+        .replaceAll(
+          "'",
+          "\\'"
+        );
     }
 
 
-    let toastTimer = null;
+    let toastTimer =
+      null;
 
-    function toast(message){
+    function toast(
+      message
+    ){
 
       const el =
         document.getElementById(
           "toast"
         );
 
-      el.textContent = message;
+      el.textContent =
+        message;
 
-      el.classList.add("show");
+      el.classList.add(
+        "show"
+      );
 
-      clearTimeout(toastTimer);
+      clearTimeout(
+        toastTimer
+      );
 
       toastTimer =
-        setTimeout(() => {
+        setTimeout(
+          () => {
 
-          el.classList.remove(
-            "show"
-          );
+            el.classList.remove(
+              "show"
+            );
 
-        },2500);
+          },
+          2500
+        );
     }
 
 
@@ -3721,11 +4922,18 @@
     function renderAll(){
 
       renderHome();
+
       renderPlan();
+
       renderQuestions();
+
       renderExams();
+
       renderBadges();
+
       updateTimer();
+
+      updateAdminBadge();
     }
 
 
@@ -3734,12 +4942,10 @@
     ===================================================== */
 
     supabaseClient.auth.onAuthStateChange(
-      async (event, session) => {
-
-        /*
-         * SIGNED_IN:
-         * Normal giriş veya e-posta doğrulama sonrası
-         */
+      async (
+        event,
+        session
+      ) => {
 
         if(
           session &&
@@ -3749,19 +4955,15 @@
           currentUser =
             session.user;
 
-          /*
-           * Email verification sonrası
-           * URL'deki auth bilgilerini Supabase
-           * otomatik olarak işler.
-           */
-
           if(
             document
               .getElementById(
                 "appScreen"
               )
               .classList
-              .contains("hidden")
+              .contains(
+                "hidden"
+              )
           ){
 
             await bootApp();
@@ -3770,7 +4972,11 @@
 
         }else{
 
-          currentUser = null;
+          currentUser =
+            null;
+
+          currentRole =
+            "user";
 
           document
             .getElementById(
@@ -3792,6 +4998,20 @@
             )
             .classList
             .remove("hidden");
+
+          document
+            .getElementById(
+              "adminBadge"
+            )
+            .classList
+            .add("hidden");
+
+          document
+            .getElementById(
+              "adminSection"
+            )
+            .classList
+            .add("hidden");
         }
       }
     );
@@ -3805,18 +5025,25 @@
 
       loadTheme();
 
-      document
-        .getElementById(
-          "examDate"
-        )
-        .value = today();
+      document.getElementById(
+        "examDate"
+      ).value =
+        today();
+
+      switchAuth(
+        "login"
+      );
 
       const {
         data
       } =
-        await supabaseClient.auth.getSession();
+        await supabaseClient
+          .auth
+          .getSession();
 
-      if(data?.session?.user){
+      if(
+        data?.session?.user
+      ){
 
         currentUser =
           data.session.user;
