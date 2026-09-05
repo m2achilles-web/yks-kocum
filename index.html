@@ -2,590 +2,672 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 
-<title>YKS Koçum</title>
+<title>YKS Koçum v2</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
 }
 
-:root {
-    --bg: #f5f6fa;
-    --card: #ffffff;
-    --text: #171923;
-    --muted: #777b87;
-    --primary: #635bff;
-    --primary2: #8b5cf6;
-    --border: #e8e9ef;
-    --success: #22c55e;
-    --danger: #ef4444;
-    --shadow: 0 10px 30px rgba(0,0,0,.07);
+:root{
+    --bg:#f5f6fa;
+    --card:#fff;
+    --text:#171923;
+    --muted:#777b87;
+    --primary:#635bff;
+    --primary2:#8b5cf6;
+    --border:#e7e8ef;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --warning:#f59e0b;
+    --shadow:0 10px 30px rgba(0,0,0,.07);
 }
 
-body.dark {
-    --bg: #101116;
-    --card: #191b22;
-    --text: #f5f5f7;
-    --muted: #9296a3;
-    --border: #292c35;
-    --shadow: 0 10px 30px rgba(0,0,0,.25);
+body.dark{
+    --bg:#101116;
+    --card:#191b22;
+    --text:#f5f5f7;
+    --muted:#9296a3;
+    --border:#292c35;
+    --shadow:0 10px 30px rgba(0,0,0,.25);
 }
 
-body {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
+body{
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
 }
 
-button,
-input,
-select {
-    font: inherit;
+button,input,select{
+    font:inherit;
 }
 
-button {
-    cursor: pointer;
-    border: 0;
+button{
+    border:0;
+    cursor:pointer;
 }
 
-.app {
-    width: 100%;
-    max-width: 1100px;
-    margin: auto;
-    min-height: 100vh;
-    padding-bottom: 90px;
+.app{
+    max-width:1100px;
+    margin:auto;
+    min-height:100vh;
+    padding-bottom:100px;
 }
 
-/* HEADER */
-
-header {
-    padding: 25px 20px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+header{
+    padding:24px 20px 12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 11px;
+.logo{
+    display:flex;
+    align-items:center;
+    gap:11px;
 }
 
-.logo-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    color: white;
-    font-size: 22px;
-    background: linear-gradient(135deg, var(--primary), var(--primary2));
-    box-shadow: 0 8px 20px rgba(99,91,255,.25);
+.logoIcon{
+    width:45px;
+    height:45px;
+    border-radius:15px;
+    display:grid;
+    place-items:center;
+    color:#fff;
+    font-size:22px;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
+    box-shadow:0 8px 20px rgba(99,91,255,.25);
 }
 
-.logo h1 {
-    font-size: 20px;
+.logo h1{
+    font-size:20px;
 }
 
-.logo p {
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 2px;
+.logo p{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:2px;
 }
 
-.theme-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 13px;
-    background: var(--card);
-    color: var(--text);
-    box-shadow: var(--shadow);
+.theme{
+    width:43px;
+    height:43px;
+    border-radius:14px;
+    background:var(--card);
+    color:var(--text);
+    box-shadow:var(--shadow);
 }
 
-/* CONTENT */
-
-main {
-    padding: 15px 20px;
+main{
+    padding:12px 20px;
 }
 
-.page {
-    display: none;
-    animation: fade .25s ease;
+.page{
+    display:none;
+    animation:fade .25s ease;
 }
 
-.page.active {
-    display: block;
+.page.active{
+    display:block;
 }
 
-@keyframes fade {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(6px);
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    to{
+        opacity:1;
+        transform:none;
     }
 }
 
-.greeting {
-    margin: 15px 0 20px;
+.greeting{
+    margin:14px 0 20px;
 }
 
-.greeting h2 {
-    font-size: 27px;
-    margin-bottom: 5px;
+.greeting h2{
+    font-size:28px;
 }
 
-.greeting p {
-    color: var(--muted);
+.greeting p{
+    color:var(--muted);
+    margin-top:4px;
 }
 
-/* DASHBOARD */
-
-.hero {
-    border-radius: 24px;
-    padding: 24px;
-    color: white;
-    background: linear-gradient(135deg, #635bff, #8b5cf6);
-    box-shadow: 0 15px 35px rgba(99,91,255,.22);
-    margin-bottom: 16px;
+.hero{
+    padding:24px;
+    border-radius:25px;
+    color:#fff;
+    background:linear-gradient(135deg,#635bff,#8b5cf6);
+    box-shadow:0 15px 35px rgba(99,91,255,.23);
+    margin-bottom:15px;
 }
 
-.hero small {
-    opacity: .8;
+.hero small{
+    opacity:.75;
 }
 
-.hero h2 {
-    font-size: 25px;
-    margin: 7px 0;
+.hero h2{
+    font-size:25px;
+    margin:7px 0;
 }
 
-.hero p {
-    opacity: .85;
-    font-size: 14px;
+.hero p{
+    opacity:.85;
+    font-size:14px;
 }
 
-.hero-grid {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 10px;
-    margin-top: 20px;
+.heroStats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin-top:20px;
 }
 
-.hero-stat {
-    background: rgba(255,255,255,.13);
-    border-radius: 15px;
-    padding: 13px;
+.heroStat{
+    background:rgba(255,255,255,.13);
+    border-radius:15px;
+    padding:13px;
 }
 
-.hero-stat strong {
-    display: block;
-    font-size: 18px;
+.heroStat strong{
+    display:block;
+    font-size:18px;
 }
 
-.hero-stat span {
-    font-size: 11px;
-    opacity: .75;
+.heroStat span{
+    font-size:11px;
+    opacity:.75;
 }
 
-.stats {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 12px;
-    margin-bottom: 18px;
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:11px;
+    margin-bottom:16px;
 }
 
-.stat {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 17px;
-    box-shadow: var(--shadow);
+.stat{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:15px;
+    box-shadow:var(--shadow);
 }
 
-.stat-icon {
-    font-size: 21px;
-    margin-bottom: 8px;
+.statIcon{
+    font-size:20px;
+    margin-bottom:7px;
 }
 
-.stat strong {
-    display: block;
-    font-size: 21px;
+.stat strong{
+    display:block;
+    font-size:20px;
 }
 
-.stat span {
-    color: var(--muted);
-    font-size: 12px;
+.stat span{
+    color:var(--muted);
+    font-size:11px;
 }
 
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 16px;
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:var(--shadow);
+    margin-bottom:15px;
 }
 
-.card-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+.cardTitle{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
 }
 
-.card-title h3 {
-    font-size: 17px;
+.cardTitle h3{
+    font-size:17px;
 }
 
-.card-title button {
-    background: transparent;
-    color: var(--primary);
-    font-size: 13px;
+.cardTitle button{
+    background:transparent;
+    color:var(--primary);
+    font-size:13px;
+}
+
+.sectionTitle{
+    margin:10px 0 20px;
+}
+
+.sectionTitle h2{
+    font-size:27px;
+}
+
+.sectionTitle p{
+    color:var(--muted);
+    font-size:14px;
+    margin-top:4px;
+}
+
+.formGrid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:13px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.field.full{
+    grid-column:1/-1;
+}
+
+.field label{
+    font-size:12px;
+    color:var(--muted);
+}
+
+.field input,
+.field select{
+    width:100%;
+    padding:13px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text);
+    outline:none;
+}
+
+.field input:focus,
+.field select:focus{
+    border-color:var(--primary);
+}
+
+.primary{
+    margin-top:15px;
+    padding:13px 18px;
+    border-radius:12px;
+    color:#fff;
+    font-weight:600;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
+}
+
+.secondary{
+    padding:12px 16px;
+    border-radius:12px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    color:var(--text);
+}
+
+.danger{
+    color:var(--danger);
+    background:transparent;
 }
 
 /* TASK */
 
-.task {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
+.task{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid var(--border);
 }
 
-.task:last-child {
-    border-bottom: 0;
+.task:last-child{
+    border-bottom:0;
 }
 
-.check {
-    width: 25px;
-    height: 25px;
-    min-width: 25px;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    background: transparent;
-    color: white;
+.check{
+    width:26px;
+    height:26px;
+    min-width:26px;
+    border:2px solid var(--border);
+    border-radius:8px;
+    background:transparent;
+    color:#fff;
 }
 
-.task.done .check {
-    background: var(--success);
-    border-color: var(--success);
+.task.done .check{
+    background:var(--success);
+    border-color:var(--success);
 }
 
-.task-info {
-    flex: 1;
+.taskInfo{
+    flex:1;
 }
 
-.task-info strong {
-    display: block;
-    font-size: 14px;
+.taskInfo strong{
+    display:block;
+    font-size:14px;
 }
 
-.task-info span {
-    font-size: 12px;
-    color: var(--muted);
+.taskInfo span{
+    color:var(--muted);
+    font-size:12px;
 }
 
-.task.done .task-info strong {
-    text-decoration: line-through;
-    opacity: .5;
+.task.done .taskInfo strong{
+    text-decoration:line-through;
+    opacity:.5;
 }
 
-/* PAGES */
+/* QUESTIONS */
 
-.section-title {
-    margin: 10px 0 20px;
+.questionStats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:9px;
+    margin-top:16px;
 }
 
-.section-title h2 {
-    font-size: 26px;
+.qStat{
+    background:var(--bg);
+    padding:12px 5px;
+    text-align:center;
+    border-radius:12px;
 }
 
-.section-title p {
-    color: var(--muted);
-    font-size: 14px;
-    margin-top: 4px;
+.qStat strong{
+    display:block;
+    font-size:18px;
 }
 
-/* FORMS */
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
-    gap: 13px;
+.qStat span{
+    color:var(--muted);
+    font-size:10px;
 }
 
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
+.questionRow{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0;
+    border-bottom:1px solid var(--border);
 }
 
-.field.full {
-    grid-column: 1 / -1;
+.questionRow:last-child{
+    border-bottom:0;
 }
 
-.field label {
-    font-size: 12px;
-    color: var(--muted);
+.questionRow strong{
+    font-size:14px;
 }
 
-.field input,
-.field select {
-    width: 100%;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    padding: 13px;
-    border-radius: 12px;
-    outline: none;
+.questionRow small{
+    color:var(--muted);
 }
 
-.field input:focus,
-.field select:focus {
-    border-color: var(--primary);
+/* TIMER */
+
+.timer{
+    text-align:center;
+    padding:25px 10px;
 }
 
-.primary-btn {
-    background: linear-gradient(135deg, var(--primary), var(--primary2));
-    color: white;
-    padding: 13px 18px;
-    border-radius: 12px;
-    font-weight: 600;
-    margin-top: 15px;
+.timerCircle{
+    width:230px;
+    height:230px;
+    border:10px solid var(--primary);
+    border-radius:50%;
+    margin:10px auto 25px;
+    display:grid;
+    place-items:center;
 }
 
-.secondary-btn {
-    background: var(--bg);
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 12px 16px;
-    border-radius: 12px;
+.timerTime{
+    font-size:48px;
+    font-weight:700;
 }
 
-/* POMODORO */
-
-.timer {
-    text-align: center;
-    padding: 25px 10px;
+.timerMode{
+    color:var(--muted);
+    font-size:13px;
 }
 
-.timer-circle {
-    width: 230px;
-    height: 230px;
-    margin: 10px auto 25px;
-    border-radius: 50%;
-    border: 10px solid var(--primary);
-    display: grid;
-    place-items: center;
+.timerButtons{
+    display:flex;
+    justify-content:center;
+    gap:10px;
 }
 
-.timer-time {
-    font-size: 48px;
-    font-weight: 700;
-    letter-spacing: 2px;
+/* EXAM */
+
+.exam{
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:12px;
 }
 
-.timer-mode {
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 4px;
+.examTop{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:12px;
 }
 
-.timer-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+.examTop span{
+    color:var(--muted);
+    font-size:12px;
 }
 
-/* DENEME */
-
-.exam {
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 12px;
+.nets{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:7px;
 }
 
-.exam-top {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
+.net{
+    background:var(--bg);
+    padding:9px;
+    border-radius:10px;
+    text-align:center;
 }
 
-.exam-top strong {
-    font-size: 15px;
+.net strong{
+    display:block;
 }
 
-.exam-top span {
-    font-size: 12px;
-    color: var(--muted);
-}
-
-.nets {
-    display: grid;
-    grid-template-columns: repeat(4,1fr);
-    gap: 7px;
-}
-
-.net {
-    background: var(--bg);
-    border-radius: 10px;
-    padding: 9px;
-    text-align: center;
-}
-
-.net strong {
-    display: block;
-    font-size: 15px;
-}
-
-.net span {
-    font-size: 10px;
-    color: var(--muted);
+.net span{
+    color:var(--muted);
+    font-size:10px;
 }
 
 /* TOPICS */
 
-.topic {
-    margin-bottom: 17px;
+.topic{
+    margin-bottom:17px;
 }
 
-.topic-top {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    margin-bottom: 7px;
+.topicTop{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:7px;
+    font-size:13px;
 }
 
-.topic-top span {
-    color: var(--muted);
+.topicTop span{
+    color:var(--muted);
 }
 
-.progress {
-    width: 100%;
-    height: 8px;
-    background: var(--border);
-    border-radius: 20px;
-    overflow: hidden;
+.topicTop button{
+    color:var(--primary);
+    background:transparent;
+    font-size:12px;
 }
 
-.progress-bar {
-    height: 100%;
-    border-radius: 20px;
-    background: linear-gradient(90deg,var(--primary),var(--primary2));
+.progress{
+    width:100%;
+    height:8px;
+    background:var(--border);
+    border-radius:20px;
+    overflow:hidden;
 }
 
-/* NAV */
-
-.bottom-nav {
-    position: fixed;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 24px);
-    max-width: 700px;
-    background: rgba(255,255,255,.9);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border-radius: 22px;
-    padding: 8px;
-    display: grid;
-    grid-template-columns: repeat(5,1fr);
-    z-index: 50;
-    box-shadow: 0 12px 35px rgba(0,0,0,.12);
+.progressBar{
+    height:100%;
+    background:linear-gradient(90deg,var(--primary),var(--primary2));
+    border-radius:20px;
 }
 
-body.dark .bottom-nav {
-    background: rgba(25,27,34,.9);
+/* PLAN */
+
+.planItem{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:13px 0;
+    border-bottom:1px solid var(--border);
 }
 
-.nav-btn {
-    background: transparent;
-    color: var(--muted);
-    border-radius: 15px;
-    padding: 8px 3px;
-    font-size: 10px;
+.planItem:last-child{
+    border-bottom:0;
 }
 
-.nav-btn div {
-    font-size: 20px;
-    margin-bottom: 3px;
+.planTime{
+    width:55px;
+    color:var(--primary);
+    font-weight:700;
+    font-size:13px;
 }
 
-.nav-btn.active {
-    color: var(--primary);
-    background: rgba(99,91,255,.08);
+.planInfo{
+    flex:1;
+}
+
+.planInfo strong{
+    display:block;
+    font-size:14px;
+}
+
+.planInfo span{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.delete{
+    background:transparent;
+    color:var(--muted);
+    font-size:18px;
 }
 
 /* EMPTY */
 
-.empty {
-    text-align: center;
-    padding: 25px 10px;
-    color: var(--muted);
+.empty{
+    text-align:center;
+    padding:25px 10px;
+    color:var(--muted);
 }
 
-/* RESPONSIVE */
+/* NAV */
 
-@media(max-width:650px) {
-    .stats {
-        grid-template-columns: repeat(3,1fr);
-    }
-
-    .hero-grid {
-        grid-template-columns: repeat(3,1fr);
-    }
-
-    .stat {
-        padding: 13px 10px;
-    }
-
-    .stat strong {
-        font-size: 17px;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .field.full {
-        grid-column: auto;
-    }
+.bottomNav{
+    position:fixed;
+    z-index:100;
+    left:50%;
+    bottom:12px;
+    transform:translateX(-50%);
+    width:calc(100% - 24px);
+    max-width:700px;
+    padding:8px;
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:2px;
+    border:1px solid var(--border);
+    border-radius:23px;
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(18px);
+    box-shadow:0 12px 35px rgba(0,0,0,.12);
 }
 
-@media(max-width:400px) {
-    main {
-        padding: 12px;
+body.dark .bottomNav{
+    background:rgba(25,27,34,.9);
+}
+
+.navBtn{
+    padding:8px 2px;
+    border-radius:15px;
+    background:transparent;
+    color:var(--muted);
+    font-size:9px;
+}
+
+.navBtn div{
+    font-size:19px;
+    margin-bottom:3px;
+}
+
+.navBtn.active{
+    color:var(--primary);
+    background:rgba(99,91,255,.08);
+}
+
+@media(max-width:700px){
+
+    main{
+        padding:10px 14px;
     }
 
-    header {
-        padding-left: 12px;
-        padding-right: 12px;
+    header{
+        padding:20px 14px 10px;
     }
 
-    .hero {
-        padding: 20px;
+    .stats{
+        grid-template-columns:repeat(2,1fr);
     }
 
-    .timer-circle {
-        width: 205px;
-        height: 205px;
+}
+
+@media(max-width:450px){
+
+    .formGrid{
+        grid-template-columns:1fr;
     }
 
-    .timer-time {
-        font-size: 42px;
+    .field.full{
+        grid-column:auto;
+    }
+
+    .hero{
+        padding:20px;
+    }
+
+    .heroStats{
+        gap:6px;
+    }
+
+    .heroStat{
+        padding:11px 7px;
+    }
+
+    .heroStat strong{
+        font-size:16px;
+    }
+
+    .timerCircle{
+        width:205px;
+        height:205px;
+    }
+
+    .timerTime{
+        font-size:42px;
+    }
+
+    .bottomNav{
+        width:calc(100% - 14px);
+        bottom:7px;
     }
 }
 </style>
@@ -596,271 +678,508 @@ body.dark .bottom-nav {
 <div class="app">
 
 <header>
-    <div class="logo">
-        <div class="logo-icon">🎓</div>
-        <div>
-            <h1>YKS Koçum</h1>
-            <p>Hedefine birlikte ilerliyoruz.</p>
-        </div>
-    </div>
 
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+<div class="logo">
+    <div class="logoIcon">🎓</div>
+
+    <div>
+        <h1>YKS Koçum</h1>
+        <p>Hedefine birlikte ilerliyoruz.</p>
+    </div>
+</div>
+
+<button class="theme" onclick="toggleTheme()" id="themeBtn">🌙</button>
+
 </header>
 
 <main>
 
-<!-- ANA SAYFA -->
+<!-- ================= HOME ================= -->
 
 <section class="page active" id="home">
 
-    <div class="greeting">
-        <h2>Merhaba 👋</h2>
-        <p>Bugün hedefin için ne yaptın?</p>
-    </div>
+<div class="greeting">
+    <h2>Merhaba 👋</h2>
+    <p>Bugün hedefin için ne yaptın?</p>
+</div>
 
-    <div class="hero">
-        <small>🎯 HEDEFİN</small>
-        <h2 id="targetText">Hedefini belirle</h2>
-        <p id="rankText">Henüz bir hedef sıralaması eklenmedi.</p>
+<div class="hero">
 
-        <div class="hero-grid">
-            <div class="hero-stat">
-                <strong id="dayCount">--</strong>
-                <span>gün kaldı</span>
-            </div>
+<small>🎯 HEDEFİN</small>
 
-            <div class="hero-stat">
-                <strong id="todayStudy">0 dk</strong>
-                <span>bugün çalışma</span>
-            </div>
+<h2 id="targetTitle">
+    Hedefini belirle
+</h2>
 
-            <div class="hero-stat">
-                <strong id="taskCount">0/0</strong>
-                <span>görev</span>
-            </div>
-        </div>
-    </div>
+<p id="targetSub">
+    Hedef bilgilerini ayarlardan oluşturabilirsin.
+</p>
 
-    <div class="stats">
+<div class="heroStats">
 
-        <div class="stat">
-            <div class="stat-icon">📚</div>
-            <strong id="topicPercent">0%</strong>
-            <span>Konu ilerleme</span>
-        </div>
+<div class="heroStat">
+    <strong id="daysLeft">--</strong>
+    <span>gün kaldı</span>
+</div>
 
-        <div class="stat">
-            <div class="stat-icon">📝</div>
-            <strong id="examCount">0</strong>
-            <span>Deneme</span>
-        </div>
+<div class="heroStat">
+    <strong id="studyToday">0 dk</strong>
+    <span>bugün çalışma</span>
+</div>
 
-        <div class="stat">
-            <div class="stat-icon">🔥</div>
-            <strong id="streak">0</strong>
-            <span>Gün serisi</span>
-        </div>
+<div class="heroStat">
+    <strong id="questionsToday">0</strong>
+    <span>bugün soru</span>
+</div>
 
-    </div>
+</div>
 
-    <div class="card">
-        <div class="card-title">
-            <h3>📚 Bugünkü Plan</h3>
-            <button onclick="showPage('plan')">Tümünü Gör</button>
-        </div>
+</div>
 
-        <div id="homeTasks"></div>
-    </div>
+<div class="stats">
+
+<div class="stat">
+    <div class="statIcon">📚</div>
+    <strong id="topicProgress">0%</strong>
+    <span>Konu ilerleme</span>
+</div>
+
+<div class="stat">
+    <div class="statIcon">📝</div>
+    <strong id="examTotal">0</strong>
+    <span>Deneme</span>
+</div>
+
+<div class="stat">
+    <div class="statIcon">🔥</div>
+    <strong id="streak">0</strong>
+    <span>Gün serisi</span>
+</div>
+
+<div class="stat">
+    <div class="statIcon">🎯</div>
+    <strong id="dailyGoal">0%</strong>
+    <span>Günlük hedef</span>
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+    <h3>📚 Bugünkü Plan</h3>
+    <button onclick="showPage('plan',this)">Tümünü Gör</button>
+</div>
+
+<div id="homeTasks"></div>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+    <h3>📝 Bugünkü Sorular</h3>
+    <button onclick="showPage('questions',this)">Ekle</button>
+</div>
+
+<div id="todayQuestionSummary"></div>
+
+</div>
 
 </section>
 
 
-<!-- PLAN -->
+<!-- ================= PLAN ================= -->
 
 <section class="page" id="plan">
 
-    <div class="section-title">
-        <h2>📚 Çalışma Planı</h2>
-        <p>Bugünkü görevlerini tamamla.</p>
-    </div>
+<div class="sectionTitle">
+    <h2>📅 Çalışma Planı</h2>
+    <p>Bugünkü çalışma programını oluştur.</p>
+</div>
 
-    <div class="card">
+<div class="card">
 
-        <div class="form-grid">
+<div class="cardTitle">
+    <h3>⚡ Otomatik Plan</h3>
+</div>
 
-            <div class="field">
-                <label>Ders</label>
-                <select id="taskSubject">
-                    <option>Matematik</option>
-                    <option>Türkçe</option>
-                    <option>Fizik</option>
-                    <option>Kimya</option>
-                    <option>Biyoloji</option>
-                    <option>Tarih</option>
-                    <option>Coğrafya</option>
-                </select>
-            </div>
+<div class="formGrid">
 
-            <div class="field">
-                <label>Süre (dakika)</label>
-                <input id="taskDuration" type="number" value="45" min="5">
-            </div>
+<div class="field">
+<label>Günlük çalışma</label>
 
-            <div class="field full">
-                <label>Konu</label>
-                <input id="taskTitle" placeholder="Örn. Problemler">
-            </div>
+<select id="planHours">
+<option value="2">2 saat</option>
+<option value="3">3 saat</option>
+<option value="4" selected>4 saat</option>
+<option value="5">5 saat</option>
+<option value="6">6 saat</option>
+<option value="7">7 saat</option>
+<option value="8">8 saat</option>
+</select>
 
-        </div>
+</div>
 
-        <button class="primary-btn" onclick="addTask()">+ Görev Ekle</button>
+<div class="field">
+<label>Başlangıç saati</label>
 
-    </div>
+<input id="startTime" type="time" value="09:00">
 
-    <div class="card">
-        <div class="card-title">
-            <h3>Bugünün Görevleri</h3>
-        </div>
+</div>
 
-        <div id="allTasks"></div>
-    </div>
+<div class="field full">
+
+<label>Dersler</label>
+
+<select id="planSubjects" multiple style="height:100px">
+
+<option selected>Matematik</option>
+<option selected>Türkçe</option>
+<option>Fizik</option>
+<option>Kimya</option>
+<option>Biyoloji</option>
+<option>Tarih</option>
+<option>Coğrafya</option>
+
+</select>
+
+</div>
+
+</div>
+
+<button class="primary" onclick="generatePlan()">
+    ✨ Otomatik Plan Oluştur
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+    <h3>📚 Görevler</h3>
+</div>
+
+<div id="allTasks"></div>
+
+</div>
 
 </section>
 
 
-<!-- POMODORO -->
+<!-- ================= QUESTIONS ================= -->
+
+<section class="page" id="questions">
+
+<div class="sectionTitle">
+    <h2>📝 Soru Takibi</h2>
+    <p>Çözdüğün soruları kaydet.</p>
+</div>
+
+<div class="card">
+
+<div class="formGrid">
+
+<div class="field">
+<label>Ders</label>
+
+<select id="questionSubject">
+<option>Matematik</option>
+<option>Türkçe</option>
+<option>Fizik</option>
+<option>Kimya</option>
+<option>Biyoloji</option>
+<option>Tarih</option>
+<option>Coğrafya</option>
+</select>
+
+</div>
+
+<div class="field">
+<label>Toplam soru</label>
+
+<input id="questionTotal" type="number" min="0" value="20">
+
+</div>
+
+<div class="field">
+<label>Doğru</label>
+
+<input id="questionCorrect" type="number" min="0" value="15">
+
+</div>
+
+<div class="field">
+<label>Yanlış</label>
+
+<input id="questionWrong" type="number" min="0" value="5">
+
+</div>
+
+<div class="field full">
+<label>Boş</label>
+
+<input id="questionBlank" type="number" min="0" value="0">
+
+</div>
+
+</div>
+
+<button class="primary" onclick="addQuestion()">
+    + Sonucu Kaydet
+</button>
+
+<div class="questionStats">
+
+<div class="qStat">
+<strong id="qTotal">0</strong>
+<span>Soru</span>
+</div>
+
+<div class="qStat">
+<strong id="qCorrect">0</strong>
+<span>Doğru</span>
+</div>
+
+<div class="qStat">
+<strong id="qWrong">0</strong>
+<span>Yanlış</span>
+</div>
+
+<div class="qStat">
+<strong id="qNet">0</strong>
+<span>Net</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+    <h3>Geçmiş Sorular</h3>
+</div>
+
+<div id="questionList"></div>
+
+</div>
+
+</section>
+
+
+<!-- ================= TIMER ================= -->
 
 <section class="page" id="timerPage">
 
-    <div class="section-title">
-        <h2>⏱️ Odaklan</h2>
-        <p>Dikkatini dağıtma, hedefe odaklan.</p>
-    </div>
+<div class="sectionTitle">
+<h2>⏱️ Odaklan</h2>
+<p>Dikkatini dağıtma, hedefe odaklan.</p>
+</div>
 
-    <div class="card timer">
+<div class="card timer">
 
-        <div class="timer-circle">
+<div class="timerCircle">
 
-            <div>
-                <div class="timer-time" id="timer">25:00</div>
-                <div class="timer-mode">Odaklanma</div>
-            </div>
+<div>
 
-        </div>
+<div class="timerTime" id="timer">
+25:00
+</div>
 
-        <div class="timer-buttons">
-            <button class="primary-btn" onclick="startTimer()" id="timerStart">
-                ▶ Başlat
-            </button>
+<div class="timerMode">
+Odaklanma
+</div>
 
-            <button class="secondary-btn" onclick="resetTimer()">
-                ↻
-            </button>
-        </div>
+</div>
 
-    </div>
+</div>
 
-    <div class="card">
-        <div class="card-title">
-            <h3>💡 Mini Tavsiye</h3>
-        </div>
+<div class="timerButtons">
 
-        <p style="color:var(--muted);font-size:14px;line-height:1.6">
-            Telefonunu sessize al, masandaki gereksiz şeyleri kaldır ve
-            sadece önündeki konuya odaklan. Küçük adımlar büyük sonuçlar getirir. 🚀
-        </p>
-    </div>
+<button class="primary" onclick="startTimer()" id="timerBtn">
+▶ Başlat
+</button>
+
+<button class="secondary" onclick="resetTimer()">
+↻
+</button>
+
+</div>
+
+</div>
 
 </section>
 
 
-<!-- DENEMELER -->
+<!-- ================= EXAMS ================= -->
 
 <section class="page" id="exams">
 
-    <div class="section-title">
-        <h2>📝 Denemeler</h2>
-        <p>Netlerini kaydet ve gelişimini takip et.</p>
-    </div>
+<div class="sectionTitle">
+<h2>📝 Denemeler</h2>
+<p>Netlerini kaydet ve gelişimini takip et.</p>
+</div>
 
-    <div class="card">
+<div class="card">
 
-        <div class="form-grid">
+<div class="formGrid">
 
-            <div class="field full">
-                <label>Deneme adı</label>
-                <input id="examName" placeholder="Örn. TYT Denemesi #1">
-            </div>
+<div class="field full">
+<label>Deneme adı</label>
+<input id="examName" placeholder="TYT Denemesi #1">
+</div>
 
-            <div class="field">
-                <label>Türkçe Net</label>
-                <input id="turkce" type="number" step="0.25" value="0">
-            </div>
+<div class="field">
+<label>Türkçe</label>
+<input id="examTurkish" type="number" step=".25" value="0">
+</div>
 
-            <div class="field">
-                <label>Matematik Net</label>
-                <input id="matematik" type="number" step="0.25" value="0">
-            </div>
+<div class="field">
+<label>Matematik</label>
+<input id="examMath" type="number" step=".25" value="0">
+</div>
 
-            <div class="field">
-                <label>Fen Net</label>
-                <input id="fen" type="number" step="0.25" value="0">
-            </div>
+<div class="field">
+<label>Fen</label>
+<input id="examScience" type="number" step=".25" value="0">
+</div>
 
-            <div class="field">
-                <label>Sosyal Net</label>
-                <input id="sosyal" type="number" step="0.25" value="0">
-            </div>
+<div class="field">
+<label>Sosyal</label>
+<input id="examSocial" type="number" step=".25" value="0">
+</div>
 
-        </div>
+</div>
 
-        <button class="primary-btn" onclick="addExam()">+ Deneme Kaydet</button>
+<button class="primary" onclick="addExam()">
++ Deneme Kaydet
+</button>
 
-    </div>
+</div>
 
-    <div class="card">
+<div class="card">
 
-        <div class="card-title">
-            <h3>Geçmiş Denemeler</h3>
-        </div>
+<div class="cardTitle">
+<h3>Geçmiş Denemeler</h3>
+</div>
 
-        <div id="examList"></div>
+<div id="examList"></div>
 
-    </div>
+</div>
 
 </section>
 
 
-<!-- KONULAR -->
+<!-- ================= TOPICS ================= -->
 
 <section class="page" id="topics">
 
-    <div class="section-title">
-        <h2>🧠 Konu Takibi</h2>
-        <p>YKS konularındaki ilerlemeni gör.</p>
-    </div>
+<div class="sectionTitle">
+<h2>🧠 Konu Takibi</h2>
+<p>Konularını tamamladıkça işaretle.</p>
+</div>
 
-    <div class="card">
+<div class="card">
 
-        <div class="card-title">
-            <h3>TYT Matematik</h3>
-            <span id="mathPercent">0%</span>
-        </div>
+<div class="cardTitle">
+<h3>TYT Matematik</h3>
+<strong id="mathPercent">0%</strong>
+</div>
 
-        <div id="mathTopics"></div>
+<div id="mathTopics"></div>
 
-    </div>
+</div>
 
-    <div class="card">
+<div class="card">
 
-        <div class="card-title">
-            <h3>TYT Türkçe</h3>
-            <span id="turkishPercent">0%</span>
-        </div>
+<div class="cardTitle">
+<h3>TYT Türkçe</h3>
+<strong id="turkishPercent">0%</strong>
+</div>
 
-        <div id="turkishTopics"></div>
+<div id="turkishTopics"></div>
 
-    </div>
+</div>
+
+</section>
+
+
+<!-- ================= SETTINGS ================= -->
+
+<section class="page" id="settings">
+
+<div class="sectionTitle">
+<h2>🎯 Hedefim</h2>
+<p>YKS hedeflerini buradan belirle.</p>
+</div>
+
+<div class="card">
+
+<div class="formGrid">
+
+<div class="field">
+<label>Alan</label>
+
+<select id="targetField">
+<option>Sayısal</option>
+<option>Eşit Ağırlık</option>
+<option>Sözel</option>
+<option>Dil</option>
+</select>
+
+</div>
+
+<div class="field">
+<label>Sınav tarihi</label>
+
+<input id="examDate" type="date">
+
+</div>
+
+<div class="field full">
+<label>Üniversite</label>
+
+<input id="targetUniversity" placeholder="Örn. İstanbul Teknik Üniversitesi">
+
+</div>
+
+<div class="field full">
+<label>Bölüm</label>
+
+<input id="targetDepartment" placeholder="Örn. Bilgisayar Mühendisliği">
+
+</div>
+
+<div class="field">
+<label>Hedef sıralama</label>
+
+<input id="targetRank" type="number" placeholder="20000">
+
+</div>
+
+<div class="field">
+<label>Günlük çalışma hedefi</label>
+
+<select id="targetHours">
+<option value="2">2 saat</option>
+<option value="3">3 saat</option>
+<option value="4">4 saat</option>
+<option value="5">5 saat</option>
+<option value="6">6 saat</option>
+<option value="7">7 saat</option>
+<option value="8">8 saat</option>
+</select>
+
+</div>
+
+</div>
+
+<button class="primary" onclick="saveTarget()">
+💾 Hedefimi Kaydet
+</button>
+
+</div>
 
 </section>
 
@@ -869,34 +1188,39 @@ body.dark .bottom-nav {
 </div>
 
 
-<!-- ALT MENÜ -->
+<!-- NAV -->
 
-<nav class="bottom-nav">
+<nav class="bottomNav">
 
-    <button class="nav-btn active" onclick="showPage('home',this)">
-        <div>🏠</div>
-        Ana Sayfa
-    </button>
+<button class="navBtn active" onclick="showPage('home',this)">
+<div>🏠</div>
+Ana Sayfa
+</button>
 
-    <button class="nav-btn" onclick="showPage('plan',this)">
-        <div>📚</div>
-        Plan
-    </button>
+<button class="navBtn" onclick="showPage('plan',this)">
+<div>📅</div>
+Plan
+</button>
 
-    <button class="nav-btn" onclick="showPage('timerPage',this)">
-        <div>⏱️</div>
-        Odak
-    </button>
+<button class="navBtn" onclick="showPage('questions',this)">
+<div>📝</div>
+Sorular
+</button>
 
-    <button class="nav-btn" onclick="showPage('exams',this)">
-        <div>📝</div>
-        Deneme
-    </button>
+<button class="navBtn" onclick="showPage('timerPage',this)">
+<div>⏱️</div>
+Odak
+</button>
 
-    <button class="nav-btn" onclick="showPage('topics',this)">
-        <div>🧠</div>
-        Konular
-    </button>
+<button class="navBtn" onclick="showPage('topics',this)">
+<div>🧠</div>
+Konular
+</button>
+
+<button class="navBtn" onclick="showPage('settings',this)">
+<div>🎯</div>
+Hedef
+</button>
 
 </nav>
 
@@ -904,62 +1228,113 @@ body.dark .bottom-nav {
 <script>
 
 /* =========================
-   VERİLER
+   DATA
 ========================= */
 
-let data = JSON.parse(localStorage.getItem("yksKocum")) || {
+let data =
+JSON.parse(localStorage.getItem("yksKocumV2")) || {
 
-    target: {
-        school: "",
-        department: "",
-        rank: "",
-        examDate: "2027-06-20"
+    target:{
+        field:"Sayısal",
+        university:"",
+        department:"",
+        rank:"",
+        examDate:"2027-06-20",
+        hours:4
     },
 
-    tasks: [],
+    tasks:[],
+    questions:[],
+    exams:[],
 
-    exams: [],
-
-    topics: {
-        math: [],
-        turkish: []
+    topics:{
+        math:[],
+        turkish:[]
     }
 
 };
 
 
 /* =========================
-   SAYFA
+   DEFAULT TOPICS
 ========================= */
 
-function showPage(id, button) {
+const mathTopics = [
 
-    document.querySelectorAll(".page").forEach(page => {
-        page.classList.remove("active");
-    });
+"Temel Kavramlar",
+"Sayılar",
+"Bölme ve Bölünebilme",
+"EBOB - EKOK",
+"Rasyonel Sayılar",
+"Üslü Sayılar",
+"Köklü Sayılar",
+"Oran - Orantı",
+"Problemler",
+"Kümeler",
+"Fonksiyonlar",
+"Permütasyon",
+"Kombinasyon",
+"Olasılık",
+"Veri - İstatistik"
 
-    document.getElementById(id).classList.add("active");
+];
 
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-        btn.classList.remove("active");
-    });
+const turkishTopics = [
 
-    if(button) {
-        button.classList.add("active");
+"Sözcükte Anlam",
+"Cümlede Anlam",
+"Paragraf",
+"Ses Bilgisi",
+"Yazım Kuralları",
+"Noktalama",
+"Sözcük Türleri",
+"Fiiller",
+"Cümlenin Ögeleri",
+"Cümle Türleri",
+"Anlatım Bozuklukları"
+
+];
+
+
+/* =========================
+   INIT
+========================= */
+
+function initTopics(){
+
+    if(!data.topics.math.length){
+
+        data.topics.math =
+        mathTopics.map(name=>({
+            name,
+            done:false
+        }));
+
     }
 
-    window.scrollTo(0,0);
+    if(!data.topics.turkish.length){
+
+        data.topics.turkish =
+        turkishTopics.map(name=>({
+            name,
+            done:false
+        }));
+
+    }
+
+    save();
+
 }
 
 
 /* =========================
-   KAYDET
+   SAVE
 ========================= */
 
-function save() {
+function save(){
 
     localStorage.setItem(
-        "yksKocum",
+        "yksKocumV2",
         JSON.stringify(data)
     );
 
@@ -967,216 +1342,398 @@ function save() {
 
 
 /* =========================
-   TEMA
+   NAVIGATION
 ========================= */
 
-function toggleTheme() {
+function showPage(id,button){
+
+    document
+    .querySelectorAll(".page")
+    .forEach(p=>p.classList.remove("active"));
+
+    document
+    .getElementById(id)
+    .classList.add("active");
+
+    document
+    .querySelectorAll(".navBtn")
+    .forEach(b=>b.classList.remove("active"));
+
+    if(button){
+        button.classList.add("active");
+    }
+
+    window.scrollTo(0,0);
+
+}
+
+
+/* =========================
+   THEME
+========================= */
+
+function toggleTheme(){
 
     document.body.classList.toggle("dark");
 
     const dark =
-        document.body.classList.contains("dark");
+    document.body.classList.contains("dark");
 
-    localStorage.setItem("yksDark", dark);
+    localStorage.setItem(
+        "yksDark",
+        dark
+    );
 
     document.getElementById("themeBtn").textContent =
-        dark ? "☀️" : "🌙";
+    dark ? "☀️" : "🌙";
+
 }
 
-if(localStorage.getItem("yksDark") === "true") {
+
+if(localStorage.getItem("yksDark")==="true"){
 
     document.body.classList.add("dark");
 
-    document.getElementById("themeBtn").textContent = "☀️";
+    document.getElementById("themeBtn").textContent="☀️";
 
 }
 
 
 /* =========================
-   GÜN SAYACI
+   TARGET
 ========================= */
 
-function updateCountdown() {
+function saveTarget(){
 
-    const exam =
-        new Date(data.target.examDate + "T00:00:00");
+    data.target.field =
+    document.getElementById("targetField").value;
 
-    const now = new Date();
+    data.target.university =
+    document.getElementById("targetUniversity").value.trim();
 
-    const diff = exam - now;
+    data.target.department =
+    document.getElementById("targetDepartment").value.trim();
+
+    data.target.rank =
+    document.getElementById("targetRank").value;
+
+    data.target.examDate =
+    document.getElementById("examDate").value;
+
+    data.target.hours =
+    Number(document.getElementById("targetHours").value);
+
+    save();
+
+    render();
+
+    alert("Hedefin kaydedildi! 🎯");
+
+}
+
+
+/* =========================
+   COUNTDOWN
+========================= */
+
+function updateCountdown(){
+
+    const date =
+    new Date(data.target.examDate+"T00:00:00");
+
+    const now =
+    new Date();
+
+    const difference =
+    date-now;
 
     const days =
-        Math.max(
-            0,
-            Math.ceil(diff / (1000 * 60 * 60 * 24))
-        );
+    Math.max(
+        0,
+        Math.ceil(
+            difference /
+            (1000*60*60*24)
+        )
+    );
 
-    document.getElementById("dayCount").textContent =
-        days;
+    document.getElementById("daysLeft").textContent =
+    days;
 
 }
 
 
 /* =========================
-   GÖREVLER
+   TASK
 ========================= */
 
-function addTask() {
+function addTask(subject,title,duration){
 
-    const subject =
-        document.getElementById("taskSubject").value;
+    data.tasks.push({
 
-    const title =
-        document.getElementById("taskTitle").value.trim();
+        id:Date.now()+Math.random(),
 
-    const duration =
-        Number(document.getElementById("taskDuration").value);
+        subject,
+        title,
+        duration,
 
-    if(!title) {
+        done:false,
 
-        alert("Önce bir konu yaz kankam 😄");
+        date:new Date()
+        .toLocaleDateString("tr-TR")
+
+    });
+
+}
+
+
+function toggleTask(id){
+
+    const task =
+    data.tasks.find(t=>t.id===id);
+
+    if(!task)return;
+
+    task.done=!task.done;
+
+    save();
+    render();
+
+}
+
+
+function deleteTask(id){
+
+    data.tasks =
+    data.tasks.filter(t=>t.id!==id);
+
+    save();
+    render();
+
+}
+
+
+function taskHTML(task){
+
+return `
+
+<div class="task ${task.done?"done":""}">
+
+<button
+class="check"
+onclick="toggleTask(${task.id})">
+
+${task.done?"✓":""}
+
+</button>
+
+<div class="taskInfo">
+
+<strong>
+${escapeHTML(task.subject)}
+ — ${escapeHTML(task.title)}
+</strong>
+
+<span>
+${task.duration} dakika
+</span>
+
+</div>
+
+<button
+class="delete"
+onclick="deleteTask(${task.id})">
+
+×
+</button>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================
+   AUTO PLAN
+========================= */
+
+function generatePlan(){
+
+    const hours =
+    Number(
+        document.getElementById("planHours").value
+    );
+
+    const start =
+    document.getElementById("startTime").value;
+
+    const select =
+    document.getElementById("planSubjects");
+
+    const subjects =
+    Array.from(select.selectedOptions)
+    .map(o=>o.value);
+
+    if(!subjects.length){
+
+        alert("En az bir ders seç kankam 😄");
         return;
 
     }
 
-    data.tasks.push({
+    data.tasks=[];
 
-        id: Date.now(),
+    const totalMinutes =
+    hours*60;
 
-        subject,
+    const taskMinutes =
+    45;
 
-        title,
+    const count =
+    Math.floor(
+        totalMinutes/taskMinutes
+    );
 
-        duration,
+    let current =
+    timeToMinutes(start);
 
-        done: false,
+    for(let i=0;i<count;i++){
 
-        date: new Date().toLocaleDateString("tr-TR")
+        const subject =
+        subjects[i%subjects.length];
 
-    });
-
-    document.getElementById("taskTitle").value = "";
-
-    save();
-    render();
-
-}
-
-
-function toggleTask(id) {
-
-    const task =
-        data.tasks.find(t => t.id === id);
-
-    if(task) {
-
-        task.done = !task.done;
-
-        save();
-        render();
+        addTask(
+            subject,
+            "Konu çalışma",
+            taskMinutes
+        );
 
     }
 
-}
-
-
-function deleteTask(id) {
-
-    data.tasks =
-        data.tasks.filter(t => t.id !== id);
-
     save();
+
     render();
 
+    alert(
+        "Bugünkü çalışma planın oluşturuldu! 🚀"
+    );
+
 }
 
 
-function taskHTML(task) {
+function timeToMinutes(time){
 
-    return `
+    const parts =
+    time.split(":");
 
-        <div class="task ${task.done ? "done" : ""}">
-
-            <button
-                class="check"
-                onclick="toggleTask(${task.id})">
-
-                ${task.done ? "✓" : ""}
-
-            </button>
-
-            <div class="task-info">
-
-                <strong>${escapeHTML(task.subject)} — ${escapeHTML(task.title)}</strong>
-
-                <span>${task.duration} dakika</span>
-
-            </div>
-
-            <button
-                onclick="deleteTask(${task.id})"
-                style="background:transparent;color:var(--muted);font-size:17px">
-
-                ×
-
-            </button>
-
-        </div>
-
-    `;
+    return (
+        Number(parts[0])*60 +
+        Number(parts[1])
+    );
 
 }
 
 
 /* =========================
-   DENEME
+   QUESTIONS
 ========================= */
 
-function addExam() {
+function addQuestion(){
+
+    const subject =
+    document.getElementById("questionSubject").value;
+
+    const total =
+    Number(document.getElementById("questionTotal").value)||0;
+
+    const correct =
+    Number(document.getElementById("questionCorrect").value)||0;
+
+    const wrong =
+    Number(document.getElementById("questionWrong").value)||0;
+
+    const blank =
+    Number(document.getElementById("questionBlank").value)||0;
+
+    if(correct+wrong+blank>total){
+
+        alert("Doğru + yanlış + boş toplamı soru sayısından fazla olamaz.");
+        return;
+
+    }
+
+    const net =
+    correct-(wrong/4);
+
+    data.questions.unshift({
+
+        id:Date.now(),
+
+        subject,
+        total,
+        correct,
+        wrong,
+        blank,
+        net,
+
+        date:new Date()
+        .toLocaleDateString("tr-TR")
+
+    });
+
+    save();
+
+    render();
+
+}
+
+
+/* =========================
+   EXAMS
+========================= */
+
+function addExam(){
 
     const name =
-        document.getElementById("examName").value.trim();
+    document.getElementById("examName").value.trim();
 
-    if(!name) {
+    if(!name){
 
-        alert("Denemeye bir isim ver kankam 😄");
+        alert("Denemeye isim ver kankam 😄");
         return;
 
     }
 
     const tr =
-        Number(document.getElementById("turkce").value) || 0;
+    Number(document.getElementById("examTurkish").value)||0;
 
     const mat =
-        Number(document.getElementById("matematik").value) || 0;
+    Number(document.getElementById("examMath").value)||0;
 
-    const fen =
-        Number(document.getElementById("fen").value) || 0;
+    const science =
+    Number(document.getElementById("examScience").value)||0;
 
-    const sos =
-        Number(document.getElementById("sosyal").value) || 0;
+    const social =
+    Number(document.getElementById("examSocial").value)||0;
 
     data.exams.unshift({
 
-        id: Date.now(),
+        id:Date.now(),
 
         name,
-
-        date: new Date().toLocaleDateString("tr-TR"),
-
         tr,
-
         mat,
+        science,
+        social,
 
-        fen,
+        total:tr+mat+science+social,
 
-        sos,
-
-        total: tr + mat + fen + sos
+        date:new Date()
+        .toLocaleDateString("tr-TR")
 
     });
 
-    document.getElementById("examName").value = "";
+    document.getElementById("examName").value="";
 
     save();
     render();
@@ -1184,10 +1741,10 @@ function addExam() {
 }
 
 
-function deleteExam(id) {
+function deleteExam(id){
 
     data.exams =
-        data.exams.filter(e => e.id !== id);
+    data.exams.filter(e=>e.id!==id);
 
     save();
     render();
@@ -1196,67 +1753,13 @@ function deleteExam(id) {
 
 
 /* =========================
-   KONULAR
+   TOPICS
 ========================= */
 
-const defaultMath = [
-    "Temel Kavramlar",
-    "Sayılar",
-    "Bölme ve Bölünebilme",
-    "EBOB - EKOK",
-    "Rasyonel Sayılar",
-    "Problemler",
-    "Kümeler",
-    "Fonksiyonlar",
-    "Permütasyon",
-    "Olasılık"
-];
-
-const defaultTurkish = [
-    "Sözcükte Anlam",
-    "Cümlede Anlam",
-    "Paragraf",
-    "Ses Bilgisi",
-    "Yazım Kuralları",
-    "Noktalama",
-    "Sözcük Türleri",
-    "Fiiller",
-    "Cümlenin Ögeleri",
-    "Anlatım Bozuklukları"
-];
-
-
-function initializeTopics() {
-
-    if(data.topics.math.length === 0) {
-
-        data.topics.math =
-            defaultMath.map(x => ({
-                name:x,
-                done:false
-            }));
-
-    }
-
-    if(data.topics.turkish.length === 0) {
-
-        data.topics.turkish =
-            defaultTurkish.map(x => ({
-                name:x,
-                done:false
-            }));
-
-    }
-
-    save();
-
-}
-
-
-function toggleTopic(type,index) {
+function toggleTopic(type,index){
 
     data.topics[type][index].done =
-        !data.topics[type][index].done;
+    !data.topics[type][index].done;
 
     save();
     render();
@@ -1264,118 +1767,117 @@ function toggleTopic(type,index) {
 }
 
 
-function renderTopics(type, elementId) {
+function renderTopics(type,id){
 
-    const element =
-        document.getElementById(elementId);
+    const list =
+    document.getElementById(id);
 
     const topics =
-        data.topics[type];
+    data.topics[type];
 
-    element.innerHTML =
-        topics.map((topic,index) => `
+    list.innerHTML =
+    topics.map((topic,index)=>`
 
-            <div class="topic">
+<div class="topic">
 
-                <div class="topic-top">
+<div class="topicTop">
 
-                    <span>
-                        ${topic.done ? "✅" : "⬜"}
-                        ${escapeHTML(topic.name)}
-                    </span>
+<span>
+${topic.done?"✅":"⬜"}
+ ${escapeHTML(topic.name)}
+</span>
 
-                    <button
-                        onclick="toggleTopic('${type}',${index})"
-                        style="background:transparent;color:var(--primary);font-size:12px">
+<button
+onclick="toggleTopic('${type}',${index})">
 
-                        ${topic.done ? "Geri Al" : "Tamamla"}
+${topic.done?"Geri Al":"Tamamla"}
 
-                    </button>
+</button>
 
-                </div>
+</div>
 
-                <div class="progress">
+<div class="progress">
 
-                    <div
-                        class="progress-bar"
-                        style="width:${topic.done ? 100 : 0}%">
-                    </div>
+<div
+class="progressBar"
+style="width:${topic.done?100:0}%">
+</div>
 
-                </div>
+</div>
 
-            </div>
+</div>
 
-        `).join("");
+`).join("");
 
 }
 
 
 /* =========================
-   POMODORO
+   TIMER
 ========================= */
 
-let timerSeconds = 25 * 60;
-let timerInterval = null;
-let timerRunning = false;
+let timerSeconds=1500;
+let timerInterval=null;
+let timerRunning=false;
 
 
-function updateTimer() {
+function updateTimer(){
 
     const minutes =
-        Math.floor(timerSeconds / 60);
+    Math.floor(timerSeconds/60);
 
     const seconds =
-        timerSeconds % 60;
+    timerSeconds%60;
 
     document.getElementById("timer").textContent =
-
-        String(minutes).padStart(2,"0") +
-        ":" +
-        String(seconds).padStart(2,"0");
+    String(minutes).padStart(2,"0")
+    +":"+
+    String(seconds).padStart(2,"0");
 
 }
 
 
-function startTimer() {
+function startTimer(){
 
-    if(timerRunning) {
+    if(timerRunning){
 
         clearInterval(timerInterval);
 
-        timerRunning = false;
+        timerRunning=false;
 
-        document.getElementById("timerStart").textContent =
-            "▶ Devam";
+        document.getElementById("timerBtn").textContent=
+        "▶ Devam";
 
         return;
 
     }
 
-    timerRunning = true;
+    timerRunning=true;
 
-    document.getElementById("timerStart").textContent =
-        "⏸ Duraklat";
+    document.getElementById("timerBtn").textContent=
+    "⏸ Duraklat";
 
-    timerInterval = setInterval(() => {
+    timerInterval =
+    setInterval(()=>{
 
         timerSeconds--;
 
         updateTimer();
 
-        if(timerSeconds <= 0) {
+        if(timerSeconds<=0){
 
             clearInterval(timerInterval);
 
-            timerRunning = false;
+            timerRunning=false;
 
-            timerSeconds = 25 * 60;
+            timerSeconds=1500;
 
-            document.getElementById("timerStart").textContent =
-                "▶ Başlat";
+            document.getElementById("timerBtn").textContent=
+            "▶ Başlat";
 
             updateTimer();
 
-            alert("Odak süresi tamamlandı! 🔥");
+            alert("Odak süren tamamlandı! 🔥");
 
         }
 
@@ -1384,16 +1886,16 @@ function startTimer() {
 }
 
 
-function resetTimer() {
+function resetTimer(){
 
     clearInterval(timerInterval);
 
-    timerRunning = false;
+    timerRunning=false;
 
-    timerSeconds = 25 * 60;
+    timerSeconds=1500;
 
-    document.getElementById("timerStart").textContent =
-        "▶ Başlat";
+    document.getElementById("timerBtn").textContent=
+    "▶ Başlat";
 
     updateTimer();
 
@@ -1401,210 +1903,412 @@ function resetTimer() {
 
 
 /* =========================
-   DASHBOARD
+   RENDER
 ========================= */
 
-function render() {
+function render(){
 
     updateCountdown();
 
-    initializeTopics();
+    document.getElementById("targetTitle").textContent =
+    data.target.department ||
+    "Hedefini belirle";
 
-    const totalTasks =
-        data.tasks.length;
+    document.getElementById("targetSub").textContent =
 
-    const doneTasks =
-        data.tasks.filter(t => t.done).length;
+    data.target.university
 
-    document.getElementById("taskCount").textContent =
-        `${doneTasks}/${totalTasks}`;
+    ?
+
+    `${data.target.university} • ${
+        data.target.rank
+        ?
+        "İlk "+Number(data.target.rank).toLocaleString("tr-TR")
+        :
+        data.target.field
+    }`
+
+    :
+
+    "Hedef bilgilerini ayarlardan oluşturabilirsin.";
+
+
+    /* QUESTIONS */
 
     const today =
-        new Date().toLocaleDateString("tr-TR");
+    new Date()
+    .toLocaleDateString("tr-TR");
+
+    const todayQuestions =
+    data.questions
+    .filter(q=>q.date===today);
+
+    const totalQuestions =
+    todayQuestions
+    .reduce((s,q)=>s+q.total,0);
+
+    document.getElementById("questionsToday").textContent =
+    totalQuestions;
+
+
+    document.getElementById("qTotal").textContent =
+    totalQuestions;
+
+    document.getElementById("qCorrect").textContent =
+    todayQuestions.reduce((s,q)=>s+q.correct,0);
+
+    document.getElementById("qWrong").textContent =
+    todayQuestions.reduce((s,q)=>s+q.wrong,0);
+
+    document.getElementById("qNet").textContent =
+    todayQuestions
+    .reduce((s,q)=>s+q.net,0)
+    .toFixed(2);
+
+
+    /* TASK */
+
+    const doneTasks =
+    data.tasks.filter(t=>t.done).length;
 
     const todayMinutes =
-        data.tasks
-            .filter(t => t.done && t.date === today)
-            .reduce((sum,t) => sum + t.duration,0);
+    data.tasks
+    .filter(t=>t.done && t.date===today)
+    .reduce((s,t)=>s+t.duration,0);
 
-    document.getElementById("todayStudy").textContent =
-        todayMinutes + " dk";
+    document.getElementById("studyToday").textContent =
+    todayMinutes+" dk";
 
-    document.getElementById("examCount").textContent =
-        data.exams.length;
 
-    const mathDone =
-        data.topics.math.filter(t => t.done).length;
+    const goalMinutes =
+    Number(data.target.hours)*60;
 
-    const turkishDone =
-        data.topics.turkish.filter(t => t.done).length;
+    const goalPercent =
+    goalMinutes
+    ?
+    Math.min(
+        100,
+        Math.round(
+            todayMinutes/goalMinutes*100
+        )
+    )
+    :
+    0;
+
+    document.getElementById("dailyGoal").textContent =
+    goalPercent+"%";
+
+
+    /* TOPICS */
 
     const totalTopics =
-        data.topics.math.length +
-        data.topics.turkish.length;
+    data.topics.math.length+
+    data.topics.turkish.length;
 
-    const doneTopics =
-        mathDone + turkishDone;
+    const completedTopics =
+    data.topics.math.filter(t=>t.done).length+
+    data.topics.turkish.filter(t=>t.done).length;
 
-    const percent =
-        totalTopics === 0
-        ? 0
-        : Math.round(doneTopics / totalTopics * 100);
+    const topicPercent =
+    totalTopics
+    ?
+    Math.round(
+        completedTopics/totalTopics*100
+    )
+    :
+    0;
 
-    document.getElementById("topicPercent").textContent =
-        percent + "%";
+    document.getElementById("topicProgress").textContent =
+    topicPercent+"%";
+
+
+    const mathDone =
+    data.topics.math.filter(t=>t.done).length;
+
+    const turkishDone =
+    data.topics.turkish.filter(t=>t.done).length;
 
     document.getElementById("mathPercent").textContent =
-        Math.round(
-            mathDone / data.topics.math.length * 100
-        ) + "%";
+    Math.round(
+        mathDone/data.topics.math.length*100
+    )+"%";
 
     document.getElementById("turkishPercent").textContent =
-        Math.round(
-            turkishDone / data.topics.turkish.length * 100
-        ) + "%";
+    Math.round(
+        turkishDone/data.topics.turkish.length*100
+    )+"%";
 
 
-    const homeTasks =
-        document.getElementById("homeTasks");
+    document.getElementById("examTotal").textContent =
+    data.exams.length;
 
-    const allTasks =
-        document.getElementById("allTasks");
 
-    if(data.tasks.length === 0) {
+    /* TASK LIST */
 
-        homeTasks.innerHTML =
-            `<div class="empty">Henüz görev eklenmedi. 📚</div>`;
+    if(!data.tasks.length){
 
-        allTasks.innerHTML =
-            `<div class="empty">Bugün için bir çalışma görevi ekle.</div>`;
+        document.getElementById("homeTasks").innerHTML=
+        `<div class="empty">
+        Henüz çalışma görevi yok. 📚
+        </div>`;
 
-    } else {
+        document.getElementById("allTasks").innerHTML=
+        `<div class="empty">
+        Otomatik plan oluşturarak başlayabilirsin.
+        </div>`;
 
-        const latest =
-            data.tasks.slice(-4).reverse();
+    }else{
 
-        homeTasks.innerHTML =
-            latest.map(taskHTML).join("");
+        document.getElementById("homeTasks").innerHTML=
+        data.tasks
+        .slice(-4)
+        .reverse()
+        .map(taskHTML)
+        .join("");
 
-        allTasks.innerHTML =
-            data.tasks.slice().reverse().map(taskHTML).join("");
+        document.getElementById("allTasks").innerHTML=
+        data.tasks
+        .slice()
+        .reverse()
+        .map(taskHTML)
+        .join("");
 
     }
 
 
+    /* QUESTION SUMMARY */
+
+    document.getElementById("todayQuestionSummary").innerHTML =
+
+    totalQuestions
+
+    ?
+
+    `<div style="
+        text-align:center;
+        padding:10px;
+        color:var(--muted);
+        font-size:14px">
+
+        Bugün <strong style="color:var(--text)">
+        ${totalQuestions}
+        </strong> soru çözdün. 🔥
+
+    </div>`
+
+    :
+
+    `<div class="empty">
+        Henüz soru kaydı yok.
+    </div>`;
+
+
+    renderQuestions();
     renderExams();
 
     renderTopics("math","mathTopics");
-
     renderTopics("turkish","turkishTopics");
 
 }
 
 
-function renderExams() {
+/* =========================
+   QUESTIONS LIST
+========================= */
+
+function renderQuestions(){
 
     const list =
-        document.getElementById("examList");
+    document.getElementById("questionList");
 
-    if(data.exams.length === 0) {
+    if(!data.questions.length){
 
-        list.innerHTML =
-            `<div class="empty">Henüz deneme eklenmedi. 📝</div>`;
+        list.innerHTML=
+        `<div class="empty">
+        Henüz soru kaydı yok.
+        </div>`;
 
         return;
 
     }
 
     list.innerHTML =
-        data.exams.map(exam => `
+    data.questions.map(q=>`
 
-            <div class="exam">
+<div class="questionRow">
 
-                <div class="exam-top">
+<div>
 
-                    <strong>${escapeHTML(exam.name)}</strong>
+<strong>
+${escapeHTML(q.subject)}
+</strong>
 
-                    <span>${exam.date}</span>
+<br>
 
-                </div>
+<small>
+${q.date} • ${q.total} soru
+</small>
 
-                <div class="nets">
+</div>
 
-                    <div class="net">
-                        <strong>${exam.tr}</strong>
-                        <span>Türkçe</span>
-                    </div>
+<div style="text-align:right">
 
-                    <div class="net">
-                        <strong>${exam.mat}</strong>
-                        <span>Matematik</span>
-                    </div>
+<strong>
+${q.net.toFixed(2)} net
+</strong>
 
-                    <div class="net">
-                        <strong>${exam.fen}</strong>
-                        <span>Fen</span>
-                    </div>
+<br>
 
-                    <div class="net">
-                        <strong>${exam.sos}</strong>
-                        <span>Sosyal</span>
-                    </div>
+<small>
+${q.correct}D / ${q.wrong}Y / ${q.blank}B
+</small>
 
-                </div>
+</div>
 
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    margin-top:12px;
-                ">
+</div>
 
-                    <strong>
-                        Toplam: ${exam.total.toFixed(2)} net
-                    </strong>
-
-                    <button
-                        onclick="deleteExam(${exam.id})"
-                        style="
-                        background:transparent;
-                        color:var(--danger);
-                        font-size:12px">
-
-                        Sil
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        `).join("");
+`).join("");
 
 }
 
 
 /* =========================
-   GÜVENLİ METİN
+   EXAMS LIST
 ========================= */
 
-function escapeHTML(text) {
+function renderExams(){
+
+    const list =
+    document.getElementById("examList");
+
+    if(!data.exams.length){
+
+        list.innerHTML=
+        `<div class="empty">
+        Henüz deneme eklenmedi.
+        </div>`;
+
+        return;
+
+    }
+
+    list.innerHTML =
+    data.exams.map(e=>`
+
+<div class="exam">
+
+<div class="examTop">
+
+<strong>
+${escapeHTML(e.name)}
+</strong>
+
+<span>
+${e.date}
+</span>
+
+</div>
+
+<div class="nets">
+
+<div class="net">
+<strong>${e.tr}</strong>
+<span>Türkçe</span>
+</div>
+
+<div class="net">
+<strong>${e.mat}</strong>
+<span>Matematik</span>
+</div>
+
+<div class="net">
+<strong>${e.science}</strong>
+<span>Fen</span>
+</div>
+
+<div class="net">
+<strong>${e.social}</strong>
+<span>Sosyal</span>
+</div>
+
+</div>
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:13px">
+
+<strong>
+Toplam ${e.total.toFixed(2)} net
+</strong>
+
+<button
+class="danger"
+onclick="deleteExam(${e.id})">
+
+Sil
+
+</button>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+
+/* =========================
+   SETTINGS LOAD
+========================= */
+
+function loadSettings(){
+
+    document.getElementById("targetField").value =
+    data.target.field;
+
+    document.getElementById("targetUniversity").value =
+    data.target.university;
+
+    document.getElementById("targetDepartment").value =
+    data.target.department;
+
+    document.getElementById("targetRank").value =
+    data.target.rank;
+
+    document.getElementById("examDate").value =
+    data.target.examDate;
+
+    document.getElementById("targetHours").value =
+    data.target.hours;
+
+}
+
+
+/* =========================
+   SAFE HTML
+========================= */
+
+function escapeHTML(text){
 
     return String(text)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
 
 /* =========================
-   BAŞLAT
+   START
 ========================= */
 
-initializeTopics();
+initTopics();
+loadSettings();
 updateTimer();
 render();
 
