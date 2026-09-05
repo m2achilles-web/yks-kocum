@@ -448,6 +448,116 @@
        PLAN
     ========================= */
 
+    .plan-editor {
+      margin-top: 14px;
+    }
+
+    .plan-editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 13px;
+    }
+
+    .plan-editor-title {
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    .plan-editor-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    .selected-count {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: rgba(99,102,241,.12);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .subject-editor {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .subject-option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 48px;
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--bg);
+      cursor: pointer;
+      user-select: none;
+      transition: .18s ease;
+    }
+
+    .subject-option:hover {
+      border-color: var(--primary);
+    }
+
+    .subject-option.selected {
+      border-color: var(--primary);
+      background: rgba(99,102,241,.09);
+    }
+
+    .subject-option input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      flex: 0 0 auto;
+      accent-color: var(--primary);
+    }
+
+    .subject-option span {
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.2;
+    }
+
+    .plan-editor-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .plan-editor-actions button {
+      flex: 1;
+    }
+
+    .plan-save-status {
+      min-height: 17px;
+      margin-top: 9px;
+      color: var(--success);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .plan-note {
+      margin-top: 10px;
+      padding: 10px 11px;
+      border-radius: 12px;
+      background: rgba(99,102,241,.07);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
     .task {
       display: flex;
       align-items: center;
@@ -772,6 +882,10 @@
       .bottom-nav {
         bottom: 8px;
       }
+
+      .subject-editor {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -796,6 +910,7 @@
       <div class="auth-subtitle">Hedefine birlikte ulaşalım.</div>
 
       <div class="auth-tabs">
+
         <button
           id="loginTab"
           class="auth-tab active"
@@ -809,35 +924,45 @@
           onclick="switchAuth('register')">
           Kayıt Ol
         </button>
+
       </div>
 
       <div id="usernameField" class="field hidden">
+
         <label>Kullanıcı adı</label>
+
         <input
           id="authUsername"
           class="input"
           type="text"
           placeholder="Örneğin: Ahmet">
+
       </div>
 
       <div class="field">
+
         <label>E-posta</label>
+
         <input
           id="authEmail"
           class="input"
           type="email"
           autocomplete="email"
           placeholder="ornek@mail.com">
+
       </div>
 
       <div class="field">
+
         <label>Şifre</label>
+
         <input
           id="authPassword"
           class="input"
           type="password"
           autocomplete="current-password"
           placeholder="••••••••">
+
       </div>
 
       <button
@@ -847,7 +972,6 @@
         Giriş Yap
       </button>
 
-      <!-- TEKRAR MAIL GÖNDER -->
       <div id="resendBox" class="resend-box hidden">
 
         <button
@@ -865,10 +989,14 @@
 
       </div>
 
-      <div id="authMessage" class="auth-message hidden"></div>
+      <div
+        id="authMessage"
+        class="auth-message hidden">
+      </div>
 
     </div>
   </section>
+
 
   <!-- APP -->
   <section id="appScreen" class="screen hidden">
@@ -877,6 +1005,7 @@
 
       <!-- TOPBAR -->
       <div class="topbar">
+
         <div class="hello">
 
           <small>YKS Koçum</small>
@@ -885,7 +1014,6 @@
             Merhaba 👋
           </h1>
 
-          <!-- ADMIN ROZETİ -->
           <div
             id="adminBadge"
             class="admin-badge hidden">
@@ -911,7 +1039,9 @@
           </button>
 
         </div>
+
       </div>
+
 
       <!-- HOME -->
       <section id="page-home">
@@ -949,6 +1079,7 @@
         <div class="stats">
 
           <div class="stat">
+
             <div class="stat-label">
               Toplam Soru
             </div>
@@ -958,9 +1089,11 @@
               id="totalQuestions">
               0
             </div>
+
           </div>
 
           <div class="stat">
+
             <div class="stat-label">
               Toplam Net
             </div>
@@ -970,9 +1103,11 @@
               id="totalNet">
               0
             </div>
+
           </div>
 
           <div class="stat">
+
             <div class="stat-label">
               Deneme
             </div>
@@ -982,9 +1117,11 @@
               id="totalExams">
               0
             </div>
+
           </div>
 
           <div class="stat">
+
             <div class="stat-label">
               Çalışma
             </div>
@@ -994,6 +1131,7 @@
               id="totalMinutes">
               0 dk
             </div>
+
           </div>
 
         </div>
@@ -1011,10 +1149,12 @@
         <div class="card">
 
           <div class="progress">
+
             <div
               id="todayProgressBar"
               style="width:0%">
             </div>
+
           </div>
 
           <div
@@ -1032,41 +1172,118 @@
 
       </section>
 
+
       <!-- PLAN -->
       <section id="page-plan" class="hidden">
 
         <div class="section-title">
+
           <h2>Günlük Plan</h2>
+
           <span id="planDateLabel"></span>
+
         </div>
 
+
+        <!-- PLAN AYARLARI -->
         <div class="card">
 
           <div class="form-grid">
 
             <div class="field">
+
               <label>Çalışma saati</label>
+
               <input
                 id="planHours"
                 class="input"
                 type="number"
                 min="0"
                 step=".5">
+
             </div>
 
             <div class="field">
+
               <label>Başlangıç</label>
+
               <input
                 id="planStart"
                 class="input"
                 type="time">
+
             </div>
 
           </div>
 
-          <div class="field">
 
-            <label>Dersler</label>
+          <!-- DERSLERİ DÜZENLE -->
+          <div class="plan-editor">
+
+            <div class="plan-editor-header">
+
+              <div>
+
+                <div class="plan-editor-title">
+                  📚 Dersleri Düzenle
+                </div>
+
+                <div class="plan-editor-subtitle">
+                  Günlük planında görmek istediğin dersleri seç.
+                </div>
+
+              </div>
+
+              <div
+                id="selectedPlanCount"
+                class="selected-count">
+                0
+              </div>
+
+            </div>
+
+            <div
+              id="planSubjectEditor"
+              class="subject-editor">
+            </div>
+
+            <div class="plan-editor-actions">
+
+              <button
+                type="button"
+                class="secondary-btn"
+                onclick="saveSelectedPlanSubjects()">
+                💾 Dersleri Kaydet
+              </button>
+
+              <button
+                type="button"
+                class="primary-btn"
+                onclick="refreshTodayPlan()">
+                🔄 Planı Yenile
+              </button>
+
+            </div>
+
+            <div
+              id="planSaveStatus"
+              class="plan-save-status">
+            </div>
+
+            <div class="plan-note">
+              💡 <strong>Planı Yenile</strong> seçtiğin derslerden
+              bugünün görevlerini yeniden oluşturur.
+              Mevcut tamamlanmış görevlerin yerine yeni görevler gelir.
+            </div>
+
+          </div>
+
+          <!-- ESKİ MULTI SELECT DE KORUNDU -->
+          <div class="field" style="margin-top:18px;">
+
+            <label>
+              Plan dersleri
+            </label>
 
             <select
               id="planSubjects"
@@ -1098,6 +1315,7 @@
 
         </div>
 
+
         <div class="section-title">
 
           <h2>Görevler</h2>
@@ -1115,6 +1333,7 @@
         </div>
 
       </section>
+
 
       <!-- QUESTIONS -->
       <section id="page-questions" class="hidden">
@@ -1234,6 +1453,7 @@
 
       </section>
 
+
       <!-- EXAMS -->
       <section id="page-exams" class="hidden">
 
@@ -1352,6 +1572,7 @@
 
       </section>
 
+
       <!-- FOCUS -->
       <section id="page-focus" class="hidden">
 
@@ -1398,6 +1619,7 @@
 
       </section>
 
+
       <!-- BADGES -->
       <section id="page-badges" class="hidden">
 
@@ -1417,6 +1639,7 @@
         </div>
 
       </section>
+
 
       <!-- PROFILE -->
       <section id="page-profile" class="hidden">
@@ -1534,6 +1757,7 @@
 
         </div>
 
+
         <div class="card">
 
           <div
@@ -1568,6 +1792,7 @@
             onchange="importData(event)">
 
         </div>
+
 
         <!-- ADMIN PANEL -->
         <div
@@ -1657,6 +1882,7 @@
 
     </main>
 
+
     <!-- NAV -->
     <nav class="bottom-nav">
 
@@ -1724,7 +1950,9 @@
 
   </section>
 
+
   <div id="toast"></div>
+
 
   <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1780,6 +2008,15 @@
     let focusRunning = false;
     let focusInterval = null;
 
+
+    /*
+      Yeni:
+      Kullanıcının seçtiği plan dersleri
+    */
+
+    let selectedPlanSubjects = [];
+
+
     const today = () =>
       new Date().toISOString().slice(0,10);
 
@@ -1789,15 +2026,25 @@
     ===================================================== */
 
     const DEFAULT_PROFILE = {
+
       username: "Öğrenci",
+
       field: "Sayısal",
+
       exam_date: "",
+
       university: "",
+
       department: "",
+
       target_rank: "",
+
       daily_hours: 4,
+
       daily_questions: 100,
+
       daily_topics: 2
+
     };
 
 
@@ -1806,17 +2053,33 @@
     ===================================================== */
 
     const SUBJECTS = [
+
       "TYT Türkçe",
       "TYT Matematik",
       "TYT Fen",
       "TYT Sosyal",
+
       "AYT Matematik",
       "AYT Fizik",
       "AYT Kimya",
       "AYT Biyoloji",
+
       "AYT Edebiyat",
       "AYT Tarih",
       "AYT Coğrafya"
+
+    ];
+
+
+    /* =====================================================
+       DEFAULT PLAN SUBJECTS
+    ===================================================== */
+
+    const DEFAULT_PLAN_SUBJECTS = [
+
+      "TYT Matematik",
+      "TYT Türkçe"
+
     ];
 
 
@@ -1825,55 +2088,198 @@
     ===================================================== */
 
     const BADGE_DEFINITIONS = [
+
       {
         key:"first",
         icon:"🎯",
         name:"İlk Adım",
         description:"İlk soru kaydını oluştur."
       },
+
       {
         key:"q100",
         icon:"💯",
         name:"100 Soru",
         description:"Toplam 100 soru çöz."
       },
+
       {
         key:"q500",
         icon:"🔥",
         name:"500 Soru",
         description:"Toplam 500 soru çöz."
       },
+
       {
         key:"q1000",
         icon:"🚀",
         name:"1000 Soru",
         description:"Toplam 1000 soru çöz."
       },
+
       {
         key:"exam",
         icon:"📊",
         name:"İlk Deneme",
         description:"İlk denemeni kaydet."
       },
+
       {
         key:"streak7",
         icon:"⚡",
         name:"7 Gün Seri",
         description:"7 gün çalışma serisine ulaş."
       },
+
       {
         key:"topics25",
         icon:"📚",
         name:"25 Konu",
         description:"25 konuyu tamamla."
       },
+
       {
         key:"net100",
         icon:"🏆",
         name:"100 Net",
         description:"Bir denemede 100 nete ulaş."
       }
+
     ];
+
+
+    /* =====================================================
+       PLAN SUBJECT LOCAL KEY
+    ===================================================== */
+
+    function planSubjectsKey(){
+
+      if(!currentUser)
+        return "yksKocumV6_plan_subjects";
+
+      return (
+        "yksKocumV6_plan_subjects_" +
+        currentUser.id
+      );
+    }
+
+
+    /* =====================================================
+       LOAD PLAN SUBJECTS
+    ===================================================== */
+
+    function loadPlanSubjects(){
+
+      let loaded = null;
+
+      /*
+        Önce günlük planın subjects alanına bak.
+      */
+
+      if(
+        dailyPlan &&
+        Array.isArray(
+          dailyPlan.subjects
+        ) &&
+        dailyPlan.subjects.length
+      ){
+
+        loaded =
+          dailyPlan.subjects;
+      }
+
+
+      /*
+        Sonra localStorage'a bak.
+      */
+
+      if(!loaded){
+
+        try{
+
+          const raw =
+            localStorage.getItem(
+              planSubjectsKey()
+            );
+
+          if(raw){
+
+            const parsed =
+              JSON.parse(raw);
+
+            if(
+              Array.isArray(parsed) &&
+              parsed.length
+            ){
+
+              loaded = parsed;
+            }
+
+          }
+
+        }catch(error){
+
+          console.warn(
+            "Plan dersleri okunamadı:",
+            error
+          );
+
+        }
+
+      }
+
+
+      /*
+        Hiçbir şey yoksa varsayılan dersler.
+      */
+
+      selectedPlanSubjects =
+        loaded
+          ? loaded.filter(
+              subject =>
+                SUBJECTS.includes(
+                  subject
+                )
+            )
+          : [...DEFAULT_PLAN_SUBJECTS];
+
+
+      if(!selectedPlanSubjects.length){
+
+        selectedPlanSubjects =
+          [...DEFAULT_PLAN_SUBJECTS];
+      }
+
+    }
+
+
+    /* =====================================================
+       SAVE PLAN SUBJECTS LOCAL
+    ===================================================== */
+
+    function savePlanSubjectsLocal(){
+
+      try{
+
+        localStorage.setItem(
+
+          planSubjectsKey(),
+
+          JSON.stringify(
+            selectedPlanSubjects
+          )
+
+        );
+
+      }catch(error){
+
+        console.warn(
+          "Plan dersleri kaydedilemedi:",
+          error
+        );
+
+      }
+    }
 
 
     /* =====================================================
@@ -1881,28 +2287,46 @@
     ===================================================== */
 
     function localKey(name){
+
       return "yksKocumV6_" + name;
+
     }
+
 
     function saveLocal(){
 
       try{
 
         localStorage.setItem(
+
           localKey("cache"),
+
           JSON.stringify({
+
             profile,
+
             questions,
+
             exams,
+
             wrongs,
+
             topics,
+
             studySessions,
+
             dailyPlan,
-            badges
+
+            badges,
+
+            selectedPlanSubjects
+
           })
+
         );
 
       }catch(e){}
+
     }
 
 
@@ -1915,7 +2339,8 @@
             localKey("cache")
           );
 
-        if(!raw) return;
+        if(!raw)
+          return;
 
         const data =
           JSON.parse(raw);
@@ -1944,11 +2369,23 @@
         badges =
           data.badges || [];
 
+        if(
+          Array.isArray(
+            data.selectedPlanSubjects
+          )
+        ){
+
+          selectedPlanSubjects =
+            data.selectedPlanSubjects;
+
+        }
+
       }catch(e){
 
         console.error(e);
 
       }
+
     }
 
 
@@ -2003,6 +2440,7 @@
         .getElementById("authMessage")
         .classList
         .add("hidden");
+
     }
 
 
@@ -2013,11 +2451,13 @@
           "authMessage"
         );
 
-      el.textContent = message;
+      el.textContent =
+        message;
 
       el.classList.remove(
         "hidden"
       );
+
     }
 
 
@@ -2058,11 +2498,15 @@
           error
         } =
           await supabaseClient.auth.resend({
+
             type:"signup",
+
             email:email,
+
             options:{
               emailRedirectTo:SITE_URL
             }
+
           });
 
         if(error)
@@ -2096,6 +2540,7 @@
           "📩 Doğrulama e-postasını tekrar gönder";
 
       }
+
     }
 
 
@@ -2173,14 +2618,22 @@
 
           const result =
             await supabaseClient.auth.signUp({
+
               email,
+
               password,
+
               options:{
-                emailRedirectTo: SITE_URL,
+
+                emailRedirectTo:
+                  SITE_URL,
+
                 data:{
                   username
                 }
+
               }
+
             });
 
           if(result.error)
@@ -2202,8 +2655,11 @@
 
           const result =
             await supabaseClient.auth.signInWithPassword({
+
               email,
+
               password
+
             });
 
           if(result.error)
@@ -2237,7 +2693,9 @@
             "Giriş Yap";
 
         }
+
       }
+
     }
 
 
@@ -2261,6 +2719,7 @@
           .remove("hidden");
 
         return "E-posta adresin henüz doğrulanmamış. Doğrulama mailini tekrar gönderebilirsin.";
+
       }
 
       if(
@@ -2292,6 +2751,7 @@
         message ||
         "Bir hata oluştu."
       );
+
     }
 
 
@@ -2302,6 +2762,8 @@
       currentUser = null;
 
       currentRole = "user";
+
+      selectedPlanSubjects = [];
 
       document
         .getElementById("appScreen")
@@ -2324,6 +2786,7 @@
         .add("hidden");
 
       switchAuth("login");
+
     }
 
 
@@ -2333,7 +2796,8 @@
 
     async function loadProfile(){
 
-      if(!currentUser) return;
+      if(!currentUser)
+        return;
 
       const {
         data,
@@ -2358,8 +2822,12 @@
       }else{
 
         profile = {
-          id: currentUser.id,
+
+          id:
+            currentUser.id,
+
           ...DEFAULT_PROFILE
+
         };
 
         const {
@@ -2373,9 +2841,11 @@
           console.error(
             insertError
           );
+
       }
 
       fillProfileUI();
+
     }
 
 
@@ -2465,6 +2935,7 @@
           0
         ) +
         " saat";
+
     }
 
 
@@ -2506,7 +2977,9 @@
         section.classList.add(
           "hidden"
         );
+
       }
+
     }
 
 
@@ -2583,6 +3056,7 @@
             )
             .value ||
           null
+
       };
 
       const {
@@ -2602,8 +3076,11 @@
       }
 
       profile = {
+
         ...profile,
+
         ...updated
+
       };
 
       saveLocal();
@@ -2615,6 +3092,7 @@
       );
 
       renderHome();
+
     }
 
 
@@ -2624,7 +3102,8 @@
 
     async function loadCloudData(){
 
-      if(!currentUser) return;
+      if(!currentUser)
+        return;
 
       try{
 
@@ -2723,6 +3202,7 @@
                 "user_id",
                 currentUser.id
               )
+
           ]);
 
         if(q.data)
@@ -2750,6 +3230,7 @@
 
             }
           );
+
         }
 
         if(s.data)
@@ -2761,6 +3242,30 @@
         if(b.data)
           badges = b.data;
 
+        /*
+          Buluttan günlük plan geldiyse
+          ders seçimlerini de al.
+        */
+
+        if(
+          dailyPlan &&
+          Array.isArray(
+            dailyPlan.subjects
+          ) &&
+          dailyPlan.subjects.length
+        ){
+
+          selectedPlanSubjects =
+            dailyPlan.subjects;
+
+          savePlanSubjectsLocal();
+
+        }else{
+
+          loadPlanSubjects();
+
+        }
+
         saveLocal();
 
       }catch(error){
@@ -2770,7 +3275,9 @@
         toast(
           "Bulut verileri yüklenirken sorun oldu."
         );
+
       }
+
     }
 
 
@@ -2811,9 +3318,11 @@
         );
 
         currentRole = "user";
+
       }
 
       updateAdminBadge();
+
     }
 
 
@@ -2847,18 +3356,13 @@
 
         renderAll();
 
-        /*
-         * Admin istatistiklerini ilk açılışta
-         * otomatik getir.
-         */
         if(
           currentRole === "admin" ||
           currentRole === "coach"
         ){
 
-          await loadAdminStats(
-            false
-          );
+          await loadAdminStats(false);
+
         }
 
       }catch(error){
@@ -2875,7 +3379,9 @@
           .getElementById("loading")
           .classList
           .add("hidden");
+
       }
+
     }
 
 
@@ -2886,6 +3392,7 @@
     function showPage(page){
 
       const pages = [
+
         "home",
         "plan",
         "questions",
@@ -2893,6 +3400,7 @@
         "focus",
         "badges",
         "profile"
+
       ];
 
       pages.forEach(
@@ -2909,6 +3417,7 @@
               "hidden",
               p !== page
             );
+
           }
 
         }
@@ -2930,8 +3439,11 @@
         );
 
       window.scrollTo({
+
         top:0,
+
         behavior:"smooth"
+
       });
 
       if(page === "home")
@@ -2957,10 +3469,10 @@
         )
       ){
 
-        loadAdminStats(
-          false
-        );
+        loadAdminStats(false);
+
       }
+
     }
 
 
@@ -2972,26 +3484,33 @@
 
       const totalQuestions =
         questions.reduce(
+
           (sum,q) =>
             sum +
             Number(
               q.total || 0
             ),
+
           0
+
         );
 
       const totalNet =
         questions.reduce(
+
           (sum,q) =>
             sum +
             Number(
               q.net || 0
             ),
+
           0
+
         );
 
       const totalMinutes =
         studySessions.reduce(
+
           (sum,s) =>
             sum +
             Number(
@@ -3000,7 +3519,9 @@
             Number(
               s.seconds || 0
             ) / 60,
+
           0
+
         );
 
       document.getElementById(
@@ -3036,6 +3557,7 @@
         " gün seri";
 
       renderTodayTasks();
+
     }
 
 
@@ -3098,14 +3620,16 @@
           break;
 
         }
+
       }
 
       return count;
+
     }
 
 
     /* =====================================================
-       PLAN
+       PLAN - CREATE
     ===================================================== */
 
     async function createTodayPlanIfNeeded(){
@@ -3113,389 +3637,77 @@
       if(!currentUser)
         return;
 
-      if(dailyPlan)
-        return;
 
-      const subjects = [
-        "TYT Matematik",
-        "TYT Türkçe"
-      ];
+      /*
+        Ders seçimlerini yükle
+      */
 
-      const tasks =
-        subjects.map(
-          (
-            subject,
-            index
-          ) => ({
-
-            id:
-              "task_" +
-              Date.now() +
-              "_" +
-              index,
-
-            date:
-              today(),
-
-            time:
-              index === 0
-                ? "18:00"
-                : "19:00",
-
-            subject,
-
-            topic:"",
-
-            minutes:60,
-
-            done:false
-
-          })
-        );
-
-      dailyPlan = {
-
-        user_id:
-          currentUser.id,
-
-        plan_date:
-          today(),
-
-        hours:
-          profile?.daily_hours ||
-          4,
-
-        start_time:
-          "18:00",
-
-        subjects,
-
-        tasks
-
-      };
-
-      await supabaseClient
-        .from("daily_plans")
-        .upsert(
-          dailyPlan,
-          {
-            onConflict:
-              "user_id,plan_date"
-          }
-        );
-
-      saveLocal();
-    }
+      loadPlanSubjects();
 
 
-    function renderPlan(){
+      /*
+        Eğer bugünün planı zaten varsa
+        onu kullan.
+      */
 
-      document.getElementById(
-        "planDateLabel"
-      ).textContent =
-        new Date()
-          .toLocaleDateString(
-            "tr-TR"
-          );
+      if(dailyPlan){
 
-      if(!dailyPlan){
+        /*
+          Eski planda subjects yoksa
+          seçilen dersleri ekle.
+        */
 
-        document.getElementById(
-          "planTaskList"
-        ).innerHTML =
-          "Bugün için plan yok.";
+        if(
+          !Array.isArray(
+            dailyPlan.subjects
+          ) ||
+          !dailyPlan.subjects.length
+        ){
 
-        return;
-      }
-
-      document.getElementById(
-        "planHours"
-      ).value =
-        dailyPlan.hours ||
-        0;
-
-      document.getElementById(
-        "planStart"
-      ).value =
-        dailyPlan.start_time ||
-        "18:00";
-
-      const selected =
-        dailyPlan.subjects ||
-        [];
-
-      Array.from(
-        document
-          .getElementById(
-            "planSubjects"
-          )
-          .options
-      ).forEach(
-        option => {
-
-          option.selected =
-            selected.includes(
-              option.value
-            );
+          dailyPlan.subjects =
+            [...selectedPlanSubjects];
 
         }
-      );
-
-      renderPlanTasks();
-    }
-
-
-    function renderPlanTasks(){
-
-      const list =
-        document.getElementById(
-          "planTaskList"
-        );
-
-      const tasks =
-        dailyPlan?.tasks ||
-        [];
-
-      if(!tasks.length){
-
-        list.innerHTML =
-          `<div style="color:var(--muted)">
-            Görev bulunmuyor.
-          </div>`;
 
         return;
       }
 
-      const done =
-        tasks.filter(
-          t => t.done
-        ).length;
-
-      document.getElementById(
-        "planProgressText"
-      ).textContent =
-        done +
-        " / " +
-        tasks.length;
-
-      list.innerHTML =
-        tasks.map(
-          task => `
-
-          <div
-            class="task ${
-              task.done
-                ? "done"
-                : ""
-            }"
-            onclick="toggleTask('${escapeAttr(task.id)}')">
-
-            <div class="task-check">
-              ${
-                task.done
-                  ? "✓"
-                  : ""
-              }
-            </div>
-
-            <div class="task-info">
-
-              <div class="task-name">
-                ${
-                  escapeHtml(
-                    task.subject ||
-                    "Ders"
-                  )
-                }
-              </div>
-
-              <div class="task-meta">
-                ${
-                  escapeHtml(
-                    task.time ||
-                    ""
-                  )
-                }
-                ·
-                ${
-                  Number(
-                    task.minutes ||
-                    0
-                  )
-                }
-                dakika
-              </div>
-
-            </div>
-
-          </div>
-
-        `
-        ).join("");
-    }
-
-
-    function renderTodayTasks(){
-
-      const container =
-        document.getElementById(
-          "todayTasks"
-        );
-
-      const tasks =
-        dailyPlan?.tasks ||
-        [];
-
-      if(!tasks.length){
-
-        container.innerHTML =
-          `<div style="color:var(--muted);font-size:13px">
-            Bugün için görev yok.
-          </div>`;
-
-        document.getElementById(
-          "todayProgressBar"
-        ).style.width =
-          "0%";
-
-        document.getElementById(
-          "todayPlanProgress"
-        ).textContent =
-          "0%";
-
-        return;
-      }
-
-      const done =
-        tasks.filter(
-          t => t.done
-        ).length;
-
-      const percent =
-        Math.round(
-          done /
-          tasks.length *
-          100
-        );
-
-      document.getElementById(
-        "todayProgressBar"
-      ).style.width =
-        percent +
-        "%";
-
-      document.getElementById(
-        "todayPlanProgress"
-      ).textContent =
-        percent +
-        "%";
-
-      container.innerHTML =
-        tasks
-          .slice(0,4)
-          .map(
-            task => `
-
-          <div
-            class="task ${
-              task.done
-                ? "done"
-                : ""
-            }"
-            onclick="toggleTask('${escapeAttr(task.id)}')">
-
-            <div class="task-check">
-              ${
-                task.done
-                  ? "✓"
-                  : ""
-              }
-            </div>
-
-            <div class="task-info">
-
-              <div class="task-name">
-                ${
-                  escapeHtml(
-                    task.subject ||
-                    "Ders"
-                  )
-                }
-              </div>
-
-              <div class="task-meta">
-                ${
-                  escapeHtml(
-                    task.time ||
-                    ""
-                  )
-                }
-                ·
-                ${
-                  task.minutes ||
-                  0
-                } dk
-              </div>
-
-            </div>
-
-          </div>
-
-        `
-          )
-          .join("");
-    }
-
-
-    async function savePlan(){
-
-      const select =
-        document.getElementById(
-          "planSubjects"
-        );
-
-      const subjects =
-        Array.from(
-          select.selectedOptions
-        )
-        .map(
-          option =>
-            option.value
-        );
-
-      if(!subjects.length){
-
-        toast(
-          "En az bir ders seç."
-        );
-
-        return;
-      }
 
       const hours =
         Number(
-          document.getElementById(
-            "planHours"
-          ).value
-        ) || 0;
+          profile?.daily_hours ||
+          4
+        );
+
 
       const start =
-        document.getElementById(
-          "planStart"
-        ).value ||
         "18:00";
 
+
+      const subjects =
+        selectedPlanSubjects.length
+          ? [...selectedPlanSubjects]
+          : [...DEFAULT_PLAN_SUBJECTS];
+
+
+      const totalMinutes =
+        Math.max(
+          15,
+          Math.round(
+            hours * 60
+          )
+        );
+
+
       const minutesPerSubject =
-        subjects.length
-          ? Math.max(
-              15,
-              Math.floor(
-                hours *
-                60 /
-                subjects.length
-              )
-            )
-          : 60;
+        Math.max(
+          15,
+          Math.floor(
+            totalMinutes /
+            subjects.length
+          )
+        );
+
 
       const tasks =
         subjects.map(
@@ -3505,9 +3717,7 @@
           ) => {
 
             const startMinutes =
-              timeToMinutes(
-                start
-              ) +
+              timeToMinutes(start) +
               index *
               minutesPerSubject;
 
@@ -3541,7 +3751,977 @@
           }
         );
 
+
       dailyPlan = {
+
+        user_id:
+          currentUser.id,
+
+        plan_date:
+          today(),
+
+        hours,
+
+        start_time:
+          start,
+
+        subjects,
+
+        tasks
+
+      };
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("daily_plans")
+          .upsert(
+
+            dailyPlan,
+
+            {
+              onConflict:
+                "user_id,plan_date"
+            }
+
+          )
+          .select()
+          .single();
+
+
+      if(!error && data){
+
+        dailyPlan = data;
+
+      }else if(error){
+
+        console.error(
+          "Plan oluşturulamadı:",
+          error
+        );
+
+      }
+
+
+      savePlanSubjectsLocal();
+
+      saveLocal();
+
+    }
+
+
+    /* =====================================================
+       PLAN - EDITOR
+    ===================================================== */
+
+    function renderPlanSubjectEditor(){
+
+      const box =
+        document.getElementById(
+          "planSubjectEditor"
+        );
+
+      if(!box)
+        return;
+
+
+      if(
+        !selectedPlanSubjects.length
+      ){
+
+        loadPlanSubjects();
+
+      }
+
+
+      box.innerHTML =
+        SUBJECTS.map(
+          subject => {
+
+            const checked =
+              selectedPlanSubjects.includes(
+                subject
+              );
+
+            return `
+
+              <label
+                class="subject-option ${
+                  checked
+                    ? "selected"
+                    : ""
+                }">
+
+                <input
+                  type="checkbox"
+                  value="${escapeHtml(subject)}"
+                  ${checked ? "checked" : ""}
+                  onchange="togglePlanSubject(this)">
+
+                <span>
+                  ${escapeHtml(subject)}
+                </span>
+
+              </label>
+
+            `;
+
+          }
+        ).join("");
+
+
+      updateSelectedPlanCount();
+
+    }
+
+
+    function updateSelectedPlanCount(){
+
+      const counter =
+        document.getElementById(
+          "selectedPlanCount"
+        );
+
+      if(counter){
+
+        counter.textContent =
+          selectedPlanSubjects.length;
+
+      }
+
+    }
+
+
+    function togglePlanSubject(input){
+
+      const subject =
+        input.value;
+
+
+      if(input.checked){
+
+        if(
+          !selectedPlanSubjects.includes(
+            subject
+          )
+        ){
+
+          selectedPlanSubjects.push(
+            subject
+          );
+
+        }
+
+      }else{
+
+        selectedPlanSubjects =
+          selectedPlanSubjects.filter(
+            item =>
+              item !== subject
+          );
+
+      }
+
+
+      input
+        .closest(
+          ".subject-option"
+        )
+        ?.classList.toggle(
+          "selected",
+          input.checked
+        );
+
+
+      updateSelectedPlanCount();
+
+    }
+
+
+    /* =====================================================
+       PLAN - SAVE SUBJECTS
+    ===================================================== */
+
+    async function saveSelectedPlanSubjects(){
+
+      if(!currentUser)
+        return;
+
+
+      if(
+        !selectedPlanSubjects.length
+      ){
+
+        toast(
+          "En az bir ders seçmelisin."
+        );
+
+        return;
+
+      }
+
+
+      savePlanSubjectsLocal();
+
+
+      /*
+        Mevcut plan varsa subjects alanını
+        güncelle fakat görevleri bozma.
+      */
+
+      if(dailyPlan){
+
+        dailyPlan.subjects =
+          [...selectedPlanSubjects];
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from("daily_plans")
+            .upsert(
+
+              {
+
+                ...dailyPlan,
+
+                subjects:
+                  [...selectedPlanSubjects],
+
+                updated_at:
+                  new Date()
+                    .toISOString()
+
+              },
+
+              {
+                onConflict:
+                  "user_id,plan_date"
+              }
+
+            )
+            .select()
+            .single();
+
+
+        if(error){
+
+          console.error(error);
+
+          toast(
+            "Dersler kaydedilemedi: " +
+            error.message
+          );
+
+          return;
+
+        }
+
+
+        if(data){
+
+          dailyPlan =
+            data;
+
+        }
+
+      }
+
+
+      saveLocal();
+
+
+      const status =
+        document.getElementById(
+          "planSaveStatus"
+        );
+
+      if(status){
+
+        status.textContent =
+          "✓ Ders tercihlerin kaydedildi.";
+
+        setTimeout(
+          () => {
+
+            status.textContent = "";
+
+          },
+          3000
+        );
+
+      }
+
+
+      renderPlan();
+
+      toast(
+        "Dersler kaydedildi 📚"
+      );
+
+    }
+
+
+    /* =====================================================
+       PLAN - REFRESH
+    ===================================================== */
+
+    async function refreshTodayPlan(){
+
+      if(!currentUser)
+        return;
+
+
+      if(
+        !selectedPlanSubjects.length
+      ){
+
+        toast(
+          "Önce en az bir ders seç."
+        );
+
+        return;
+
+      }
+
+
+      const hours =
+        Number(
+          document.getElementById(
+            "planHours"
+          ).value
+        ) ||
+        Number(
+          profile?.daily_hours ||
+          4
+        );
+
+
+      const start =
+        document.getElementById(
+          "planStart"
+        ).value ||
+        dailyPlan?.start_time ||
+        "18:00";
+
+
+      const totalMinutes =
+        Math.max(
+          15,
+          Math.round(
+            hours * 60
+          )
+        );
+
+
+      const minutesPerSubject =
+        Math.max(
+          15,
+          Math.floor(
+            totalMinutes /
+            selectedPlanSubjects.length
+          )
+        );
+
+
+      const tasks =
+        selectedPlanSubjects.map(
+          (
+            subject,
+            index
+          ) => {
+
+            const startMinutes =
+              timeToMinutes(start) +
+              index *
+              minutesPerSubject;
+
+            return {
+
+              id:
+                "task_" +
+                Date.now() +
+                "_" +
+                index,
+
+              date:
+                today(),
+
+              time:
+                minutesToTime(
+                  startMinutes
+                ),
+
+              subject,
+
+              topic:"",
+
+              minutes:
+                minutesPerSubject,
+
+              done:false
+
+            };
+
+          }
+        );
+
+
+      const newPlan = {
+
+        user_id:
+          currentUser.id,
+
+        plan_date:
+          today(),
+
+        hours,
+
+        start_time:
+          start,
+
+        subjects:
+          [...selectedPlanSubjects],
+
+        tasks,
+
+        updated_at:
+          new Date()
+            .toISOString()
+
+      };
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("daily_plans")
+          .upsert(
+
+            newPlan,
+
+            {
+              onConflict:
+                "user_id,plan_date"
+            }
+
+          )
+          .select()
+          .single();
+
+
+      if(error){
+
+        console.error(error);
+
+        toast(
+          "Plan yenilenemedi: " +
+          error.message
+        );
+
+        return;
+
+      }
+
+
+      dailyPlan =
+        data || newPlan;
+
+
+      savePlanSubjectsLocal();
+
+      saveLocal();
+
+      renderPlan();
+
+      renderHome();
+
+      toast(
+        "Plan seçtiğin derslere göre yenilendi 🔄"
+      );
+
+    }
+
+
+    /* =====================================================
+       PLAN
+    ===================================================== */
+
+    function renderPlan(){
+
+      document.getElementById(
+        "planDateLabel"
+      ).textContent =
+        new Date()
+          .toLocaleDateString(
+            "tr-TR"
+          );
+
+
+      /*
+        Dersleri yükle
+      */
+
+      loadPlanSubjects();
+
+
+      /*
+        Editor
+      */
+
+      renderPlanSubjectEditor();
+
+
+      if(!dailyPlan){
+
+        document.getElementById(
+          "planTaskList"
+        ).innerHTML =
+          "Bugün için plan yok.";
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "planHours"
+      ).value =
+        dailyPlan.hours ||
+        0;
+
+
+      document.getElementById(
+        "planStart"
+      ).value =
+        dailyPlan.start_time ||
+        "18:00";
+
+
+      /*
+        Eski multi-select'i de
+        seçilen derslerle senkron tut.
+      */
+
+      const selected =
+        dailyPlan.subjects ||
+        selectedPlanSubjects ||
+        [];
+
+
+      Array.from(
+        document
+          .getElementById(
+            "planSubjects"
+          )
+          .options
+      ).forEach(
+        option => {
+
+          option.selected =
+            selected.includes(
+              option.value
+            );
+
+        }
+      );
+
+
+      renderPlanTasks();
+
+    }
+
+
+    function renderPlanTasks(){
+
+      const list =
+        document.getElementById(
+          "planTaskList"
+        );
+
+
+      const tasks =
+        dailyPlan?.tasks ||
+        [];
+
+
+      if(!tasks.length){
+
+        list.innerHTML =
+          `<div style="color:var(--muted)">
+            Görev bulunmuyor.
+          </div>`;
+
+        document.getElementById(
+          "planProgressText"
+        ).textContent =
+          "0 / 0";
+
+        return;
+
+      }
+
+
+      const done =
+        tasks.filter(
+          t => t.done
+        ).length;
+
+
+      document.getElementById(
+        "planProgressText"
+      ).textContent =
+        done +
+        " / " +
+        tasks.length;
+
+
+      list.innerHTML =
+        tasks.map(
+          task => `
+
+          <div
+            class="task ${
+              task.done
+                ? "done"
+                : ""
+            }"
+            onclick="toggleTask('${escapeAttr(task.id)}')">
+
+            <div class="task-check">
+              ${
+                task.done
+                  ? "✓"
+                  : ""
+              }
+            </div>
+
+            <div class="task-info">
+
+              <div class="task-name">
+
+                ${
+                  escapeHtml(
+                    task.subject ||
+                    "Ders"
+                  )
+                }
+
+              </div>
+
+              <div class="task-meta">
+
+                ${
+                  escapeHtml(
+                    task.time ||
+                    ""
+                  )
+                }
+
+                ·
+
+                ${
+                  Number(
+                    task.minutes ||
+                    0
+                  )
+                }
+
+                dakika
+
+              </div>
+
+            </div>
+
+          </div>
+
+        `
+        ).join("");
+
+    }
+
+
+    function renderTodayTasks(){
+
+      const container =
+        document.getElementById(
+          "todayTasks"
+        );
+
+
+      const tasks =
+        dailyPlan?.tasks ||
+        [];
+
+
+      if(!tasks.length){
+
+        container.innerHTML =
+          `<div style="color:var(--muted);font-size:13px">
+            Bugün için görev yok.
+          </div>`;
+
+
+        document.getElementById(
+          "todayProgressBar"
+        ).style.width =
+          "0%";
+
+
+        document.getElementById(
+          "todayPlanProgress"
+        ).textContent =
+          "0%";
+
+
+        return;
+
+      }
+
+
+      const done =
+        tasks.filter(
+          t => t.done
+        ).length;
+
+
+      const percent =
+        Math.round(
+          done /
+          tasks.length *
+          100
+        );
+
+
+      document.getElementById(
+        "todayProgressBar"
+      ).style.width =
+        percent +
+        "%";
+
+
+      document.getElementById(
+        "todayPlanProgress"
+      ).textContent =
+        percent +
+        "%";
+
+
+      container.innerHTML =
+        tasks
+          .slice(0,4)
+          .map(
+            task => `
+
+          <div
+            class="task ${
+              task.done
+                ? "done"
+                : ""
+            }"
+            onclick="toggleTask('${escapeAttr(task.id)}')">
+
+            <div class="task-check">
+
+              ${
+                task.done
+                  ? "✓"
+                  : ""
+              }
+
+            </div>
+
+            <div class="task-info">
+
+              <div class="task-name">
+
+                ${
+                  escapeHtml(
+                    task.subject ||
+                    "Ders"
+                  )
+                }
+
+              </div>
+
+              <div class="task-meta">
+
+                ${
+                  escapeHtml(
+                    task.time ||
+                    ""
+                  )
+                }
+
+                ·
+
+                ${
+                  task.minutes ||
+                  0
+                }
+
+                dk
+
+              </div>
+
+            </div>
+
+          </div>
+
+        `
+          )
+          .join("");
+
+    }
+
+
+    /* =====================================================
+       PLAN - NORMAL SAVE
+    ===================================================== */
+
+    async function savePlan(){
+
+      const select =
+        document.getElementById(
+          "planSubjects"
+        );
+
+
+      const subjects =
+        Array.from(
+          select.selectedOptions
+        )
+        .map(
+          option =>
+            option.value
+        );
+
+
+      if(!subjects.length){
+
+        toast(
+          "En az bir ders seç."
+        );
+
+        return;
+
+      }
+
+
+      const hours =
+        Number(
+          document.getElementById(
+            "planHours"
+          ).value
+        ) || 0;
+
+
+      const start =
+        document.getElementById(
+          "planStart"
+        ).value ||
+        "18:00";
+
+
+      /*
+        Yeni ders seçimlerini ana sisteme aktar.
+      */
+
+      selectedPlanSubjects =
+        [...subjects];
+
+
+      savePlanSubjectsLocal();
+
+
+      const minutesPerSubject =
+        Math.max(
+          15,
+          Math.floor(
+            hours *
+            60 /
+            subjects.length
+          )
+        );
+
+
+      /*
+        Mevcut görevlerin tamamlanma durumunu koru.
+      */
+
+      const oldTasks =
+        dailyPlan?.tasks ||
+        [];
+
+
+      const tasks =
+        subjects.map(
+          (
+            subject,
+            index
+          ) => {
+
+            const previous =
+              oldTasks.find(
+                task =>
+                  task.subject ===
+                  subject
+              );
+
+
+            const startMinutes =
+              timeToMinutes(
+                start
+              ) +
+              index *
+              minutesPerSubject;
+
+
+            return {
+
+              id:
+                previous?.id ||
+                (
+                  "task_" +
+                  Date.now() +
+                  "_" +
+                  index
+                ),
+
+              date:
+                today(),
+
+              time:
+                minutesToTime(
+                  startMinutes
+                ),
+
+              subject,
+
+              topic:
+                previous?.topic ||
+                "",
+
+              minutes:
+                minutesPerSubject,
+
+              done:
+                previous?.done ||
+                false
+
+            };
+
+          }
+        );
+
+
+      const newPlan = {
 
         user_id:
           currentUser.id,
@@ -3564,18 +4744,26 @@
 
       };
 
+
       const {
+        data,
         error
       } =
         await supabaseClient
           .from("daily_plans")
           .upsert(
-            dailyPlan,
+
+            newPlan,
+
             {
               onConflict:
                 "user_id,plan_date"
             }
-          );
+
+          )
+          .select()
+          .single();
+
 
       if(error){
 
@@ -3586,7 +4774,13 @@
         );
 
         return;
+
       }
+
+
+      dailyPlan =
+        data || newPlan;
+
 
       saveLocal();
 
@@ -3597,6 +4791,7 @@
       toast(
         "Plan kaydedildi 📅"
       );
+
     }
 
 
@@ -3605,6 +4800,7 @@
       if(!dailyPlan?.tasks)
         return;
 
+
       const task =
         dailyPlan.tasks.find(
           t =>
@@ -3612,32 +4808,62 @@
             String(id)
         );
 
+
       if(!task)
         return;
+
 
       task.done =
         !task.done;
 
-      await supabaseClient
-        .from("daily_plans")
-        .upsert(
-          {
-            ...dailyPlan,
-            updated_at:
-              new Date()
-                .toISOString()
-          },
-          {
-            onConflict:
-              "user_id,plan_date"
-          }
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("daily_plans")
+          .upsert(
+
+            {
+
+              ...dailyPlan,
+
+              updated_at:
+                new Date()
+                  .toISOString()
+
+            },
+
+            {
+              onConflict:
+                "user_id,plan_date"
+            }
+
+          );
+
+
+      if(error){
+
+        console.error(error);
+
+        task.done =
+          !task.done;
+
+        toast(
+          "Görev güncellenemedi."
         );
+
+        return;
+
+      }
+
 
       saveLocal();
 
       renderPlanTasks();
 
       renderTodayTasks();
+
     }
 
 
@@ -3685,6 +4911,7 @@
           ).value
         ) || 0;
 
+
       if(total <= 0){
 
         toast(
@@ -3692,11 +4919,30 @@
         );
 
         return;
+
       }
+
+
+      if(
+        correct +
+        wrong +
+        blank >
+        total
+      ){
+
+        toast(
+          "Doğru + yanlış + boş toplamı soru sayısını geçemez."
+        );
+
+        return;
+
+      }
+
 
       const net =
         correct -
         wrong / 4;
+
 
       const row = {
 
@@ -3725,6 +4971,7 @@
 
       };
 
+
       const {
         data,
         error
@@ -3735,6 +4982,7 @@
           .select()
           .single();
 
+
       if(error){
 
         console.error(error);
@@ -3744,17 +4992,22 @@
         );
 
         return;
+
       }
+
 
       questions.unshift(
         data
       );
 
+
       saveLocal();
+
 
       document.getElementById(
         "qTopic"
       ).value = "";
+
 
       checkBadges();
 
@@ -3762,9 +5015,11 @@
 
       renderHome();
 
+
       toast(
         "Soru kaydı eklendi 🎯"
       );
+
     }
 
 
@@ -3775,6 +5030,7 @@
           "questionList"
         );
 
+
       if(!questions.length){
 
         container.innerHTML =
@@ -3783,7 +5039,9 @@
           </div>`;
 
         return;
+
       }
+
 
       container.innerHTML =
         questions
@@ -3798,53 +5056,76 @@
                 <div>
 
                   <div class="list-title">
+
                     ${
                       escapeHtml(
                         q.subject
                       )
                     }
+
                   </div>
 
                   <div class="list-meta">
+
                     ${
                       escapeHtml(
                         q.topic ||
                         "Konu belirtilmedi"
                       )
                     }
+
                     ·
+
                     ${
                       q.date ||
                       ""
                     }
+
                   </div>
 
                 </div>
 
                 <div class="net">
+
                   ${
                     Number(
                       q.net ||
                       0
                     ).toFixed(2)
                   }
+
                 </div>
 
               </div>
 
               <div class="list-meta">
+
                 ${
                   q.total
-                } soru
-                · ${
+                }
+                soru
+
+                ·
+
+                ${
                   q.correct
-                } doğru
-                · ${
+                }
+                doğru
+
+                ·
+
+                ${
                   q.wrong
-                } yanlış
-                · ${
+                }
+                yanlış
+
+                ·
+
+                ${
                   q.blank
-                } boş
+                }
+                boş
+
               </div>
 
             </div>
@@ -3852,6 +5133,7 @@
           `
           )
           .join("");
+
     }
 
 
@@ -3866,16 +5148,19 @@
           "examName"
         ).value.trim();
 
+
       const date =
         document.getElementById(
           "examDate"
         ).value ||
         today();
 
+
       const type =
         document.getElementById(
           "examType"
         ).value;
+
 
       const turkish =
         Number(
@@ -3884,12 +5169,14 @@
           ).value
         ) || 0;
 
+
       const math =
         Number(
           document.getElementById(
             "examMath"
           ).value
         ) || 0;
+
 
       const science =
         Number(
@@ -3898,12 +5185,14 @@
           ).value
         ) || 0;
 
+
       const social =
         Number(
           document.getElementById(
             "examSocial"
           ).value
         ) || 0;
+
 
       if(!name){
 
@@ -3912,13 +5201,16 @@
         );
 
         return;
+
       }
+
 
       const net =
         turkish +
         math +
         science +
         social;
+
 
       const row = {
 
@@ -3946,6 +5238,7 @@
 
       };
 
+
       const {
         data,
         error
@@ -3956,6 +5249,7 @@
           .select()
           .single();
 
+
       if(error){
 
         console.error(error);
@@ -3965,17 +5259,22 @@
         );
 
         return;
+
       }
+
 
       exams.unshift(
         data
       );
 
+
       saveLocal();
+
 
       document.getElementById(
         "examName"
       ).value = "";
+
 
       checkBadges();
 
@@ -3983,9 +5282,11 @@
 
       renderHome();
 
+
       toast(
         "Deneme kaydedildi 📊"
       );
+
     }
 
 
@@ -3996,6 +5297,7 @@
           "examList"
         );
 
+
       if(!exams.length){
 
         container.innerHTML =
@@ -4004,7 +5306,9 @@
           </div>`;
 
         return;
+
       }
+
 
       container.innerHTML =
         exams
@@ -4018,55 +5322,68 @@
               <div>
 
                 <div class="list-title">
+
                   ${
                     escapeHtml(
                       e.name
                     )
                   }
+
                 </div>
 
                 <div class="list-meta">
+
                   ${
                     e.type ||
                     ""
                   }
+
                   ·
+
                   ${
                     e.date ||
                     ""
                   }
+
                 </div>
 
               </div>
 
               <div class="net">
+
                 ${
                   Number(
                     e.net ||
                     0
                   ).toFixed(2)
                 }
+
               </div>
 
             </div>
 
             <div class="list-meta">
+
               Türkçe ${
                 e.turkish ||
                 0
               }
+
               · Mat ${
                 e.math ||
                 0
               }
+
               · Fen ${
                 e.science ||
                 0
               }
+
               · Sosyal ${
                 e.social ||
                 0
               }
+
             </div>
 
           </div>
@@ -4074,6 +5391,7 @@
         `
           )
           .join("");
+
     }
 
 
@@ -4092,6 +5410,7 @@
         startFocus();
 
       }
+
     }
 
 
@@ -4103,6 +5422,7 @@
         "timerStart"
       ).textContent =
         "Durdur";
+
 
       focusInterval =
         setInterval(
@@ -4126,6 +5446,7 @@
           },
           1000
         );
+
     }
 
 
@@ -4141,6 +5462,7 @@
         "timerStart"
       ).textContent =
         "Başlat";
+
     }
 
 
@@ -4152,6 +5474,7 @@
         1500;
 
       updateTimer();
+
     }
 
 
@@ -4163,6 +5486,7 @@
         1500;
 
       updateTimer();
+
 
       const row = {
 
@@ -4183,6 +5507,7 @@
 
       };
 
+
       const {
         data,
         error
@@ -4193,13 +5518,18 @@
           .select()
           .single();
 
+
       if(
         !error &&
         data
-      )
+      ){
+
         studySessions.unshift(
           data
         );
+
+      }
+
 
       saveLocal();
 
@@ -4207,9 +5537,11 @@
 
       renderHome();
 
+
       toast(
         "25 dakikalık çalışma tamamlandı! 🔥"
       );
+
     }
 
 
@@ -4226,6 +5558,7 @@
           "0"
         );
 
+
       const seconds =
         (
           focusSeconds %
@@ -4237,12 +5570,14 @@
           "0"
         );
 
+
       document.getElementById(
         "timer"
       ).textContent =
         minutes +
         ":" +
         seconds;
+
     }
 
 
@@ -4254,36 +5589,47 @@
 
       const totalQuestions =
         questions.reduce(
+
           (sum,q) =>
             sum +
             Number(
               q.total ||
               0
             ),
+
           0
+
         );
 
+
       const keys = [];
+
 
       if(totalQuestions >= 1)
         keys.push("first");
 
+
       if(totalQuestions >= 100)
         keys.push("q100");
+
 
       if(totalQuestions >= 500)
         keys.push("q500");
 
+
       if(totalQuestions >= 1000)
         keys.push("q1000");
 
+
       if(exams.length >= 1)
         keys.push("exam");
+
 
       if(
         calculateStreak() >= 7
       )
         keys.push("streak7");
+
 
       const doneTopics =
         Object.values(topics)
@@ -4294,10 +5640,12 @@
           )
           .length;
 
+
       if(
         doneTopics >= 25
       )
         keys.push("topics25");
+
 
       if(
         exams.some(
@@ -4313,6 +5661,7 @@
 
       }
 
+
       for(
         const key of keys
       ){
@@ -4324,8 +5673,10 @@
               key
           );
 
+
         if(exists)
           continue;
+
 
         const {
           data,
@@ -4334,26 +5685,36 @@
           await supabaseClient
             .from("badges")
             .insert({
+
               user_id:
                 currentUser.id,
+
               badge_key:
                 key
+
             })
             .select()
             .single();
 
+
         if(
           !error &&
           data
-        )
+        ){
+
           badges.push(
             data
           );
+
+        }
+
       }
+
 
       saveLocal();
 
       renderBadges();
+
     }
 
 
@@ -4364,13 +5725,17 @@
           "badgeList"
         );
 
+
       const earned =
         new Set(
+
           badges.map(
             b =>
               b.badge_key
           )
+
         );
+
 
       document.getElementById(
         "badgeCount"
@@ -4378,6 +5743,7 @@
         earned.size +
         " / " +
         BADGE_DEFINITIONS.length;
+
 
       container.innerHTML =
         BADGE_DEFINITIONS
@@ -4389,6 +5755,7 @@
                   badge.key
                 );
 
+
               return `
 
               <div
@@ -4399,15 +5766,19 @@
                 }">
 
                 <div class="badge-icon">
+
                   ${
                     badge.icon
                   }
+
                 </div>
 
                 <div class="badge-name">
+
                   ${
                     badge.name
                   }
+
                 </div>
 
                 <div
@@ -4430,6 +5801,7 @@
             }
           )
           .join("");
+
     }
 
 
@@ -4452,15 +5824,22 @@
           );
 
         return;
+
       }
+
 
       try{
 
         const [
+
           profilesResult,
+
           questionsResult,
+
           examsResult,
+
           sessionsResult
+
         ] =
           await Promise.all([
 
@@ -4484,25 +5863,30 @@
 
           ]);
 
+
         if(
           profilesResult.error
         )
           throw profilesResult.error;
+
 
         if(
           questionsResult.error
         )
           throw questionsResult.error;
 
+
         if(
           examsResult.error
         )
           throw examsResult.error;
 
+
         if(
           sessionsResult.error
         )
           throw sessionsResult.error;
+
 
         document.getElementById(
           "adminUsers"
@@ -4511,12 +5895,14 @@
             ?.length ||
           0;
 
+
         document.getElementById(
           "adminQuestions"
         ).textContent =
           questionsResult.data
             ?.length ||
           0;
+
 
         document.getElementById(
           "adminExams"
@@ -4525,12 +5911,14 @@
             ?.length ||
           0;
 
+
         const minutes =
           (
             sessionsResult.data ||
             []
           )
           .reduce(
+
             (
               sum,
               s
@@ -4544,8 +5932,11 @@
                 s.seconds ||
                 0
               ) / 60,
+
             0
+
           );
+
 
         document.getElementById(
           "adminMinutes"
@@ -4554,10 +5945,12 @@
             minutes
           );
 
+
         if(showMessage)
           toast(
             "Admin istatistikleri güncellendi."
           );
+
 
       }catch(error){
 
@@ -4567,7 +5960,9 @@
           toast(
             error.message
           );
+
       }
+
     }
 
 
@@ -4599,12 +5994,16 @@
 
         dailyPlan,
 
-        badges
+        badges,
+
+        selectedPlanSubjects
 
       };
 
+
       const blob =
         new Blob(
+
           [
             JSON.stringify(
               data,
@@ -4612,36 +6011,47 @@
               2
             )
           ],
+
           {
             type:
               "application/json"
           }
+
         );
+
 
       const url =
         URL.createObjectURL(
           blob
         );
 
+
       const a =
         document.createElement(
           "a"
         );
 
-      a.href = url;
+
+      a.href =
+        url;
+
 
       a.download =
         "yks-kocum-yedek.json";
 
+
       a.click();
+
 
       URL.revokeObjectURL(
         url
       );
 
+
       toast(
         "Yedek dışa aktarıldı."
       );
+
     }
 
 
@@ -4652,20 +6062,25 @@
       const file =
         event.target.files?.[0];
 
+
       if(!file)
         return;
+
 
       try{
 
         const text =
           await file.text();
 
+
         const data =
           JSON.parse(text);
+
 
         if(data.profile)
           profile =
             data.profile;
+
 
         if(
           Array.isArray(
@@ -4675,6 +6090,7 @@
           questions =
             data.questions;
 
+
         if(
           Array.isArray(
             data.exams
@@ -4682,6 +6098,7 @@
         )
           exams =
             data.exams;
+
 
         if(
           Array.isArray(
@@ -4691,9 +6108,11 @@
           wrongs =
             data.wrongs;
 
+
         if(data.topics)
           topics =
             data.topics;
+
 
         if(
           Array.isArray(
@@ -4703,9 +6122,11 @@
           studySessions =
             data.studySessions;
 
+
         if(data.dailyPlan)
           dailyPlan =
             data.dailyPlan;
+
 
         if(
           Array.isArray(
@@ -4715,15 +6136,36 @@
           badges =
             data.badges;
 
+
+        if(
+          Array.isArray(
+            data.selectedPlanSubjects
+          )
+        ){
+
+          selectedPlanSubjects =
+            data.selectedPlanSubjects;
+
+          savePlanSubjectsLocal();
+
+        }else{
+
+          loadPlanSubjects();
+
+        }
+
+
         saveLocal();
 
         fillProfileUI();
 
         renderAll();
 
+
         toast(
           "Yedek içe aktarıldı. ☁️"
         );
+
 
       }catch(error){
 
@@ -4735,7 +6177,9 @@
 
       }
 
+
       event.target.value = "";
+
     }
 
 
@@ -4749,14 +6193,19 @@
         "dark"
       );
 
+
       localStorage.setItem(
+
         localKey("dark"),
+
         document.body.classList.contains(
           "dark"
         )
           ? "1"
           : "0"
+
       );
+
     }
 
 
@@ -4767,10 +6216,12 @@
           localKey("dark")
         ) === "1";
 
+
       document.body.classList.toggle(
         "dark",
         dark
       );
+
     }
 
 
@@ -4787,11 +6238,16 @@
           .split(":")
           .map(Number);
 
+
       return (
+
         (parts[0] || 0) *
         60 +
+
         (parts[1] || 0)
+
       );
+
     }
 
 
@@ -4799,9 +6255,25 @@
       total
     ){
 
+      /*
+        24 saati aşarsa ertesi güne
+        sarmasını engellemek için.
+      */
+
       total =
-        total %
-        1440;
+        Math.max(
+          0,
+          total
+        );
+
+
+      if(total >= 1440){
+
+        total =
+          total % 1440;
+
+      }
+
 
       const h =
         Math.floor(
@@ -4812,6 +6284,7 @@
           2,
           "0"
         );
+
 
       const m =
         (
@@ -4824,9 +6297,11 @@
           "0"
         );
 
+
       return h +
         ":" +
         m;
+
     }
 
 
@@ -4837,26 +6312,32 @@
       return String(
         value ?? ""
       )
+
         .replaceAll(
           "&",
           "&amp;"
         )
+
         .replaceAll(
           "<",
           "&lt;"
         )
+
         .replaceAll(
           ">",
           "&gt;"
         )
+
         .replaceAll(
           '"',
           "&quot;"
         )
+
         .replaceAll(
           "'",
           "&#039;"
         );
+
     }
 
 
@@ -4867,19 +6348,23 @@
       return String(
         value ?? ""
       )
+
         .replaceAll(
           "\\",
           "\\\\"
         )
+
         .replaceAll(
           "'",
           "\\'"
         );
+
     }
 
 
     let toastTimer =
       null;
+
 
     function toast(
       message
@@ -4890,16 +6375,20 @@
           "toast"
         );
 
+
       el.textContent =
         message;
+
 
       el.classList.add(
         "show"
       );
 
+
       clearTimeout(
         toastTimer
       );
+
 
       toastTimer =
         setTimeout(
@@ -4912,6 +6401,7 @@
           },
           2500
         );
+
     }
 
 
@@ -4934,6 +6424,7 @@
       updateTimer();
 
       updateAdminBadge();
+
     }
 
 
@@ -4942,6 +6433,7 @@
     ===================================================== */
 
     supabaseClient.auth.onAuthStateChange(
+
       async (
         event,
         session
@@ -4954,6 +6446,7 @@
 
           currentUser =
             session.user;
+
 
           if(
             document
@@ -4978,12 +6471,17 @@
           currentRole =
             "user";
 
+          selectedPlanSubjects =
+            [];
+
+
           document
             .getElementById(
               "loading"
             )
             .classList
             .add("hidden");
+
 
           document
             .getElementById(
@@ -4992,12 +6490,14 @@
             .classList
             .add("hidden");
 
+
           document
             .getElementById(
               "authScreen"
             )
             .classList
             .remove("hidden");
+
 
           document
             .getElementById(
@@ -5006,14 +6506,18 @@
             .classList
             .add("hidden");
 
+
           document
             .getElementById(
               "adminSection"
             )
             .classList
             .add("hidden");
+
         }
+
       }
+
     );
 
 
@@ -5025,14 +6529,17 @@
 
       loadTheme();
 
+
       document.getElementById(
         "examDate"
       ).value =
         today();
 
+
       switchAuth(
         "login"
       );
+
 
       const {
         data
@@ -5040,6 +6547,7 @@
         await supabaseClient
           .auth
           .getSession();
+
 
       if(
         data?.session?.user
@@ -5065,7 +6573,9 @@
           )
           .classList
           .remove("hidden");
+
       }
+
     }
 
 
