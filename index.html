@@ -31,8 +31,12 @@
   -webkit-tap-highlight-color:transparent;
 }
 
-body{
+html,body{
   margin:0;
+  min-height:100%;
+}
+
+body{
   background:var(--bg);
   color:var(--text);
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -44,7 +48,7 @@ body.dark{
   --text:#f5f5fa;
   --muted:#a3a3b4;
   --line:#30303e;
-  --shadow:0 12px 35px rgba(0,0,0,.25);
+  --shadow:0 12px 35px rgba(0,0,0,.28);
 }
 
 button,input,select,textarea{
@@ -56,64 +60,72 @@ button{
   cursor:pointer;
 }
 
+input,select,textarea{
+  color:var(--text);
+}
+
 .hidden{
   display:none!important;
 }
 
-#app{
-  max-width:520px;
-  min-height:100vh;
-  margin:auto;
-  position:relative;
-  padding-bottom:92px;
-}
 
-/* AUTH */
+/* =========================
+   AUTH
+========================= */
 
 #authScreen{
   min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:24px;
+  padding:22px;
 }
 
 .auth-card{
   width:100%;
+  max-width:430px;
   background:var(--card);
+  border:1px solid var(--line);
   border-radius:30px;
   padding:30px 24px;
   box-shadow:var(--shadow);
 }
 
 .auth-logo{
-  text-align:center;
-  font-size:54px;
-  margin-bottom:8px;
+  width:75px;
+  height:75px;
+  border-radius:24px;
+  margin:0 auto 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:38px;
+  color:#fff;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  box-shadow:0 15px 30px rgba(108,92,231,.25);
 }
 
 .auth-title{
   text-align:center;
   font-size:28px;
   font-weight:900;
-  margin-bottom:6px;
 }
 
 .auth-sub{
   text-align:center;
   color:var(--muted);
-  font-size:14px;
-  margin-bottom:25px;
+  font-size:13px;
+  margin:7px 0 24px;
 }
 
 .auth-tabs{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px;
-  background:var(--bg);
+  gap:7px;
   padding:5px;
+  background:var(--bg);
   border-radius:15px;
-  margin-bottom:20px;
+  margin-bottom:18px;
 }
 
 .auth-tabs button{
@@ -126,19 +138,18 @@ button{
 .auth-tabs button.active{
   background:var(--card);
   color:var(--text);
-  font-weight:800;
+  font-weight:900;
   box-shadow:0 3px 12px rgba(0,0,0,.05);
 }
 
 .input{
   width:100%;
   padding:14px 15px;
+  margin-bottom:10px;
   border:1px solid var(--line);
-  background:var(--bg);
-  color:var(--text);
   border-radius:14px;
   outline:none;
-  margin-bottom:11px;
+  background:var(--bg);
 }
 
 .input:focus{
@@ -147,19 +158,12 @@ button{
 
 .primary{
   width:100%;
-  background:linear-gradient(135deg,var(--primary),var(--primary2));
-  color:white;
   padding:14px;
   border-radius:15px;
-  font-weight:800;
-  margin-top:5px;
-}
-
-.secondary{
-  background:var(--bg);
-  color:var(--text);
-  padding:12px 15px;
-  border-radius:13px;
+  color:#fff;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  font-weight:900;
+  margin-top:4px;
 }
 
 .auth-message{
@@ -167,21 +171,33 @@ button{
   text-align:center;
   color:var(--muted);
   font-size:13px;
-  margin-top:13px;
+  margin-top:12px;
+  line-height:1.4;
 }
 
 .privacy{
-  margin-top:18px;
-  font-size:11px;
-  line-height:1.5;
-  color:var(--muted);
+  margin-top:17px;
   text-align:center;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.5;
 }
 
-/* HEADER */
+
+/* =========================
+   APP
+========================= */
+
+#app{
+  width:100%;
+  max-width:520px;
+  min-height:100vh;
+  margin:auto;
+  padding-bottom:92px;
+}
 
 header{
-  padding:18px 18px 12px;
+  padding:17px 17px 12px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -194,16 +210,15 @@ header{
 }
 
 .logo{
-  width:42px;
-  height:42px;
+  width:43px;
+  height:43px;
   border-radius:14px;
   display:flex;
   align-items:center;
   justify-content:center;
-  color:white;
+  color:#fff;
   background:linear-gradient(135deg,var(--primary),var(--primary2));
-  font-size:22px;
-  box-shadow:0 8px 20px rgba(108,92,231,.25);
+  box-shadow:0 8px 20px rgba(108,92,231,.2);
 }
 
 .brand-title{
@@ -212,19 +227,22 @@ header{
 }
 
 .brand-sub{
-  color:var(--muted);
   font-size:11px;
+  color:var(--muted);
 }
 
 .theme{
-  width:42px;
-  height:42px;
+  width:43px;
+  height:43px;
   border-radius:14px;
   background:var(--card);
-  box-shadow:var(--shadow);
+  border:1px solid var(--line);
 }
 
-/* PAGES */
+
+/* =========================
+   PAGES
+========================= */
 
 .page{
   display:none;
@@ -236,16 +254,16 @@ header{
 }
 
 .hero{
-  background:linear-gradient(135deg,#6c5ce7,#8b7cf6);
-  color:white;
-  border-radius:25px;
+  color:#fff;
   padding:22px;
-  margin-bottom:15px;
+  margin-bottom:14px;
+  border-radius:25px;
+  background:linear-gradient(135deg,#6c5ce7,#8b7cf6);
   box-shadow:0 15px 30px rgba(108,92,231,.2);
 }
 
 .hero small{
-  opacity:.8;
+  opacity:.82;
 }
 
 .hero h1{
@@ -270,43 +288,7 @@ header{
 
 .card-title{
   font-weight:900;
-  margin-bottom:12px;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
-
-.stat{
-  background:var(--bg);
-  border-radius:16px;
-  padding:15px;
-}
-
-.stat b{
-  display:block;
-  font-size:22px;
-  margin-bottom:3px;
-}
-
-.stat span{
-  color:var(--muted);
-  font-size:11px;
-}
-
-.progress{
-  height:9px;
-  background:var(--bg);
-  border-radius:99px;
-  overflow:hidden;
-}
-
-.progress div{
-  height:100%;
-  background:linear-gradient(90deg,var(--primary),var(--primary2));
-  border-radius:99px;
+  margin-bottom:11px;
 }
 
 .row{
@@ -329,12 +311,53 @@ header{
   font-weight:900;
 }
 
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:15px;
+}
+
+.stat b{
+  display:block;
+  font-size:22px;
+}
+
+.stat span{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.progress{
+  height:9px;
+  background:var(--bg);
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.progress div{
+  height:100%;
+  border-radius:99px;
+  background:linear-gradient(90deg,var(--primary),var(--primary2));
+}
+
 .btn{
   padding:11px 14px;
   border-radius:13px;
-  background:var(--primary);
   color:#fff;
+  background:var(--primary);
   font-weight:800;
+}
+
+.btn.gray{
+  color:var(--text);
+  background:var(--bg);
 }
 
 .btn.green{
@@ -343,11 +366,6 @@ header{
 
 .btn.red{
   background:var(--red);
-}
-
-.btn.gray{
-  background:var(--bg);
-  color:var(--text);
 }
 
 .list-item{
@@ -370,37 +388,53 @@ header{
 }
 
 .empty{
+  padding:20px 5px;
   text-align:center;
   color:var(--muted);
-  padding:20px 5px;
 }
 
-/* BOTTOM NAV */
+
+/* =========================
+   PLAN
+========================= */
+
+.task-done{
+  opacity:.65;
+}
+
+.task-done .task-title{
+  text-decoration:line-through;
+}
+
+
+/* =========================
+   NAV
+========================= */
 
 .bottom-nav{
   position:fixed;
-  bottom:0;
+  z-index:50;
   left:50%;
-  transform:translateX(-50%);
+  bottom:0;
   width:min(520px,100%);
-  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
-  background:rgba(255,255,255,.9);
-  backdrop-filter:blur(18px);
-  border-top:1px solid var(--line);
+  transform:translateX(-50%);
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  z-index:50;
+  padding:9px 10px calc(9px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(18px);
+  border-top:1px solid var(--line);
 }
 
-.dark .bottom-nav{
-  background:rgba(27,27,40,.92);
+body.dark .bottom-nav{
+  background:rgba(27,27,40,.94);
 }
 
 .nav-btn{
+  padding:5px 2px;
   background:transparent;
   color:var(--muted);
   font-size:10px;
-  padding:5px 2px;
 }
 
 .nav-btn span{
@@ -414,17 +448,20 @@ header{
   font-weight:900;
 }
 
-/* MODAL */
+
+/* =========================
+   MODAL
+========================= */
 
 .modal{
   position:fixed;
+  z-index:100;
   inset:0;
-  background:rgba(0,0,0,.55);
   display:none;
   align-items:flex-end;
   justify-content:center;
-  z-index:100;
   padding:10px;
+  background:rgba(0,0,0,.58);
 }
 
 .modal.show{
@@ -435,9 +472,9 @@ header{
   width:min(520px,100%);
   max-height:90vh;
   overflow:auto;
+  padding:20px;
   background:var(--card);
   border-radius:27px 27px 15px 15px;
-  padding:20px;
 }
 
 .modal-title{
@@ -452,22 +489,17 @@ header{
   gap:10px;
 }
 
-.form-grid .full{
-  grid-column:1/-1;
-}
 
-/* ADMIN */
+/* =========================
+   ADMIN
+========================= */
 
 .admin-user{
-  background:var(--bg);
-  border-radius:17px;
   padding:15px;
   margin-bottom:9px;
+  border-radius:17px;
+  background:var(--bg);
   cursor:pointer;
-}
-
-.admin-user:hover{
-  outline:2px solid rgba(108,92,231,.15);
 }
 
 .admin-name{
@@ -482,10 +514,10 @@ header{
 }
 
 .admin-stat{
-  text-align:center;
-  background:var(--card);
   padding:8px 4px;
+  text-align:center;
   border-radius:10px;
+  background:var(--card);
 }
 
 .admin-stat b{
@@ -494,28 +526,31 @@ header{
 }
 
 .admin-stat span{
-  font-size:9px;
   color:var(--muted);
+  font-size:9px;
 }
 
-/* TOAST */
+
+/* =========================
+   TOAST
+========================= */
 
 #toast{
   position:fixed;
+  z-index:300;
   left:50%;
   bottom:90px;
-  transform:translateX(-50%) translateY(20px);
-  background:#20202c;
-  color:white;
+  max-width:90%;
   padding:11px 15px;
+  transform:translateX(-50%) translateY(20px);
   border-radius:13px;
+  background:#20202c;
+  color:#fff;
   font-size:13px;
+  text-align:center;
   opacity:0;
   pointer-events:none;
   transition:.25s;
-  z-index:300;
-  max-width:90%;
-  text-align:center;
 }
 
 #toast.show{
@@ -527,103 +562,188 @@ header{
 
 <body>
 
-<!-- AUTH -->
+<!-- =========================
+     AUTH SCREEN
+========================= -->
+
 <div id="authScreen">
+
   <div class="auth-card">
 
     <div class="auth-logo">🎓</div>
 
-    <div class="auth-title">YKS Koçum</div>
+    <div class="auth-title">
+      YKS Koçum
+    </div>
 
     <div class="auth-sub">
-      Çalışmalarını hesabında güvenle sakla.
+      Hedefine birlikte ilerleyelim.
     </div>
 
     <div class="auth-tabs">
-      <button id="loginTab" class="active" onclick="switchAuth('login')">
+
+      <button
+        id="loginTab"
+        class="active"
+        onclick="switchAuth('login')">
         Giriş Yap
       </button>
-      <button id="registerTab" onclick="switchAuth('register')">
+
+      <button
+        id="registerTab"
+        onclick="switchAuth('register')">
         Kayıt Ol
       </button>
+
     </div>
+
 
     <div id="registerFields" class="hidden">
-      <input id="registerUsername"
-             class="input"
-             placeholder="Kullanıcı adı">
+
+      <input
+        id="registerUsername"
+        class="input"
+        type="text"
+        autocomplete="nickname"
+        placeholder="Kullanıcı adı">
+
     </div>
 
-    <input id="authEmail"
-           class="input"
-           type="email"
-           autocomplete="email"
-           placeholder="E-posta">
 
-    <input id="authPassword"
-           class="input"
-           type="password"
-           autocomplete="current-password"
-           placeholder="Şifre">
+    <input
+      id="authEmail"
+      class="input"
+      type="email"
+      autocomplete="email"
+      placeholder="E-posta">
 
-    <button id="authButton"
-            class="primary"
-            onclick="handleAuth()">
+
+    <input
+      id="authPassword"
+      class="input"
+      type="password"
+      autocomplete="current-password"
+      placeholder="Şifre">
+
+
+    <button
+      id="authButton"
+      class="primary"
+      onclick="handleAuth()">
       Giriş Yap
     </button>
 
-    <div id="authMessage" class="auth-message"></div>
+
+    <div
+      id="authMessage"
+      class="auth-message">
+    </div>
+
 
     <div class="privacy">
-      Gereksiz kişisel bilgi girme. YKS Koçum yalnızca hesap ve
-      çalışma verilerini kullanır.
+      Yalnızca gerekli hesap ve çalışma verilerini kullan.
+      Gerçek ad, telefon, adres gibi gereksiz bilgileri girme.
     </div>
 
   </div>
+
 </div>
 
 
-<!-- APP -->
+<!-- =========================
+     APP
+========================= -->
+
 <div id="app" class="hidden">
 
 <header>
+
   <div class="brand">
-    <div class="logo">🎓</div>
-    <div>
-      <div class="brand-title">YKS Koçum</div>
-      <div class="brand-sub" id="headerUser">Hoş geldin</div>
+
+    <div class="logo">
+      🎓
     </div>
+
+    <div>
+      <div class="brand-title">
+        YKS Koçum
+      </div>
+
+      <div
+        id="headerUser"
+        class="brand-sub">
+        Hoş geldin
+      </div>
+    </div>
+
   </div>
 
-  <button class="theme" onclick="toggleTheme()">🌙</button>
+
+  <button
+    class="theme"
+    onclick="toggleTheme()">
+    🌙
+  </button>
+
 </header>
 
 
-<!-- HOME -->
-<section id="home" class="page active">
+<!-- =========================
+     HOME
+========================= -->
+
+<section
+  id="home"
+  class="page active">
 
   <div class="hero">
-    <small id="homeGreeting">Hoş geldin 👋</small>
-    <h1>Bugün ne yapıyoruz?</h1>
-    <p>Hedefine küçük adımlarla yaklaş.</p>
+
+    <small id="homeGreeting">
+      Hoş geldin 👋
+    </small>
+
+    <h1>
+      Bugün ne yapıyoruz?
+    </h1>
+
+    <p>
+      Hedefine küçük adımlarla yaklaş.
+    </p>
+
   </div>
+
 
   <div class="card">
+
     <div class="row">
+
       <div>
-        <div class="card-title">🎯 Hedef</div>
-        <div id="targetText" class="muted small">
+
+        <div class="card-title">
+          🎯 Hedef
+        </div>
+
+        <div
+          id="targetText"
+          class="muted small">
           Henüz hedef belirlenmedi.
         </div>
+
       </div>
 
-      <button class="btn gray" onclick="openTarget()">
+      <button
+        class="btn gray"
+        onclick="openTarget()">
         Düzenle
       </button>
+
     </div>
+
   </div>
 
+
   <div class="stats">
+
     <div class="stat">
       <b id="statQuestions">0</b>
       <span>Toplam Soru</span>
@@ -643,10 +763,15 @@ header{
       <b id="statMinutes">0</b>
       <span>Çalışma Dakikası</span>
     </div>
+
   </div>
 
+
   <div class="card" style="margin-top:13px">
-    <div class="card-title">🔥 Aktivite</div>
+
+    <div class="card-title">
+      🔥 Bugünkü Aktivite
+    </div>
 
     <div class="row small">
       <span>Bugünkü soru</span>
@@ -656,7 +781,10 @@ header{
     <div style="height:8px"></div>
 
     <div class="progress">
-      <div id="questionProgress" style="width:0%"></div>
+      <div
+        id="questionProgress"
+        style="width:0%">
+      </div>
     </div>
 
     <div style="height:12px"></div>
@@ -665,184 +793,392 @@ header{
       <span>Bugünkü çalışma</span>
       <b id="todayStudy">0 dk</b>
     </div>
+
   </div>
 
+
   <div class="card">
-    <div class="card-title">🏆 Rozetler</div>
+
+    <div class="card-title">
+      🏆 Rozetler
+    </div>
+
     <div id="badgesBox"></div>
+
   </div>
 
 </section>
 
 
-<!-- PLAN -->
-<section id="plan" class="page">
+<!-- =========================
+     PLAN
+========================= -->
+
+<section
+  id="plan"
+  class="page">
 
   <div class="card">
+
     <div class="row">
+
       <div>
-        <div class="card-title">📅 Bugünün Planı</div>
-        <div class="muted small" id="planInfo"></div>
+
+        <div class="card-title">
+          📅 Bugünün Planı
+        </div>
+
+        <div
+          id="planInfo"
+          class="muted small">
+        </div>
+
       </div>
 
-      <button class="btn" onclick="openPlanModal()">
+      <button
+        class="btn"
+        onclick="openPlanModal()">
         Planla
       </button>
+
     </div>
+
   </div>
+
 
   <div id="planTasks"></div>
 
+
   <div class="card">
+
     <div class="row">
+
       <div>
-        <div class="card-title">⏱️ Odak</div>
-        <div class="big" id="timerText">25:00</div>
+
+        <div class="card-title">
+          ⏱️ Odak
+        </div>
+
+        <div
+          id="timerText"
+          class="big">
+          25:00
+        </div>
+
       </div>
 
-      <button class="btn green" onclick="startFocus()">
+      <button
+        class="btn green"
+        onclick="startFocus()">
         Başlat
       </button>
+
     </div>
+
   </div>
 
 </section>
 
 
-<!-- QUESTIONS -->
-<section id="questions" class="page">
+<!-- =========================
+     QUESTIONS
+========================= -->
+
+<section
+  id="questions"
+  class="page">
 
   <div class="card">
-    <div class="card-title">📚 Soru Sonucu Ekle</div>
 
-    <select id="qSubject" class="input"></select>
-    <input id="qTopic" class="input" placeholder="Konu">
-
-    <div class="form-grid">
-      <input id="qTotal" class="input" type="number" placeholder="Toplam">
-      <input id="qCorrect" class="input" type="number" placeholder="Doğru">
-      <input id="qWrong" class="input" type="number" placeholder="Yanlış">
-      <input id="qBlank" class="input" type="number" placeholder="Boş">
+    <div class="card-title">
+      📚 Soru Sonucu Ekle
     </div>
 
-    <button class="primary" onclick="addQuestion()">
-      Sonucu Kaydet
-    </button>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📊 Son Soru Sonuçları</div>
-    <div id="questionList"></div>
-  </div>
-
-</section>
-
-
-<!-- EXAMS -->
-<section id="exams" class="page">
-
-  <div class="card">
-    <div class="card-title">📝 Deneme Ekle</div>
-
-    <input id="examName" class="input" placeholder="Deneme adı">
-
-    <select id="examType" class="input">
-      <option>TYT</option>
-      <option>AYT</option>
+    <select
+      id="qSubject"
+      class="input">
     </select>
 
+    <input
+      id="qTopic"
+      class="input"
+      placeholder="Konu">
+
+
     <div class="form-grid">
-      <input id="examTurkish" class="input" type="number" placeholder="Türkçe">
-      <input id="examMath" class="input" type="number" placeholder="Matematik">
-      <input id="examScience" class="input" type="number" placeholder="Fen">
-      <input id="examSocial" class="input" type="number" placeholder="Sosyal">
+
+      <input
+        id="qTotal"
+        class="input"
+        type="number"
+        min="0"
+        placeholder="Toplam">
+
+      <input
+        id="qCorrect"
+        class="input"
+        type="number"
+        min="0"
+        placeholder="Doğru">
+
+      <input
+        id="qWrong"
+        class="input"
+        type="number"
+        min="0"
+        placeholder="Yanlış">
+
+      <input
+        id="qBlank"
+        class="input"
+        type="number"
+        min="0"
+        placeholder="Boş">
+
     </div>
 
-    <button class="primary" onclick="addExam()">
-      Denemeyi Kaydet
+
+    <button
+      class="primary"
+      onclick="addQuestion()">
+      Sonucu Kaydet
     </button>
+
   </div>
 
+
   <div class="card">
-    <div class="card-title">📈 Denemeler</div>
-    <div id="examList"></div>
+
+    <div class="card-title">
+      📊 Sonuçlar
+    </div>
+
+    <div id="questionList"></div>
+
   </div>
 
 </section>
 
 
-<!-- MORE -->
-<section id="more" class="page">
+<!-- =========================
+     EXAMS
+========================= -->
+
+<section
+  id="exams"
+  class="page">
 
   <div class="card">
-    <div class="card-title">👤 Hesap</div>
 
-    <div class="small muted">Kullanıcı</div>
-    <div id="accountUsername" style="font-weight:900;margin-bottom:8px"></div>
+    <div class="card-title">
+      📝 Deneme Ekle
+    </div>
 
-    <div class="small muted">E-posta</div>
-    <div id="accountEmail" style="font-weight:700;margin-bottom:15px"></div>
+    <input
+      id="examName"
+      class="input"
+      placeholder="Deneme adı">
 
-    <button class="btn red" onclick="logout()">
-      Çıkış Yap
+
+    <select
+      id="examType"
+      class="input">
+
+      <option>TYT</option>
+      <option>AYT</option>
+
+    </select>
+
+
+    <div class="form-grid">
+
+      <input
+        id="examTurkish"
+        class="input"
+        type="number"
+        placeholder="Türkçe">
+
+      <input
+        id="examMath"
+        class="input"
+        type="number"
+        placeholder="Matematik">
+
+      <input
+        id="examScience"
+        class="input"
+        type="number"
+        placeholder="Fen">
+
+      <input
+        id="examSocial"
+        class="input"
+        type="number"
+        placeholder="Sosyal">
+
+    </div>
+
+
+    <button
+      class="primary"
+      onclick="addExam()">
+      Denemeyi Kaydet
     </button>
+
   </div>
 
-  <div id="adminButtonBox" class="card hidden">
+
+  <div class="card">
+
+    <div class="card-title">
+      📈 Denemeler
+    </div>
+
+    <div id="examList"></div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     MORE
+========================= -->
+
+<section
+  id="more"
+  class="page">
+
+  <div class="card">
+
+    <div class="card-title">
+      👤 Hesap
+    </div>
+
+    <div class="small muted">
+      Kullanıcı
+    </div>
+
+    <div
+      id="accountUsername"
+      style="font-weight:900;margin-bottom:9px">
+    </div>
+
+    <div class="small muted">
+      E-posta
+    </div>
+
+    <div
+      id="accountEmail"
+      style="font-weight:700;margin-bottom:15px">
+    </div>
+
+    <button
+      class="btn red"
+      onclick="logout()">
+      Çıkış Yap
+    </button>
+
+  </div>
+
+
+  <div
+    id="adminButtonBox"
+    class="card hidden">
+
     <div class="row">
+
       <div>
-        <div class="card-title">👑 Koç Paneli</div>
+
+        <div class="card-title">
+          👑 Koç Paneli
+        </div>
+
         <div class="muted small">
           Öğrenci sonuçlarını görüntüle
         </div>
+
       </div>
 
-      <button class="btn" onclick="openPage('admin')">
+      <button
+        class="btn"
+        onclick="openPage('admin')">
         Aç
       </button>
+
     </div>
+
   </div>
 
-  <div class="card">
-    <div class="card-title">💾 Veri</div>
 
-    <button class="btn gray" onclick="exportData()">
-      Verileri Dışa Aktar
+  <div class="card">
+
+    <div class="card-title">
+      💾 Veri
+    </div>
+
+    <button
+      class="btn gray"
+      onclick="exportData()">
+      Dışa Aktar
     </button>
 
-    <button class="btn gray" style="margin-left:6px" onclick="importData()">
+    <button
+      class="btn gray"
+      style="margin-left:5px"
+      onclick="importData()">
       İçeri Aktar
     </button>
 
-    <input id="importFile"
-           type="file"
-           accept=".json"
-           style="display:none"
-           onchange="readImport(event)">
+    <input
+      id="importFile"
+      type="file"
+      accept=".json"
+      style="display:none"
+      onchange="readImport(event)">
+
   </div>
 
 </section>
 
 
-<!-- ADMIN -->
-<section id="admin" class="page">
+<!-- =========================
+     ADMIN
+========================= -->
+
+<section
+  id="admin"
+  class="page">
 
   <div class="card">
+
     <div class="row">
+
       <div>
-        <div class="card-title">👑 Koç Paneli</div>
+
+        <div class="card-title">
+          👑 Koç Paneli
+        </div>
+
         <div class="muted small">
           Öğrencilerin genel çalışma verileri
         </div>
+
       </div>
 
-      <button class="btn gray" onclick="openPage('more')">
+      <button
+        class="btn gray"
+        onclick="openPage('more')">
         Geri
       </button>
+
     </div>
+
   </div>
 
+
   <div class="stats">
+
     <div class="stat">
       <b id="adminUsers">0</b>
       <span>Öğrenci</span>
@@ -862,43 +1198,73 @@ header{
       <b id="adminMinutes">0</b>
       <span>Çalışma dk</span>
     </div>
+
   </div>
 
-  <div class="card" style="margin-top:13px">
-    <div class="card-title">👥 Öğrenciler</div>
 
-    <input id="adminSearch"
-           class="input"
-           placeholder="Öğrenci ara..."
-           oninput="renderAdminUsers()">
+  <div class="card" style="margin-top:13px">
+
+    <div class="card-title">
+      👥 Öğrenciler
+    </div>
+
+    <input
+      id="adminSearch"
+      class="input"
+      placeholder="Öğrenci ara..."
+      oninput="renderAdminUsers()">
 
     <div id="adminUsersList"></div>
+
   </div>
 
 </section>
 
 
-<!-- NAV -->
+<!-- =========================
+     NAV
+========================= -->
+
 <nav class="bottom-nav">
 
-  <button class="nav-btn active" data-page="home" onclick="openPage('home')">
-    <span>🏠</span>Ana Sayfa
+  <button
+    class="nav-btn active"
+    data-page="home"
+    onclick="openPage('home')">
+    <span>🏠</span>
+    Ana Sayfa
   </button>
 
-  <button class="nav-btn" data-page="plan" onclick="openPage('plan')">
-    <span>📅</span>Plan
+  <button
+    class="nav-btn"
+    data-page="plan"
+    onclick="openPage('plan')">
+    <span>📅</span>
+    Plan
   </button>
 
-  <button class="nav-btn" data-page="questions" onclick="openPage('questions')">
-    <span>📚</span>Soru
+  <button
+    class="nav-btn"
+    data-page="questions"
+    onclick="openPage('questions')">
+    <span>📚</span>
+    Soru
   </button>
 
-  <button class="nav-btn" data-page="exams" onclick="openPage('exams')">
-    <span>📝</span>Deneme
+  <button
+    class="nav-btn"
+    data-page="exams"
+    onclick="openPage('exams')">
+    <span>📝</span>
+    Deneme
   </button>
 
-  <button class="nav-btn" data-page="more" onclick="openPage('more')">
-    <span>⚙️</span>Daha Fazla
+  <button
+    class="nav-btn"
+    data-page="more"
+    onclick="openPage('more')">
+    <span>⚙️</span>
+    Daha Fazla
   </button>
 
 </nav>
@@ -906,149 +1272,218 @@ header{
 </div>
 
 
-<!-- TARGET MODAL -->
-<div id="targetModal" class="modal">
+<!-- =========================
+     TARGET MODAL
+========================= -->
+
+<div
+  id="targetModal"
+  class="modal">
+
   <div class="modal-box">
 
-    <div class="modal-title">🎯 Hedefini Belirle</div>
+    <div class="modal-title">
+      🎯 Hedefini Belirle
+    </div>
 
-    <select id="targetField" class="input">
+    <select
+      id="targetField"
+      class="input">
+
       <option>Sayısal</option>
       <option>Eşit Ağırlık</option>
       <option>Sözel</option>
       <option>Dil</option>
+
     </select>
 
-    <input id="targetUniversity"
-           class="input"
-           placeholder="Hedef üniversite">
+    <input
+      id="targetUniversity"
+      class="input"
+      placeholder="Hedef üniversite">
 
-    <input id="targetDepartment"
-           class="input"
-           placeholder="Hedef bölüm">
+    <input
+      id="targetDepartment"
+      class="input"
+      placeholder="Hedef bölüm">
 
-    <input id="targetRank"
-           class="input"
-           type="number"
-           placeholder="Hedef sıralama">
+    <input
+      id="targetRank"
+      class="input"
+      type="number"
+      placeholder="Hedef sıralama">
 
     <div class="form-grid">
-      <input id="targetHours"
-             class="input"
-             type="number"
-             placeholder="Günlük saat">
 
-      <input id="targetQuestions"
-             class="input"
-             type="number"
-             placeholder="Günlük soru">
+      <input
+        id="targetHours"
+        class="input"
+        type="number"
+        placeholder="Günlük saat">
+
+      <input
+        id="targetQuestions"
+        class="input"
+        type="number"
+        placeholder="Günlük soru">
+
     </div>
 
-    <button class="primary" onclick="saveTarget()">
+    <button
+      class="primary"
+      onclick="saveTarget()">
       Hedefi Kaydet
     </button>
 
-    <button class="secondary"
-            style="width:100%;margin-top:8px"
-            onclick="closeModal('targetModal')">
+    <button
+      class="btn gray"
+      style="width:100%;margin-top:8px"
+      onclick="closeModal('targetModal')">
       Vazgeç
     </button>
 
   </div>
+
 </div>
 
 
-<!-- PLAN MODAL -->
-<div id="planModal" class="modal">
+<!-- =========================
+     PLAN MODAL
+========================= -->
+
+<div
+  id="planModal"
+  class="modal">
+
   <div class="modal-box">
 
-    <div class="modal-title">📅 Günlük Plan</div>
+    <div class="modal-title">
+      📅 Günlük Plan
+    </div>
 
-    <input id="planHours"
-           class="input"
-           type="number"
-           placeholder="Kaç saat çalışacaksın?">
+    <input
+      id="planHours"
+      class="input"
+      type="number"
+      placeholder="Kaç saat çalışacaksın?">
 
-    <input id="planStart"
-           class="input"
-           type="time"
-           value="18:00">
+    <input
+      id="planStart"
+      class="input"
+      type="time"
+      value="18:00">
 
-    <input id="planSubject"
-           class="input"
-           placeholder="Ders">
+    <input
+      id="planSubject"
+      class="input"
+      placeholder="Ders">
 
-    <input id="planTopic"
-           class="input"
-           placeholder="Konu">
+    <input
+      id="planTopic"
+      class="input"
+      placeholder="Konu">
 
-    <input id="planMinutes"
-           class="input"
-           type="number"
-           placeholder="Dakika">
+    <input
+      id="planMinutes"
+      class="input"
+      type="number"
+      placeholder="Dakika">
 
-    <button class="primary" onclick="addPlanTask()">
+    <button
+      class="primary"
+      onclick="addPlanTask()">
       Görevi Ekle
     </button>
 
-    <button class="secondary"
-            style="width:100%;margin-top:8px"
-            onclick="closeModal('planModal')">
+    <button
+      class="btn gray"
+      style="width:100%;margin-top:8px"
+      onclick="closeModal('planModal')">
       Kapat
     </button>
 
   </div>
+
 </div>
 
 
-<!-- FOCUS MODAL -->
-<div id="focusModal" class="modal">
-  <div class="modal-box" style="text-align:center">
+<!-- =========================
+     FOCUS MODAL
+========================= -->
 
-    <div class="modal-title">⏱️ Odaklan</div>
+<div
+  id="focusModal"
+  class="modal">
 
-    <div class="big" id="focusBig">
+  <div
+    class="modal-box"
+    style="text-align:center">
+
+    <div class="modal-title">
+      ⏱️ Odaklan
+    </div>
+
+    <div
+      id="focusBig"
+      class="big">
       25:00
     </div>
 
-    <div class="muted small" style="margin:10px 0 18px">
+    <div
+      class="muted small"
+      style="margin:10px 0 18px">
       Telefonu bırak ve derse odaklan.
     </div>
 
-    <button id="focusButton"
-            class="primary"
-            onclick="toggleFocus()">
+    <button
+      id="focusButton"
+      class="primary"
+      onclick="toggleFocus()">
       Başlat
     </button>
 
-    <button class="secondary"
-            style="width:100%;margin-top:8px"
-            onclick="closeFocus()">
+    <button
+      class="btn gray"
+      style="width:100%;margin-top:8px"
+      onclick="closeFocus()">
       Kapat
     </button>
 
   </div>
+
 </div>
 
 
-<!-- STUDENT DETAIL -->
-<div id="studentModal" class="modal">
+<!-- =========================
+     STUDENT MODAL
+========================= -->
+
+<div
+  id="studentModal"
+  class="modal">
+
   <div class="modal-box">
 
     <div class="row">
-      <div class="modal-title" id="studentTitle">
+
+      <div
+        id="studentTitle"
+        class="modal-title">
         Öğrenci
       </div>
 
-      <button class="secondary"
-              onclick="closeModal('studentModal')">
+      <button
+        class="btn gray"
+        onclick="closeModal('studentModal')">
         ✕
       </button>
+
     </div>
 
     <div id="studentDetails"></div>
 
   </div>
+
 </div>
 
 
@@ -1056,10 +1491,14 @@ header{
 
 
 <script>
-/* =====================================================
+/* =========================================================
    YKS KOÇUM V6
-   Supabase + Auth + Admin
-===================================================== */
+========================================================= */
+
+
+/* =========================
+   SUPABASE
+========================= */
 
 const SUPABASE_URL =
   "https://wcjusyzrlnnbtwyjypnm.supabase.co";
@@ -1081,8 +1520,38 @@ const supabaseClient =
   );
 
 
-const LOCAL_KEY = "yksKocumV6Local";
+/* =========================
+   GLOBAL
+========================= */
 
+const LOCAL_KEY =
+  "yksKocumV6Local";
+
+let session = null;
+let currentUser = null;
+
+let currentRole = "user";
+let isAdmin = false;
+
+let data = defaultData();
+
+let focusTimer = null;
+let focusSeconds = 1500;
+let focusRunning = false;
+
+let adminProfiles = [];
+let adminQuestions = [];
+let adminExams = [];
+let adminStudy = [];
+let adminWrongs = [];
+let adminTopics = [];
+
+let currentAuthMode = "login";
+
+
+/* =========================
+   SUBJECTS
+========================= */
 
 const SUBJECTS = [
   "TYT Türkçe",
@@ -1100,62 +1569,60 @@ const SUBJECTS = [
 
 
 const BADGES = [
-  ["first","🌱","İlk Adım","İlk soru sonucunu girdin."],
-  ["q100","💯","100 Soru","100 soru çözdün."],
-  ["q500","🔥","500 Soru","500 soru çözdün."],
-  ["q1000","🚀","1000 Soru","1000 soru çözdün."],
-  ["exam","📝","İlk Deneme","İlk denemeni girdin."],
-  ["streak7","🔥","7 Gün","7 gün aktif oldun."],
-  ["net100","🏆","100 Net","Toplam 100 nete ulaştın."]
+
+  [
+    "first",
+    "🌱",
+    "İlk Adım",
+    "İlk soru sonucunu girdin."
+  ],
+
+  [
+    "q100",
+    "💯",
+    "100 Soru",
+    "100 soru çözdün."
+  ],
+
+  [
+    "q500",
+    "🔥",
+    "500 Soru",
+    "500 soru çözdün."
+  ],
+
+  [
+    "q1000",
+    "🚀",
+    "1000 Soru",
+    "1000 soru çözdün."
+  ],
+
+  [
+    "exam",
+    "📝",
+    "İlk Deneme",
+    "İlk denemeni girdin."
+  ],
+
+  [
+    "net100",
+    "🏆",
+    "100 Net",
+    "Toplam 100 nete ulaştın."
+  ]
+
 ];
 
 
-let session = null;
-let currentUser = null;
-let currentRole = "user";
-let isAdmin = false;
-
-let data = defaultData();
-
-let focusTimer = null;
-let focusSeconds = 1500;
-let focusRunning = false;
-
-let adminProfiles = [];
-let adminQuestions = [];
-let adminExams = [];
-let adminStudy = [];
-let adminWrongs = [];
-let adminTopics = [];
-
-
-/* =====================================================
+/* =========================
    DEFAULT DATA
-===================================================== */
-
-function todayKey(){
-  const d = new Date();
-
-  return [
-    d.getFullYear(),
-    String(d.getMonth()+1).padStart(2,"0"),
-    String(d.getDate()).padStart(2,"0")
-  ].join("-");
-}
-
-
-function uid(){
-  if(window.crypto && crypto.randomUUID){
-    return crypto.randomUUID();
-  }
-
-  return Date.now().toString(36) +
-    Math.random().toString(36).slice(2);
-}
-
+========================= */
 
 function defaultData(){
+
   return {
+
     version:6,
 
     settings:{
@@ -1187,50 +1654,104 @@ function defaultData(){
     topics:{},
     studySessions:[],
     badges:{}
+
   };
 }
 
 
-/* =====================================================
-   LOCAL STORAGE
-===================================================== */
+/* =========================
+   DATE / ID
+========================= */
+
+function todayKey(){
+
+  const d = new Date();
+
+  return [
+    d.getFullYear(),
+    String(d.getMonth()+1).padStart(2,"0"),
+    String(d.getDate()).padStart(2,"0")
+  ].join("-");
+}
+
+
+function uid(){
+
+  if(
+    window.crypto &&
+    crypto.randomUUID
+  ){
+    return crypto.randomUUID();
+  }
+
+  return Date.now().toString(36) +
+    Math.random().toString(36).slice(2);
+}
+
+
+/* =========================
+   LOCAL
+========================= */
 
 function saveLocal(){
-  localStorage.setItem(
-    LOCAL_KEY,
-    JSON.stringify(data)
-  );
+
+  try{
+
+    localStorage.setItem(
+      LOCAL_KEY,
+      JSON.stringify(data)
+    );
+
+  }catch(error){
+
+    console.error(
+      "Local save:",
+      error
+    );
+  }
 }
 
 
 function loadLocal(){
+
   try{
-    const raw = localStorage.getItem(LOCAL_KEY);
 
-    if(raw){
-      const parsed = JSON.parse(raw);
+    const raw =
+      localStorage.getItem(LOCAL_KEY);
 
-      data = {
-        ...defaultData(),
-        ...parsed
-      };
+    if(!raw) return false;
 
-      return true;
-    }
+    const parsed =
+      JSON.parse(raw);
 
-  }catch(e){
-    console.error(e);
+    data = {
+      ...defaultData(),
+      ...parsed
+    };
+
+    return true;
+
+  }catch(error){
+
+    console.error(
+      "Local load:",
+      error
+    );
+
+    data = defaultData();
+
+    return false;
   }
-
-  return false;
 }
 
 
-/* =====================================================
-   AUTH
-===================================================== */
+/* =========================
+   AUTH MODE
+========================= */
 
-function switchAuth(type){
+function switchAuth(mode){
+
+  currentAuthMode = mode;
 
   const loginTab =
     document.getElementById("loginTab");
@@ -1244,14 +1765,19 @@ function switchAuth(type){
   const authButton =
     document.getElementById("authButton");
 
-  if(type === "login"){
+  const message =
+    document.getElementById("authMessage");
+
+
+  if(mode === "login"){
 
     loginTab.classList.add("active");
     registerTab.classList.remove("active");
 
     registerFields.classList.add("hidden");
 
-    authButton.textContent = "Giriş Yap";
+    authButton.textContent =
+      "Giriş Yap";
 
   }else{
 
@@ -1260,20 +1786,20 @@ function switchAuth(type){
 
     registerFields.classList.remove("hidden");
 
-    authButton.textContent = "Hesap Oluştur";
+    authButton.textContent =
+      "Hesap Oluştur";
   }
 
-  document.getElementById("authMessage").textContent = "";
+
+  message.textContent = "";
 }
 
 
-async function handleAuth(){
+/* =========================
+   AUTH
+========================= */
 
-  const registerMode =
-    !document
-      .getElementById("registerTab")
-      .classList
-      .contains("active");
+async function handleAuth(){
 
   const email =
     document
@@ -1287,15 +1813,28 @@ async function handleAuth(){
       .value;
 
   const message =
-    document.getElementById("authMessage");
+    document.getElementById(
+      "authMessage"
+    );
 
-  if(!email || !password){
+
+  if(!email){
 
     message.textContent =
-      "E-posta ve şifre gerekli.";
+      "E-posta adresini gir.";
 
     return;
   }
+
+
+  if(!password){
+
+    message.textContent =
+      "Şifreni gir.";
+
+    return;
+  }
+
 
   if(password.length < 6){
 
@@ -1305,161 +1844,243 @@ async function handleAuth(){
     return;
   }
 
+
   message.textContent =
     "İşlem yapılıyor...";
 
 
   try{
 
-    if(registerMode){
+    /* =========================
+       REGISTER
+    ========================= */
+
+    if(currentAuthMode === "register"){
 
       const username =
         document
-          .getElementById("registerUsername")
+          .getElementById(
+            "registerUsername"
+          )
           .value
           .trim();
 
-      const {data:result,error} =
+
+      const result =
         await supabaseClient.auth.signUp({
-          email,
-          password,
+
+          email:email,
+
+          password:password,
+
           options:{
             data:{
-              username:username || "Öğrenci"
+              username:
+                username || "Öğrenci"
             }
           }
+
         });
 
-      if(error) throw error;
 
-      if(result.session){
-
-        message.textContent =
-          "Hesabın oluşturuldu.";
-
-      }else{
-
-        message.textContent =
-          "Hesabın oluşturuldu. E-posta doğrulaması gerekiyorsa gelen kutunu kontrol et.";
+      if(result.error){
+        throw result.error;
       }
 
-    }else{
 
-      const {data:result,error} =
-        await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
+      /*
+       * Confirm email kapalıysa
+       * Supabase session döndürür.
+       */
 
-      if(error) throw error;
+      if(result.data.session){
 
-      if(result.session){
-        await bootApp(result.session);
+        await bootApp(
+          result.data.session
+        );
+
+        return;
       }
+
+
+      /*
+       * Confirm email açıksa
+       */
+
+      message.textContent =
+        "Hesap oluşturuldu. E-posta doğrulaması gerekiyorsa gelen kutunu kontrol et.";
+
+      return;
     }
+
+
+    /* =========================
+       LOGIN
+    ========================= */
+
+    const result =
+      await supabaseClient.auth
+        .signInWithPassword({
+
+          email:email,
+
+          password:password
+
+        });
+
+
+    if(result.error){
+      throw result.error;
+    }
+
+
+    if(result.data.session){
+
+      await bootApp(
+        result.data.session
+      );
+    }
+
+
+  }catch(error){
+
+    console.error(
+      "Auth error:",
+      error
+    );
+
+    message.textContent =
+      translateAuthError(
+        error.message
+      );
+  }
+}
+
+
+/* =========================
+   AUTH ERRORS
+========================= */
+
+function translateAuthError(message){
+
+  if(!message){
+    return "Bir hata oluştu.";
+  }
+
+  const text =
+    message.toLowerCase();
+
+
+  if(
+    text.includes("invalid login") ||
+    text.includes("invalid credentials")
+  ){
+    return "E-posta veya şifre yanlış.";
+  }
+
+
+  if(
+    text.includes("already registered") ||
+    text.includes("user already registered")
+  ){
+    return "Bu e-posta zaten kayıtlı.";
+  }
+
+
+  if(
+    text.includes("password should be")
+  ){
+    return "Şifre en az 6 karakter olmalı.";
+  }
+
+
+  if(
+    text.includes("email not confirmed")
+  ){
+    return "Önce e-posta adresini doğrulaman gerekiyor.";
+  }
+
+
+  return message;
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+  try{
+
+    await supabaseClient.auth.signOut();
 
   }catch(error){
 
     console.error(error);
-
-    message.textContent =
-      translateAuthError(error.message);
-  }
-}
-
-
-function translateAuthError(msg){
-
-  if(!msg) return "Bir hata oluştu.";
-
-  if(msg.toLowerCase().includes("invalid login")){
-    return "E-posta veya şifre yanlış.";
   }
 
-  if(msg.toLowerCase().includes("already registered")){
-    return "Bu e-posta zaten kayıtlı.";
-  }
-
-  if(msg.toLowerCase().includes("password")){
-    return "Şifre en az 6 karakter olmalı.";
-  }
-
-  return msg;
-}
-
-
-async function logout(){
-
-  await supabaseClient.auth.signOut();
 
   session = null;
   currentUser = null;
   currentRole = "user";
   isAdmin = false;
 
+
   document
     .getElementById("app")
     .classList
     .add("hidden");
+
 
   document
     .getElementById("authScreen")
     .classList
     .remove("hidden");
 
+
   switchAuth("login");
+
+
+  document.getElementById("authEmail")
+    .value = "";
+
+  document.getElementById("authPassword")
+    .value = "";
 }
 
 
+/* =========================
+   AUTH STATE
+========================= */
+
 supabaseClient.auth.onAuthStateChange(
-  async (_event,newSession)=>{
+  (_event,newSession)=>{
 
-    if(newSession && !currentUser){
+    /*
+     * Burada await kullanmıyoruz.
+     * Auth callback'i kilitlememek için
+     * boot işlemini ayrı çalıştırıyoruz.
+     */
 
-      await bootApp(newSession);
+    if(
+      newSession &&
+      !currentUser
+    ){
+
+      setTimeout(
+        ()=>bootApp(newSession),
+        0
+      );
     }
+
   }
 );
 
 
-/* =====================================================
+/* =========================
    BOOT
-===================================================== */
-
-async function bootApp(newSession){
-
-  session = newSession;
-  currentUser = newSession.user;
-
-  document
-    .getElementById("authScreen")
-    .classList
-    .add("hidden");
-
-  document
-    .getElementById("app")
-    .classList
-    .remove("hidden");
-
-  loadLocal();
-
-  await getRole();
-
-  await loadProfile();
-
-  await loadCloudData();
-
-  applyTheme();
-
-  populateSubjects();
-
-  renderAll();
-
-  showToast(
-    "Hesabına başarıyla bağlandın."
-  );
-}
-
+========================= */
 
 async function init(){
 
@@ -1467,14 +2088,36 @@ async function init(){
 
   applyTheme();
 
-  const result =
-    await supabaseClient.auth.getSession();
+  populateSubjects();
 
-  if(result.data.session){
 
-    await bootApp(result.data.session);
+  try{
 
-  }else{
+    const result =
+      await supabaseClient.auth
+        .getSession();
+
+
+    if(result.data.session){
+
+      await bootApp(
+        result.data.session
+      );
+
+    }else{
+
+      document
+        .getElementById("authScreen")
+        .classList
+        .remove("hidden");
+    }
+
+  }catch(error){
+
+    console.error(
+      "Init:",
+      error
+    );
 
     document
       .getElementById("authScreen")
@@ -1484,139 +2127,250 @@ async function init(){
 }
 
 
-/* =====================================================
+async function bootApp(newSession){
+
+  if(!newSession) return;
+
+  session = newSession;
+  currentUser = newSession.user;
+
+
+  document
+    .getElementById("authScreen")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("app")
+    .classList
+    .remove("hidden");
+
+
+  await getRole();
+
+  await loadProfile();
+
+  await loadCloudData();
+
+
+  applyTheme();
+
+  populateSubjects();
+
+  renderAll();
+
+
+  showToast(
+    "Hesabın hazır 🎓"
+  );
+}
+
+
+/* =========================
    ROLE
-===================================================== */
+========================= */
 
 async function getRole(){
 
+  currentRole = "user";
+  isAdmin = false;
+
+
   try{
 
-    const {data:role,error} =
-      await supabaseClient.rpc("my_role");
+    const result =
+      await supabaseClient
+        .rpc("my_role");
 
-    if(error) throw error;
 
-    currentRole = role || "user";
+    if(result.error){
+      throw result.error;
+    }
+
+
+    currentRole =
+      result.data || "user";
+
 
     isAdmin =
       currentRole === "admin" ||
       currentRole === "coach";
 
+
   }catch(error){
 
-    console.error("Role:",error);
-
-    currentRole = "user";
-    isAdmin = false;
+    console.error(
+      "Role:",
+      error
+    );
   }
+
 
   document
     .getElementById("adminButtonBox")
     .classList
-    .toggle("hidden",!isAdmin);
+    .toggle(
+      "hidden",
+      !isAdmin
+    );
 }
 
 
-/* =====================================================
-   PROFILE
-===================================================== */
+/* =========================
+   PROFILE LOAD
+========================= */
 
 async function loadProfile(){
 
   if(!currentUser) return;
 
-  const {data:profile,error} =
-    await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("id",currentUser.id)
-      .maybeSingle();
 
-  if(error){
+  try{
 
-    console.error(error);
-    return;
-  }
-
-  const meta =
-    currentUser.user_metadata || {};
-
-  const username =
-    profile?.username ||
-    meta.username ||
-    "Öğrenci";
-
-  document.getElementById("headerUser").textContent =
-    username;
-
-  document.getElementById("accountUsername").textContent =
-    username;
-
-  document.getElementById("accountEmail").textContent =
-    currentUser.email || "";
+    const result =
+      await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id",currentUser.id)
+        .maybeSingle();
 
 
-  if(profile){
+    if(result.error){
+      throw result.error;
+    }
 
-    data.target = {
-      ...data.target,
 
-      field:
+    const profile =
+      result.data;
+
+
+    const metadata =
+      currentUser.user_metadata || {};
+
+
+    const username =
+      profile?.username ||
+      metadata.username ||
+      "Öğrenci";
+
+
+    setAccountName(username);
+
+
+    if(profile){
+
+      data.target.field =
         profile.field ||
-        data.target.field,
+        data.target.field;
 
-      university:
+      data.target.university =
         profile.university ||
-        data.target.university,
+        data.target.university;
 
-      department:
+      data.target.department =
         profile.department ||
-        data.target.department,
+        data.target.department;
 
-      rank:
-        profile.target_rank ||
-        data.target.rank,
+      data.target.rank =
+        profile.target_rank ??
+        data.target.rank;
 
-      hours:
-        profile.daily_hours ||
-        data.target.hours,
+      data.target.hours =
+        profile.daily_hours ??
+        data.target.hours;
 
-      questions:
-        profile.daily_questions ||
-        data.target.questions
-    };
+      data.target.questions =
+        profile.daily_questions ??
+        data.target.questions;
 
-  }else{
+      data.target.topics =
+        profile.daily_topics ??
+        data.target.topics;
+    }
 
-    await supabaseClient
-      .from("profiles")
-      .upsert({
-        id:currentUser.id,
-        username
-      });
+
+    /*
+     * Trigger profil oluşturmadıysa
+     * burada oluşturuyoruz.
+     */
+
+    if(!profile){
+
+      const insertResult =
+        await supabaseClient
+          .from("profiles")
+          .upsert({
+
+            id:currentUser.id,
+
+            username:username
+
+          });
+
+
+      if(insertResult.error){
+        console.error(
+          "Profile create:",
+          insertResult.error
+        );
+      }
+    }
+
+
+  }catch(error){
+
+    console.error(
+      "Profile:",
+      error
+    );
   }
 }
 
 
-/* =====================================================
+function setAccountName(username){
+
+  document.getElementById(
+    "headerUser"
+  ).textContent = username;
+
+  document.getElementById(
+    "accountUsername"
+  ).textContent = username;
+
+  document.getElementById(
+    "accountEmail"
+  ).textContent =
+    currentUser?.email || "";
+
+  document.getElementById(
+    "homeGreeting"
+  ).textContent =
+    "Hoş geldin " +
+    username +
+    " 👋";
+}
+
+
+/* =========================
    CLOUD LOAD
-===================================================== */
+========================= */
 
 async function loadCloudData(){
 
   if(!currentUser) return;
 
+
   try{
 
     const [
-      questions,
-      exams,
-      wrongs,
-      topics,
-      sessions,
-      plans,
-      badges
+      questionsResult,
+      examsResult,
+      wrongsResult,
+      topicsResult,
+      sessionsResult,
+      planResult,
+      badgesResult
     ] = await Promise.all([
 
       supabaseClient
@@ -1659,143 +2413,216 @@ async function loadCloudData(){
         .from("badges")
         .select("*")
         .eq("user_id",currentUser.id)
+
     ]);
 
 
-    if(questions.error) throw questions.error;
+    if(questionsResult.error)
+      throw questionsResult.error;
+
+    if(examsResult.error)
+      throw examsResult.error;
+
+    if(wrongsResult.error)
+      throw wrongsResult.error;
+
+    if(topicsResult.error)
+      throw topicsResult.error;
+
+    if(sessionsResult.error)
+      throw sessionsResult.error;
+
+    if(planResult.error)
+      throw planResult.error;
+
+    if(badgesResult.error)
+      throw badgesResult.error;
+
+
+    /* QUESTIONS */
 
     data.questions =
-      (questions.data || []).map(x=>({
-        id:x.id,
-        date:x.date,
-        subject:x.subject,
-        topic:x.topic,
-        total:x.total,
-        correct:x.correct,
-        wrong:x.wrong,
-        blank:x.blank,
-        net:Number(x.net || 0)
-      }));
+      (questionsResult.data || [])
+        .map(row=>({
+
+          id:row.id,
+          date:row.date,
+          subject:row.subject,
+          topic:row.topic || "",
+          total:Number(row.total || 0),
+          correct:Number(row.correct || 0),
+          wrong:Number(row.wrong || 0),
+          blank:Number(row.blank || 0),
+          net:Number(row.net || 0)
+
+        }));
 
 
-    if(exams.error) throw exams.error;
+    /* EXAMS */
 
     data.exams =
-      (exams.data || []).map(x=>({
-        id:x.id,
-        name:x.name,
-        date:x.date,
-        type:x.type,
-        turkish:Number(x.turkish || 0),
-        math:Number(x.math || 0),
-        science:Number(x.science || 0),
-        social:Number(x.social || 0),
-        net:Number(x.net || 0)
-      }));
+      (examsResult.data || [])
+        .map(row=>({
+
+          id:row.id,
+          name:row.name || "Deneme",
+          date:row.date,
+          type:row.type || "TYT",
+          turkish:Number(row.turkish || 0),
+          math:Number(row.math || 0),
+          science:Number(row.science || 0),
+          social:Number(row.social || 0),
+          net:Number(row.net || 0)
+
+        }));
 
 
-    if(wrongs.error) throw wrongs.error;
+    /* WRONGS */
 
     data.wrongs =
-      (wrongs.data || []).map(x=>({
-        id:x.id,
-        date:x.date,
-        subject:x.subject,
-        topic:x.topic,
-        reason:x.reason,
-        note:x.note,
-        resolved:x.resolved
-      }));
+      (wrongsResult.data || [])
+        .map(row=>({
+
+          id:row.id,
+          date:row.date,
+          subject:row.subject,
+          topic:row.topic,
+          reason:row.reason,
+          note:row.note,
+          resolved:row.resolved
+
+        }));
 
 
-    if(topics.error) throw topics.error;
+    /* TOPICS */
 
     data.topics = {};
 
-    (topics.data || []).forEach(x=>{
+    (topicsResult.data || [])
+      .forEach(row=>{
 
-      data.topics[
-        x.subject + "::" + x.topic
-      ] = x.state;
-    });
+        data.topics[
+          row.subject +
+          "::" +
+          row.topic
+        ] = row.state;
+
+      });
 
 
-    if(sessions.error) throw sessions.error;
+    /* STUDY */
 
     data.studySessions =
-      (sessions.data || []).map(x=>({
-        id:x.id,
-        date:x.date,
-        minutes:x.minutes || 0,
-        seconds:x.seconds || 0,
-        taskId:x.task_id,
-        label:x.label
-      }));
+      (sessionsResult.data || [])
+        .map(row=>({
+
+          id:row.id,
+          date:row.date,
+          minutes:Number(row.minutes || 0),
+          seconds:Number(row.seconds || 0),
+          taskId:row.task_id,
+          label:row.label
+
+        }));
 
 
-    if(plans.error) throw plans.error;
+    /* PLAN */
 
-    if(plans.data){
+    if(planResult.data){
+
+      const p =
+        planResult.data;
 
       data.plan = {
-        ...data.plan,
-        date:plans.data.plan_date,
-        hours:plans.data.hours || 0,
-        start:plans.data.start_time || "18:00",
-        subjects:plans.data.subjects || [],
-        tasks:plans.data.tasks || []
+
+        date:p.plan_date,
+
+        hours:Number(p.hours || 0),
+
+        start:p.start_time || "18:00",
+
+        subjects:Array.isArray(p.subjects)
+          ? p.subjects
+          : [],
+
+        tasks:Array.isArray(p.tasks)
+          ? p.tasks
+          : []
+
       };
 
     }else{
 
       data.plan = {
-        ...data.plan,
+
         date:todayKey(),
+
+        hours:
+          Number(data.target.hours || 4),
+
+        start:"18:00",
+
+        subjects:[],
+
         tasks:[]
+
       };
+
     }
 
 
-    if(badges.error) throw badges.error;
+    /* BADGES */
 
     data.badges = {};
 
-    (badges.data || []).forEach(x=>{
-      data.badges[x.badge_key] = true;
-    });
+    (badgesResult.data || [])
+      .forEach(row=>{
+
+        data.badges[
+          row.badge_key
+        ] = true;
+
+      });
 
 
     saveLocal();
 
+
   }catch(error){
 
-    console.error("Cloud load:",error);
+    console.error(
+      "Cloud load:",
+      error
+    );
 
     showToast(
-      "Bulut verileri alınırken bir hata oluştu."
+      "Bulut verileri yüklenirken hata oluştu."
     );
   }
 }
 
 
-/* =====================================================
+/* =========================
    PROFILE SAVE
-===================================================== */
+========================= */
 
 async function saveProfile(){
 
   if(!currentUser) return;
 
+
   const payload = {
+
     id:currentUser.id,
 
-    field:data.target.field,
+    field:
+      data.target.field || null,
 
     university:
-      data.target.university,
+      data.target.university || null,
 
     department:
-      data.target.department,
+      data.target.department || null,
 
     target_rank:
       data.target.rank
@@ -1810,339 +2637,621 @@ async function saveProfile(){
 
     daily_topics:
       Number(data.target.topics || 0)
+
   };
 
-  const {error} =
+
+  const result =
     await supabaseClient
       .from("profiles")
       .upsert(payload);
 
-  if(error){
-    console.error(error);
-    showToast("Hedef buluta kaydedilemedi.");
+
+  if(result.error){
+
+    console.error(
+      "Profile save:",
+      result.error
+    );
+
+    showToast(
+      "Profil kaydedilemedi."
+    );
+
+    return false;
   }
+
+
+  return true;
 }
 
 
-/* =====================================================
-   QUESTION
-===================================================== */
+/* =========================
+   QUESTIONS
+========================= */
 
-function addQuestion(){
+async function addQuestion(){
 
   const subject =
-    document.getElementById("qSubject").value;
+    document.getElementById(
+      "qSubject"
+    ).value;
 
   const topic =
-    document.getElementById("qTopic").value.trim();
+    document.getElementById(
+      "qTopic"
+    ).value.trim();
 
   const total =
-    Number(document.getElementById("qTotal").value || 0);
+    Number(
+      document.getElementById(
+        "qTotal"
+      ).value || 0
+    );
 
   const correct =
-    Number(document.getElementById("qCorrect").value || 0);
+    Number(
+      document.getElementById(
+        "qCorrect"
+      ).value || 0
+    );
 
   const wrong =
-    Number(document.getElementById("qWrong").value || 0);
+    Number(
+      document.getElementById(
+        "qWrong"
+      ).value || 0
+    );
 
   const blank =
-    Number(document.getElementById("qBlank").value || 0);
+    Number(
+      document.getElementById(
+        "qBlank"
+      ).value || 0
+    );
+
 
   if(total <= 0){
 
-    showToast("Toplam soru sayısını gir.");
+    showToast(
+      "Toplam soru sayısını gir."
+    );
+
     return;
   }
 
-  if(correct + wrong + blank > total){
 
-    showToast("Doğru + yanlış + boş toplamı geçemez.");
+  if(
+    correct < 0 ||
+    wrong < 0 ||
+    blank < 0 ||
+    correct + wrong + blank > total
+  ){
+
+    showToast(
+      "Soru sayılarını kontrol et."
+    );
+
     return;
   }
+
 
   const net =
     correct - wrong / 4;
 
 
   const item = {
+
     id:uid(),
+
     date:todayKey(),
+
     subject,
+
     topic,
+
     total,
+
     correct,
+
     wrong,
+
     blank,
+
     net
+
   };
+
 
   data.questions.unshift(item);
 
   saveLocal();
 
-  syncQuestion(item);
-
-  checkBadges();
-
   renderAll();
 
-  document.getElementById("qTopic").value = "";
-  document.getElementById("qTotal").value = "";
-  document.getElementById("qCorrect").value = "";
-  document.getElementById("qWrong").value = "";
-  document.getElementById("qBlank").value = "";
 
-  showToast("Soru sonucu kaydedildi 📚");
-}
-
-
-async function syncQuestion(item){
-
-  if(!currentUser) return;
-
-  const {error} =
+  const result =
     await supabaseClient
       .from("questions")
       .insert({
+
         user_id:currentUser.id,
+
         date:item.date,
+
         subject:item.subject,
+
         topic:item.topic,
+
         total:item.total,
+
         correct:item.correct,
+
         wrong:item.wrong,
+
         blank:item.blank,
+
         net:item.net
+
       });
 
-  if(error){
-    console.error(error);
-    showToast("Bulut kaydında hata oluştu.");
+
+  if(result.error){
+
+    console.error(
+      "Question:",
+      result.error
+    );
+
+    showToast(
+      "Yerelde kaydedildi fakat buluta yazılamadı."
+    );
+
+  }else{
+
+    showToast(
+      "Soru sonucu kaydedildi 📚"
+    );
   }
+
+
+  checkBadges();
+
+
+  document.getElementById(
+    "qTopic"
+  ).value = "";
+
+  document.getElementById(
+    "qTotal"
+  ).value = "";
+
+  document.getElementById(
+    "qCorrect"
+  ).value = "";
+
+  document.getElementById(
+    "qWrong"
+  ).value = "";
+
+  document.getElementById(
+    "qBlank"
+  ).value = "";
 }
 
 
-/* =====================================================
-   EXAM
-===================================================== */
+/* =========================
+   EXAMS
+========================= */
 
-function addExam(){
+async function addExam(){
 
   const name =
-    document.getElementById("examName").value.trim();
+    document.getElementById(
+      "examName"
+    ).value.trim();
 
   const type =
-    document.getElementById("examType").value;
+    document.getElementById(
+      "examType"
+    ).value;
 
   const turkish =
-    Number(document.getElementById("examTurkish").value || 0);
+    Number(
+      document.getElementById(
+        "examTurkish"
+      ).value || 0
+    );
 
   const math =
-    Number(document.getElementById("examMath").value || 0);
+    Number(
+      document.getElementById(
+        "examMath"
+      ).value || 0
+    );
 
   const science =
-    Number(document.getElementById("examScience").value || 0);
+    Number(
+      document.getElementById(
+        "examScience"
+      ).value || 0
+    );
 
   const social =
-    Number(document.getElementById("examSocial").value || 0);
+    Number(
+      document.getElementById(
+        "examSocial"
+      ).value || 0
+    );
+
 
   if(!name){
 
-    showToast("Deneme adı gir.");
+    showToast(
+      "Deneme adı gir."
+    );
+
     return;
   }
 
+
   const net =
-    turkish + math + science + social;
+    turkish +
+    math +
+    science +
+    social;
 
 
   const item = {
+
     id:uid(),
+
     name,
+
     date:todayKey(),
+
     type,
+
     turkish,
+
     math,
+
     science,
+
     social,
+
     net
+
   };
+
 
   data.exams.unshift(item);
 
   saveLocal();
 
-  syncExam(item);
-
-  checkBadges();
-
   renderAll();
 
-  document.getElementById("examName").value = "";
-  document.getElementById("examTurkish").value = "";
-  document.getElementById("examMath").value = "";
-  document.getElementById("examScience").value = "";
-  document.getElementById("examSocial").value = "";
 
-  showToast("Deneme kaydedildi 📝");
-}
-
-
-async function syncExam(item){
-
-  if(!currentUser) return;
-
-  const {error} =
+  const result =
     await supabaseClient
       .from("exams")
       .insert({
+
         user_id:currentUser.id,
+
         name:item.name,
+
         date:item.date,
+
         type:item.type,
+
         turkish:item.turkish,
+
         math:item.math,
+
         science:item.science,
+
         social:item.social,
+
         net:item.net
+
       });
 
-  if(error) console.error(error);
+
+  if(result.error){
+
+    console.error(
+      "Exam:",
+      result.error
+    );
+
+    showToast(
+      "Deneme yerelde kaldı, bulut kaydında hata oldu."
+    );
+
+  }else{
+
+    showToast(
+      "Deneme kaydedildi 📝"
+    );
+  }
+
+
+  checkBadges();
+
+
+  document.getElementById(
+    "examName"
+  ).value = "";
+
+  document.getElementById(
+    "examTurkish"
+  ).value = "";
+
+  document.getElementById(
+    "examMath"
+  ).value = "";
+
+  document.getElementById(
+    "examScience"
+  ).value = "";
+
+  document.getElementById(
+    "examSocial"
+  ).value = "";
 }
 
 
-/* =====================================================
+/* =========================
    TARGET
-===================================================== */
+========================= */
 
 function openTarget(){
 
-  document.getElementById("targetField").value =
+  document.getElementById(
+    "targetField"
+  ).value =
     data.target.field || "Sayısal";
 
-  document.getElementById("targetUniversity").value =
+  document.getElementById(
+    "targetUniversity"
+  ).value =
     data.target.university || "";
 
-  document.getElementById("targetDepartment").value =
+  document.getElementById(
+    "targetDepartment"
+  ).value =
     data.target.department || "";
 
-  document.getElementById("targetRank").value =
+  document.getElementById(
+    "targetRank"
+  ).value =
     data.target.rank || "";
 
-  document.getElementById("targetHours").value =
+  document.getElementById(
+    "targetHours"
+  ).value =
     data.target.hours || 4;
 
-  document.getElementById("targetQuestions").value =
+  document.getElementById(
+    "targetQuestions"
+  ).value =
     data.target.questions || 100;
 
-  document
-    .getElementById("targetModal")
-    .classList
-    .add("show");
+
+  document.getElementById(
+    "targetModal"
+  ).classList.add("show");
 }
 
 
 async function saveTarget(){
 
   data.target.field =
-    document.getElementById("targetField").value;
+    document.getElementById(
+      "targetField"
+    ).value;
 
   data.target.university =
-    document.getElementById("targetUniversity").value.trim();
+    document.getElementById(
+      "targetUniversity"
+    ).value.trim();
 
   data.target.department =
-    document.getElementById("targetDepartment").value.trim();
+    document.getElementById(
+      "targetDepartment"
+    ).value.trim();
 
   data.target.rank =
-    document.getElementById("targetRank").value;
+    document.getElementById(
+      "targetRank"
+    ).value;
 
   data.target.hours =
-    Number(document.getElementById("targetHours").value || 0);
+    Number(
+      document.getElementById(
+        "targetHours"
+      ).value || 0
+    );
 
   data.target.questions =
-    Number(document.getElementById("targetQuestions").value || 0);
+    Number(
+      document.getElementById(
+        "targetQuestions"
+      ).value || 0
+    );
+
 
   saveLocal();
 
   await saveProfile();
 
-  closeModal("targetModal");
+  closeModal(
+    "targetModal"
+  );
 
   renderAll();
 
-  showToast("Hedefin kaydedildi 🎯");
+  showToast(
+    "Hedefin kaydedildi 🎯"
+  );
 }
 
 
-/* =====================================================
+/* =========================
    PLAN
-===================================================== */
+========================= */
 
 function openPlanModal(){
 
-  document.getElementById("planHours").value =
-    data.plan.hours || data.target.hours || 4;
+  document.getElementById(
+    "planHours"
+  ).value =
+    data.plan.hours ||
+    data.target.hours ||
+    4;
 
-  document.getElementById("planStart").value =
-    data.plan.start || "18:00";
+  document.getElementById(
+    "planStart"
+  ).value =
+    data.plan.start ||
+    "18:00";
 
-  document
-    .getElementById("planModal")
-    .classList
-    .add("show");
+
+  document.getElementById(
+    "planModal"
+  ).classList.add("show");
 }
 
 
-function addPlanTask(){
+async function addPlanTask(){
 
   const hours =
-    Number(document.getElementById("planHours").value || 0);
+    Number(
+      document.getElementById(
+        "planHours"
+      ).value || 0
+    );
 
   const start =
-    document.getElementById("planStart").value;
+    document.getElementById(
+      "planStart"
+    ).value || "18:00";
 
   const subject =
-    document.getElementById("planSubject").value.trim();
+    document.getElementById(
+      "planSubject"
+    ).value.trim();
 
   const topic =
-    document.getElementById("planTopic").value.trim();
+    document.getElementById(
+      "planTopic"
+    ).value.trim();
 
   const minutes =
-    Number(document.getElementById("planMinutes").value || 0);
+    Number(
+      document.getElementById(
+        "planMinutes"
+      ).value || 0
+    );
 
-  if(!subject || minutes <= 0){
 
-    showToast("Ders ve dakika gir.");
+  if(!subject){
+
+    showToast(
+      "Ders gir."
+    );
+
     return;
   }
 
-  data.plan.date = todayKey();
-  data.plan.hours = hours;
-  data.plan.start = start;
+
+  if(minutes <= 0){
+
+    showToast(
+      "Dakika gir."
+    );
+
+    return;
+  }
+
+
+  data.plan.date =
+    todayKey();
+
+  data.plan.hours =
+    hours;
+
+  data.plan.start =
+    start;
+
 
   data.plan.tasks.push({
+
     id:uid(),
+
     date:todayKey(),
+
     time:start,
+
     subject,
+
     topic,
+
     minutes,
+
     done:false
+
   });
+
 
   saveLocal();
 
-  syncPlan();
+  await syncPlan();
 
-  closeModal("planModal");
+  closeModal(
+    "planModal"
+  );
 
-  document.getElementById("planSubject").value = "";
-  document.getElementById("planTopic").value = "";
-  document.getElementById("planMinutes").value = "";
+  document.getElementById(
+    "planSubject"
+  ).value = "";
+
+  document.getElementById(
+    "planTopic"
+  ).value = "";
+
+  document.getElementById(
+    "planMinutes"
+  ).value = "";
 
   renderAll();
 
-  showToast("Planına görev eklendi 📅");
+  showToast(
+    "Planına görev eklendi 📅"
+  );
+}
+
+
+async function toggleTask(id){
+
+  const task =
+    data.plan.tasks.find(
+      x=>x.id === id
+    );
+
+  if(!task) return;
+
+
+  task.done =
+    !task.done;
+
+
+  saveLocal();
+
+  await syncPlan();
+
+  renderAll();
 }
 
 
@@ -2150,56 +3259,58 @@ async function syncPlan(){
 
   if(!currentUser) return;
 
-  const payload = {
-    user_id:currentUser.id,
-    plan_date:data.plan.date,
-    hours:data.plan.hours,
-    start_time:data.plan.start,
-    subjects:data.plan.subjects || [],
-    tasks:data.plan.tasks || [],
-    updated_at:new Date().toISOString()
-  };
 
-  const {error} =
+  const result =
     await supabaseClient
       .from("daily_plans")
-      .upsert(
-        payload,
-        {
-          onConflict:"user_id,plan_date"
-        }
-      );
+      .upsert({
 
-  if(error) console.error(error);
+        user_id:currentUser.id,
+
+        plan_date:
+          data.plan.date,
+
+        hours:
+          data.plan.hours,
+
+        start_time:
+          data.plan.start,
+
+        subjects:
+          data.plan.subjects || [],
+
+        tasks:
+          data.plan.tasks || [],
+
+        updated_at:
+          new Date().toISOString()
+
+      },{
+        onConflict:
+          "user_id,plan_date"
+      });
+
+
+  if(result.error){
+
+    console.error(
+      "Plan:",
+      result.error
+    );
+  }
 }
 
 
-function toggleTask(id){
-
-  const task =
-    data.plan.tasks.find(x=>x.id === id);
-
-  if(!task) return;
-
-  task.done = !task.done;
-
-  saveLocal();
-  syncPlan();
-
-  renderAll();
-}
-
-
-/* =====================================================
-   FOCUS TIMER
-===================================================== */
+/* =========================
+   FOCUS
+========================= */
 
 function startFocus(){
 
-  document
-    .getElementById("focusModal")
-    .classList
-    .add("show");
+  document.getElementById(
+    "focusModal"
+  ).classList.add("show");
+
 
   if(!focusRunning){
 
@@ -2216,69 +3327,113 @@ function toggleFocus(){
 
     stopFocus();
 
-  }else{
-
-    focusRunning = true;
-
-    document.getElementById("focusButton")
-      .textContent = "Durdur";
-
-    focusTimer =
-      setInterval(()=>{
-
-        focusSeconds--;
-
-        updateFocusUI();
-
-        if(focusSeconds <= 0){
-
-          finishFocus();
-
-        }
-
-      },1000);
+    return;
   }
+
+
+  focusRunning = true;
+
+  document.getElementById(
+    "focusButton"
+  ).textContent =
+    "Durdur";
+
+
+  focusTimer =
+    setInterval(()=>{
+
+      focusSeconds--;
+
+      updateFocusUI();
+
+
+      if(focusSeconds <= 0){
+
+        finishFocus();
+      }
+
+    },1000);
 }
 
 
 function stopFocus(){
 
-  clearInterval(focusTimer);
+  clearInterval(
+    focusTimer
+  );
 
   focusTimer = null;
+
   focusRunning = false;
 
-  document.getElementById("focusButton")
-    .textContent = "Başlat";
+  document.getElementById(
+    "focusButton"
+  ).textContent =
+    "Başlat";
 }
 
 
-function finishFocus(){
+async function finishFocus(){
 
   stopFocus();
 
+
   const item = {
+
     id:uid(),
+
     date:todayKey(),
+
     minutes:25,
+
     seconds:0,
+
     label:"Odak çalışması"
+
   };
+
 
   data.studySessions.push(item);
 
   saveLocal();
 
-  syncStudySession(item);
+  renderAll();
 
-  document.getElementById("focusBig")
-    .textContent = "25:00";
+
+  const result =
+    await supabaseClient
+      .from("study_sessions")
+      .insert({
+
+        user_id:currentUser.id,
+
+        date:item.date,
+
+        minutes:item.minutes,
+
+        seconds:item.seconds,
+
+        task_id:null,
+
+        label:item.label
+
+      });
+
+
+  if(result.error){
+
+    console.error(
+      "Study:",
+      result.error
+    );
+  }
+
 
   closeFocus();
 
-  renderAll();
-
-  showToast("25 dakikalık çalışma tamamlandı! 🔥");
+  showToast(
+    "25 dakikalık çalışma tamamlandı! 🔥"
+  );
 }
 
 
@@ -2286,89 +3441,97 @@ function closeFocus(){
 
   stopFocus();
 
-  closeModal("focusModal");
+  closeModal(
+    "focusModal"
+  );
 }
 
 
 function updateFocusUI(){
 
-  const min =
-    Math.floor(focusSeconds / 60);
+  const minutes =
+    Math.floor(
+      focusSeconds / 60
+    );
 
-  const sec =
+  const seconds =
     focusSeconds % 60;
 
+
   const text =
-    String(min).padStart(2,"0") +
+    String(minutes).padStart(2,"0") +
     ":" +
-    String(sec).padStart(2,"0");
+    String(seconds).padStart(2,"0");
 
-  document.getElementById("focusBig")
-    .textContent = text;
 
-  document.getElementById("timerText")
-    .textContent = text;
+  document.getElementById(
+    "focusBig"
+  ).textContent = text;
+
+  document.getElementById(
+    "timerText"
+  ).textContent = text;
 }
 
 
-async function syncStudySession(item){
-
-  if(!currentUser) return;
-
-  const {error} =
-    await supabaseClient
-      .from("study_sessions")
-      .insert({
-        user_id:currentUser.id,
-        date:item.date,
-        minutes:item.minutes,
-        seconds:item.seconds,
-        task_id:item.taskId || null,
-        label:item.label || null
-      });
-
-  if(error) console.error(error);
-}
-
-
-/* =====================================================
+/* =========================
    BADGES
-===================================================== */
+========================= */
 
-function checkBadges(){
+async function checkBadges(){
 
-  const q =
+  const totalQuestions =
     data.questions.reduce(
-      (sum,x)=>sum + Number(x.total || 0),
+      (sum,x)=>
+        sum +
+        Number(x.total || 0),
       0
     );
 
-  const net =
+
+  const totalNet =
     data.questions.reduce(
-      (sum,x)=>sum + Number(x.net || 0),
+      (sum,x)=>
+        sum +
+        Number(x.net || 0),
       0
     );
 
-  const unlock = key => {
 
-    if(data.badges[key]) return;
+  const unlock =
+    async key=>{
 
-    data.badges[key] = true;
+      if(data.badges[key])
+        return;
 
-    syncBadge(key);
+      data.badges[key] = true;
 
-    showToast("Yeni rozet kazandın 🏆");
-  };
+      saveLocal();
+
+      await syncBadge(key);
+    };
 
 
-  if(q >= 1) unlock("first");
-  if(q >= 100) unlock("q100");
-  if(q >= 500) unlock("q500");
-  if(q >= 1000) unlock("q1000");
-  if(data.exams.length >= 1) unlock("exam");
-  if(net >= 100) unlock("net100");
+  if(totalQuestions >= 1)
+    await unlock("first");
 
-  saveLocal();
+  if(totalQuestions >= 100)
+    await unlock("q100");
+
+  if(totalQuestions >= 500)
+    await unlock("q500");
+
+  if(totalQuestions >= 1000)
+    await unlock("q1000");
+
+  if(data.exams.length >= 1)
+    await unlock("exam");
+
+  if(totalNet >= 100)
+    await unlock("net100");
+
+
+  renderBadges();
 }
 
 
@@ -2376,37 +3539,57 @@ async function syncBadge(key){
 
   if(!currentUser) return;
 
-  const {error} =
+
+  const result =
     await supabaseClient
       .from("badges")
       .upsert({
+
         user_id:currentUser.id,
+
         badge_key:key
+
       },{
-        onConflict:"user_id,badge_key"
+        onConflict:
+          "user_id,badge_key"
       });
 
-  if(error) console.error(error);
+
+  if(result.error){
+
+    console.error(
+      "Badge:",
+      result.error
+    );
+  }
 }
 
 
-/* =====================================================
-   ADMIN
-===================================================== */
+/* =========================
+   ADMIN LOAD
+========================= */
 
 async function loadAdmin(){
 
-  if(!isAdmin) return;
+  if(!isAdmin){
+
+    showToast(
+      "Bu bölüme erişimin yok."
+    );
+
+    return;
+  }
+
 
   try{
 
     const [
-      profiles,
-      questions,
-      exams,
-      study,
-      wrongs,
-      topics
+      profilesResult,
+      questionsResult,
+      examsResult,
+      studyResult,
+      wrongsResult,
+      topicsResult
     ] = await Promise.all([
 
       supabaseClient
@@ -2433,49 +3616,100 @@ async function loadAdmin(){
       supabaseClient
         .from("topics")
         .select("*")
+
     ]);
 
 
-    if(profiles.error) throw profiles.error;
-    if(questions.error) throw questions.error;
-    if(exams.error) throw exams.error;
-    if(study.error) throw study.error;
+    if(profilesResult.error)
+      throw profilesResult.error;
 
-    adminProfiles = profiles.data || [];
-    adminQuestions = questions.data || [];
-    adminExams = exams.data || [];
-    adminStudy = study.data || [];
-    adminWrongs = wrongs.data || [];
-    adminTopics = topics.data || [];
+    if(questionsResult.error)
+      throw questionsResult.error;
+
+    if(examsResult.error)
+      throw examsResult.error;
+
+    if(studyResult.error)
+      throw studyResult.error;
+
+    if(wrongsResult.error)
+      throw wrongsResult.error;
+
+    if(topicsResult.error)
+      throw topicsResult.error;
 
 
-    document.getElementById("adminUsers")
-      .textContent = adminProfiles.length;
+    adminProfiles =
+      profilesResult.data || [];
 
-    document.getElementById("adminQuestions")
-      .textContent =
+    adminQuestions =
+      questionsResult.data || [];
+
+    adminExams =
+      examsResult.data || [];
+
+    adminStudy =
+      studyResult.data || [];
+
+    adminWrongs =
+      wrongsResult.data || [];
+
+    adminTopics =
+      topicsResult.data || [];
+
+
+    const totalQuestions =
       adminQuestions.reduce(
-        (s,x)=>s + Number(x.total || 0),
+        (sum,x)=>
+          sum +
+          Number(x.total || 0),
         0
       );
 
-    document.getElementById("adminExams")
-      .textContent = adminExams.length;
 
-    document.getElementById("adminMinutes")
-      .textContent =
+    const totalMinutes =
       adminStudy.reduce(
-        (s,x)=>s +
+        (sum,x)=>
+          sum +
           Number(x.minutes || 0) +
           Number(x.seconds || 0)/60,
         0
-      ).toFixed(0);
+      );
+
+
+    document.getElementById(
+      "adminUsers"
+    ).textContent =
+      adminProfiles.length;
+
+
+    document.getElementById(
+      "adminQuestions"
+    ).textContent =
+      totalQuestions;
+
+
+    document.getElementById(
+      "adminExams"
+    ).textContent =
+      adminExams.length;
+
+
+    document.getElementById(
+      "adminMinutes"
+    ).textContent =
+      Math.round(totalMinutes);
+
 
     renderAdminUsers();
 
+
   }catch(error){
 
-    console.error("Admin:",error);
+    console.error(
+      "Admin:",
+      error
+    );
 
     showToast(
       "Koç paneli verileri alınamadı."
@@ -2484,72 +3718,97 @@ async function loadAdmin(){
 }
 
 
+/* =========================
+   ADMIN USERS
+========================= */
+
 function renderAdminUsers(){
 
   const box =
-    document.getElementById("adminUsersList");
+    document.getElementById(
+      "adminUsersList"
+    );
 
   const search =
     (
-      document
-        .getElementById("adminSearch")
-        .value || ""
+      document.getElementById(
+        "adminSearch"
+      ).value || ""
     ).toLowerCase();
 
-  const profiles =
-    adminProfiles.filter(p=>{
 
-      const name =
-        (p.username || "").toLowerCase();
+  const profiles =
+    adminProfiles.filter(profile=>{
+
+      const username =
+        (
+          profile.username ||
+          ""
+        ).toLowerCase();
 
       const university =
-        (p.university || "").toLowerCase();
+        (
+          profile.university ||
+          ""
+        ).toLowerCase();
 
       return (
-        name.includes(search) ||
+        username.includes(search) ||
         university.includes(search)
       );
+
     });
 
 
   if(!profiles.length){
 
     box.innerHTML =
-      `<div class="empty">Öğrenci bulunamadı.</div>`;
+      `<div class="empty">
+        Öğrenci bulunamadı.
+      </div>`;
 
     return;
   }
 
 
   box.innerHTML =
-    profiles.map(p=>{
+    profiles.map(profile=>{
 
-      const uid =
-        p.id;
+      const id =
+        profile.id;
 
-      const q =
-        adminQuestions
-          .filter(x=>x.user_id === uid);
+
+      const questions =
+        adminQuestions.filter(
+          x=>x.user_id === id
+        );
+
 
       const exams =
-        adminExams
-          .filter(x=>x.user_id === uid);
+        adminExams.filter(
+          x=>x.user_id === id
+        );
+
 
       const study =
-        adminStudy
-          .filter(x=>x.user_id === uid);
+        adminStudy.filter(
+          x=>x.user_id === id
+        );
 
 
       const questionCount =
-        q.reduce(
-          (s,x)=>s + Number(x.total || 0),
+        questions.reduce(
+          (sum,x)=>
+            sum +
+            Number(x.total || 0),
           0
         );
 
+
       const minutes =
         study.reduce(
-          (s,x)=>
-            s +
+          (sum,x)=>
+            sum +
             Number(x.minutes || 0) +
             Number(x.seconds || 0)/60,
           0
@@ -2557,26 +3816,37 @@ function renderAdminUsers(){
 
 
       return `
-        <div class="admin-user"
-             onclick="openStudent('${uid}')">
+
+        <div
+          class="admin-user"
+          onclick="openStudent('${id}')">
 
           <div class="row">
+
             <div>
+
               <div class="admin-name">
                 ${escapeHtml(
-                  p.username || "Öğrenci"
+                  profile.username ||
+                  "Öğrenci"
                 )}
               </div>
 
               <div class="muted small">
                 ${escapeHtml(
-                  p.field || "Alan belirtilmemiş"
+                  profile.field ||
+                  "Alan belirtilmemiş"
                 )}
               </div>
+
             </div>
 
-            <div>›</div>
+            <div>
+              ›
+            </div>
+
           </div>
+
 
           <div class="admin-stats">
 
@@ -2598,16 +3868,23 @@ function renderAdminUsers(){
           </div>
 
         </div>
+
       `;
 
     }).join("");
 }
 
 
+/* =========================
+   ADMIN STUDENT
+========================= */
+
 function openStudent(id){
 
   const profile =
-    adminProfiles.find(x=>x.id === id);
+    adminProfiles.find(
+      x=>x.id === id
+    );
 
   if(!profile) return;
 
@@ -2640,330 +3917,443 @@ function openStudent(id){
 
   const totalQuestions =
     questions.reduce(
-      (s,x)=>s + Number(x.total || 0),
+      (sum,x)=>
+        sum +
+        Number(x.total || 0),
       0
     );
+
 
   const totalNet =
     questions.reduce(
-      (s,x)=>s + Number(x.net || 0),
+      (sum,x)=>
+        sum +
+        Number(x.net || 0),
       0
     );
 
+
   const totalMinutes =
     study.reduce(
-      (s,x)=>
-        s +
+      (sum,x)=>
+        sum +
         Number(x.minutes || 0) +
         Number(x.seconds || 0)/60,
       0
     );
 
-  const doneTopics =
+
+  const completedTopics =
     topics.filter(
       x=>x.state === "done"
     ).length;
 
 
-  document.getElementById("studentTitle")
-    .textContent =
-    profile.username || "Öğrenci";
+  document.getElementById(
+    "studentTitle"
+  ).textContent =
+    profile.username ||
+    "Öğrenci";
 
 
-  document.getElementById("studentDetails")
-    .innerHTML = `
+  document.getElementById(
+    "studentDetails"
+  ).innerHTML = `
 
-      <div class="stats">
+    <div class="stats">
 
-        <div class="stat">
-          <b>${totalQuestions}</b>
-          <span>Soru</span>
-        </div>
+      <div class="stat">
+        <b>${totalQuestions}</b>
+        <span>Soru</span>
+      </div>
 
-        <div class="stat">
-          <b>${totalNet.toFixed(1)}</b>
-          <span>Net</span>
-        </div>
+      <div class="stat">
+        <b>${totalNet.toFixed(1)}</b>
+        <span>Net</span>
+      </div>
 
-        <div class="stat">
-          <b>${exams.length}</b>
-          <span>Deneme</span>
-        </div>
+      <div class="stat">
+        <b>${exams.length}</b>
+        <span>Deneme</span>
+      </div>
 
-        <div class="stat">
-          <b>${Math.round(totalMinutes)}</b>
-          <span>Çalışma dk</span>
-        </div>
+      <div class="stat">
+        <b>${Math.round(totalMinutes)}</b>
+        <span>Çalışma dk</span>
+      </div>
+
+    </div>
+
+
+    <div class="card" style="margin-top:12px">
+
+      <div class="card-title">
+        🎯 Hedef
+      </div>
+
+      <div class="small">
+        <b>Alan:</b>
+        ${escapeHtml(
+          profile.field || "-"
+        )}
+      </div>
+
+      <div
+        class="small"
+        style="margin-top:6px">
+
+        <b>Üniversite:</b>
+        ${escapeHtml(
+          profile.university || "-"
+        )}
 
       </div>
 
-      <div class="card"
-           style="margin-top:12px">
+      <div
+        class="small"
+        style="margin-top:6px">
 
-        <div class="card-title">
-          🎯 Hedef
-        </div>
-
-        <div class="small">
-          <b>Alan:</b>
-          ${escapeHtml(profile.field || "-")}
-        </div>
-
-        <div class="small" style="margin-top:5px">
-          <b>Üniversite:</b>
-          ${escapeHtml(profile.university || "-")}
-        </div>
-
-        <div class="small" style="margin-top:5px">
-          <b>Bölüm:</b>
-          ${escapeHtml(profile.department || "-")}
-        </div>
-
-        <div class="small" style="margin-top:5px">
-          <b>Hedef sıralama:</b>
-          ${profile.target_rank || "-"}
-        </div>
+        <b>Bölüm:</b>
+        ${escapeHtml(
+          profile.department || "-"
+        )}
 
       </div>
 
-      <div class="card">
+      <div
+        class="small"
+        style="margin-top:6px">
 
-        <div class="card-title">
-          📚 Konu Durumu
-        </div>
-
-        <div class="row">
-          <span class="muted">
-            Tamamlanan
-          </span>
-
-          <b>
-            ${doneTopics}/${topics.length}
-          </b>
-        </div>
+        <b>Hedef sıralama:</b>
+        ${profile.target_rank || "-"}
 
       </div>
 
-      <div class="card">
+    </div>
 
-        <div class="card-title">
-          📝 Son Denemeler
-        </div>
 
-        ${
-          exams.slice(0,5).map(x=>`
+    <div class="card">
+
+      <div class="card-title">
+        📚 Konular
+      </div>
+
+      <div class="row">
+
+        <span class="muted">
+          Tamamlanan
+        </span>
+
+        <b>
+          ${completedTopics}/${topics.length}
+        </b>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        📝 Son Denemeler
+      </div>
+
+      ${
+        exams
+          .slice(0,5)
+          .map(exam=>`
 
             <div class="list-item">
 
               <div class="row">
 
                 <div>
+
                   <b>
-                    ${escapeHtml(x.name || "Deneme")}
+                    ${escapeHtml(
+                      exam.name ||
+                      "Deneme"
+                    )}
                   </b>
 
                   <div class="muted small">
-                    ${x.date || ""}
+                    ${exam.date || ""}
                   </div>
+
                 </div>
 
                 <b>
-                  ${Number(x.net || 0).toFixed(1)}
+                  ${Number(
+                    exam.net || 0
+                  ).toFixed(1)}
                 </b>
 
               </div>
 
             </div>
 
-          `).join("") ||
-          `<div class="empty">
-            Henüz deneme yok.
-          </div>`
-        }
+          `)
+          .join("") ||
+
+        `<div class="empty">
+          Henüz deneme yok.
+        </div>`
+      }
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        ❌ Yanlışlar
+      </div>
+
+      <div class="row">
+
+        <span>Toplam yanlış kaydı</span>
+
+        <b>
+          ${wrongs.length}
+        </b>
 
       </div>
 
-      <div class="card">
+    </div>
 
-        <div class="card-title">
-          ❌ Yanlışlar
-        </div>
-
-        <div class="row">
-          <span>Toplam</span>
-          <b>${wrongs.length}</b>
-        </div>
-
-      </div>
-    `;
+  `;
 
 
-  document
-    .getElementById("studentModal")
-    .classList
-    .add("show");
+  document.getElementById(
+    "studentModal"
+  ).classList.add("show");
 }
 
 
-/* =====================================================
-   RENDER
-===================================================== */
+/* =========================
+   RENDER ALL
+========================= */
 
 function renderAll(){
 
   renderHome();
+
   renderPlan();
+
   renderQuestions();
+
   renderExams();
+
   renderBadges();
 
   updateAccount();
-
-  if(isAdmin && !document.getElementById("admin").classList.contains("active")){
-    // Admin verisini sadece gerektiğinde yükle.
-  }
 }
 
+
+/* =========================
+   HOME
+========================= */
 
 function renderHome(){
 
   const totalQuestions =
     data.questions.reduce(
-      (s,x)=>s + Number(x.total || 0),
+      (sum,x)=>
+        sum +
+        Number(x.total || 0),
       0
     );
+
 
   const totalNet =
     data.questions.reduce(
-      (s,x)=>s + Number(x.net || 0),
+      (sum,x)=>
+        sum +
+        Number(x.net || 0),
       0
     );
 
+
   const totalMinutes =
     data.studySessions.reduce(
-      (s,x)=>
-        s +
+      (sum,x)=>
+        sum +
         Number(x.minutes || 0) +
         Number(x.seconds || 0)/60,
       0
     );
 
 
-  document.getElementById("statQuestions")
-    .textContent = totalQuestions;
+  document.getElementById(
+    "statQuestions"
+  ).textContent =
+    totalQuestions;
 
-  document.getElementById("statNet")
-    .textContent = totalNet.toFixed(1);
 
-  document.getElementById("statExams")
-    .textContent = data.exams.length;
+  document.getElementById(
+    "statNet"
+  ).textContent =
+    totalNet.toFixed(1);
 
-  document.getElementById("statMinutes")
-    .textContent = Math.round(totalMinutes);
+
+  document.getElementById(
+    "statExams"
+  ).textContent =
+    data.exams.length;
+
+
+  document.getElementById(
+    "statMinutes"
+  ).textContent =
+    Math.round(totalMinutes);
 
 
   const todayQuestions =
     data.questions
-      .filter(x=>x.date === todayKey())
+      .filter(
+        x=>x.date === todayKey()
+      )
       .reduce(
-        (s,x)=>s + Number(x.total || 0),
+        (sum,x)=>
+          sum +
+          Number(x.total || 0),
         0
       );
 
 
   const todayStudy =
     data.studySessions
-      .filter(x=>x.date === todayKey())
+      .filter(
+        x=>x.date === todayKey()
+      )
       .reduce(
-        (s,x)=>
-          s +
+        (sum,x)=>
+          sum +
           Number(x.minutes || 0) +
           Number(x.seconds || 0)/60,
         0
       );
 
 
-  document.getElementById("todayQuestions")
-    .textContent = todayQuestions;
+  document.getElementById(
+    "todayQuestions"
+  ).textContent =
+    todayQuestions;
 
-  document.getElementById("todayStudy")
-    .textContent =
-    Math.round(todayStudy) + " dk";
+
+  document.getElementById(
+    "todayStudy"
+  ).textContent =
+    Math.round(todayStudy) +
+    " dk";
 
 
   const goal =
-    Number(data.target.questions || 0);
+    Number(
+      data.target.questions || 0
+    );
+
 
   const percent =
     goal > 0
-      ? Math.min(100,(todayQuestions / goal)*100)
+      ? Math.min(
+          100,
+          todayQuestions /
+          goal *
+          100
+        )
       : 0;
 
-  document.getElementById("questionProgress")
-    .style.width = percent + "%";
 
-
-  const username =
-    currentUser?.user_metadata?.username ||
-    "Öğrenci";
-
-  document.getElementById("homeGreeting")
-    .textContent =
-    "Hoş geldin " + username + " 👋";
+  document.getElementById(
+    "questionProgress"
+  ).style.width =
+    percent + "%";
 
 
   let target = "";
 
+
   if(data.target.university){
-    target += data.target.university;
+    target +=
+      data.target.university;
   }
+
 
   if(data.target.department){
 
-    if(target) target += " • ";
+    if(target)
+      target += " • ";
 
-    target += data.target.department;
+    target +=
+      data.target.department;
   }
+
 
   if(data.target.rank){
 
-    if(target) target += " • ";
+    if(target)
+      target += " • ";
 
     target +=
-      Number(data.target.rank).toLocaleString("tr-TR") +
+      Number(
+        data.target.rank
+      ).toLocaleString(
+        "tr-TR"
+      ) +
       ". hedef";
   }
 
+
   if(!target){
-    target = "Henüz hedef belirlenmedi.";
+
+    target =
+      "Henüz hedef belirlenmedi.";
   }
 
-  document.getElementById("targetText")
-    .textContent = target;
+
+  document.getElementById(
+    "targetText"
+  ).textContent =
+    target;
 }
 
+
+/* =========================
+   PLAN RENDER
+========================= */
 
 function renderPlan(){
 
   const box =
-    document.getElementById("planTasks");
+    document.getElementById(
+      "planTasks"
+    );
+
 
   const tasks =
     data.plan.tasks || [];
 
-  document.getElementById("planInfo")
-    .textContent =
+
+  document.getElementById(
+    "planInfo"
+  ).textContent =
     `${data.plan.hours || 0} saat • ${tasks.length} görev`;
 
 
   if(!tasks.length){
 
     box.innerHTML = `
+
       <div class="card">
+
         <div class="empty">
           Bugün için henüz görev eklemedin.
         </div>
+
       </div>
+
     `;
 
     return;
@@ -2973,29 +4363,44 @@ function renderPlan(){
   box.innerHTML =
     tasks.map(task=>`
 
-      <div class="card">
+      <div class="card ${task.done ? "task-done" : ""}">
 
         <div class="row">
 
           <div style="flex:1">
 
             <div class="small muted">
-              ${escapeHtml(task.time || "")}
+              ${escapeHtml(
+                task.time || ""
+              )}
             </div>
 
-            <div style="
-              font-weight:900;
-              margin:4px 0
-            ">
-              ${escapeHtml(task.subject)}
+            <div
+              class="task-title"
+              style="
+                font-weight:900;
+                margin:4px 0
+              ">
+
+              ${escapeHtml(
+                task.subject
+              )}
+
             </div>
 
             <div class="small muted">
-              ${escapeHtml(task.topic || "")}
-              • ${task.minutes} dk
+
+              ${escapeHtml(
+                task.topic || ""
+              )}
+
+              •
+              ${task.minutes} dk
+
             </div>
 
           </div>
+
 
           <button
             class="btn ${task.done ? "green" : "gray"}"
@@ -3013,10 +4418,17 @@ function renderPlan(){
 }
 
 
+/* =========================
+   QUESTIONS RENDER
+========================= */
+
 function renderQuestions(){
 
   const box =
-    document.getElementById("questionList");
+    document.getElementById(
+      "questionList"
+    );
+
 
   if(!data.questions.length){
 
@@ -3030,54 +4442,77 @@ function renderQuestions(){
 
 
   box.innerHTML =
-    data.questions.slice(0,10).map(x=>`
+    data.questions
+      .slice(0,15)
+      .map(item=>`
 
-      <div class="list-item">
+        <div class="list-item">
 
-        <div class="row">
+          <div class="row">
 
-          <div>
+            <div>
 
-            <span class="subject-pill">
-              ${escapeHtml(x.subject)}
-            </span>
+              <span class="subject-pill">
+                ${escapeHtml(
+                  item.subject
+                )}
+              </span>
 
-            <div style="font-weight:800;margin-top:5px">
-              ${escapeHtml(x.topic || "Genel")}
+              <div
+                style="
+                  font-weight:800;
+                  margin-top:5px
+                ">
+
+                ${escapeHtml(
+                  item.topic ||
+                  "Genel"
+                )}
+
+              </div>
+
+              <div class="muted small">
+                ${item.date}
+              </div>
+
             </div>
 
-            <div class="muted small">
-              ${x.date}
-            </div>
 
-          </div>
+            <div style="text-align:right">
 
-          <div style="text-align:right">
+              <b>
+                ${item.correct}D
+                ${item.wrong}Y
+                ${item.blank}B
+              </b>
 
-            <b>
-              ${x.correct}D
-              ${x.wrong}Y
-              ${x.blank}B
-            </b>
+              <div class="muted small">
+                Net ${Number(
+                  item.net
+                ).toFixed(2)}
+              </div>
 
-            <div class="muted small">
-              Net ${Number(x.net).toFixed(2)}
             </div>
 
           </div>
 
         </div>
 
-      </div>
-
-    `).join("");
+      `).join("");
 }
 
+
+/* =========================
+   EXAMS RENDER
+========================= */
 
 function renderExams(){
 
   const box =
-    document.getElementById("examList");
+    document.getElementById(
+      "examList"
+    );
+
 
   if(!data.exams.length){
 
@@ -3091,62 +4526,92 @@ function renderExams(){
 
 
   box.innerHTML =
-    data.exams.slice(0,10).map(x=>`
+    data.exams
+      .slice(0,15)
+      .map(item=>`
 
-      <div class="list-item">
-
-        <div class="row">
-
-          <div>
-
-            <b>
-              ${escapeHtml(x.name)}
-            </b>
-
-            <div class="muted small">
-              ${x.type} • ${x.date}
-            </div>
-
-          </div>
-
-          <div>
-            <b>${Number(x.net).toFixed(1)}</b>
-            <div class="muted small">net</div>
-          </div>
-
-        </div>
-
-      </div>
-
-    `).join("");
-}
-
-
-function renderBadges(){
-
-  const box =
-    document.getElementById("badgesBox");
-
-  box.innerHTML =
-    BADGES.map(b=>{
-
-      const earned =
-        !!data.badges[b[0]];
-
-      return `
         <div class="list-item">
 
           <div class="row">
 
             <div>
+
               <b>
-                ${earned ? b[1] : "🔒"}
-                ${b[2]}
+                ${escapeHtml(
+                  item.name
+                )}
               </b>
 
               <div class="muted small">
-                ${b[3]}
+                ${item.type} • ${item.date}
               </div>
+
+            </div>
+
+            <div>
+
+              <b>
+                ${Number(
+                  item.net
+                ).toFixed(1)}
+              </b>
+
+              <div class="muted small">
+                net
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `).join("");
+}
+
+
+/* =========================
+   BADGES RENDER
+========================= */
+
+function renderBadges(){
+
+  const box =
+    document.getElementById(
+      "badgesBox"
+    );
+
+
+  box.innerHTML =
+    BADGES.map(badge=>{
+
+      const earned =
+        !!data.badges[
+          badge[0]
+        ];
+
+
+      return `
+
+        <div class="list-item">
+
+          <div class="row">
+
+            <div>
+
+              <b>
+                ${earned
+                  ? badge[1]
+                  : "🔒"
+                }
+
+                ${badge[2]}
+              </b>
+
+              <div class="muted small">
+                ${badge[3]}
+              </div>
+
             </div>
 
             <div>
@@ -3156,59 +4621,88 @@ function renderBadges(){
           </div>
 
         </div>
+
       `;
 
     }).join("");
 }
 
 
+/* =========================
+   ACCOUNT
+========================= */
+
 function updateAccount(){
 
-  if(!currentUser) return;
+  if(!currentUser)
+    return;
+
 
   const username =
     currentUser.user_metadata?.username ||
+    document.getElementById(
+      "accountUsername"
+    ).textContent ||
     "Öğrenci";
 
-  document.getElementById("accountUsername")
-    .textContent = username;
 
-  document.getElementById("accountEmail")
-    .textContent =
-    currentUser.email || "";
-
-  document.getElementById("headerUser")
-    .textContent = username;
+  setAccountName(
+    username
+  );
 }
 
 
-/* =====================================================
+/* =========================
    NAV
-===================================================== */
+========================= */
 
 async function openPage(page){
 
+  if(
+    page === "admin" &&
+    !isAdmin
+  ){
+
+    showToast(
+      "Bu bölüme erişimin yok."
+    );
+
+    return;
+  }
+
+
   document
     .querySelectorAll(".page")
-    .forEach(x=>{
-      x.classList.remove("active");
+    .forEach(element=>{
+
+      element.classList.remove(
+        "active"
+      );
+
     });
 
+
   const target =
-    document.getElementById(page);
+    document.getElementById(
+      page
+    );
+
 
   if(target){
-    target.classList.add("active");
+
+    target.classList.add(
+      "active"
+    );
   }
 
 
   document
     .querySelectorAll(".nav-btn")
-    .forEach(btn=>{
+    .forEach(button=>{
 
-      btn.classList.toggle(
+      button.classList.toggle(
         "active",
-        btn.dataset.page === page
+        button.dataset.page === page
       );
 
     });
@@ -3216,21 +4710,14 @@ async function openPage(page){
 
   if(page === "admin"){
 
-    if(!isAdmin){
-
-      showToast("Bu bölüme erişimin yok.");
-      openPage("home");
-      return;
-    }
-
     await loadAdmin();
   }
 }
 
 
-/* =====================================================
+/* =========================
    THEME
-===================================================== */
+========================= */
 
 function toggleTheme(){
 
@@ -3252,56 +4739,94 @@ function applyTheme(){
 }
 
 
-/* =====================================================
+/* =========================
    MODAL
-===================================================== */
+========================= */
 
 function closeModal(id){
 
-  document
-    .getElementById(id)
-    .classList
-    .remove("show");
+  const modal =
+    document.getElementById(id);
+
+  if(modal){
+
+    modal.classList.remove(
+      "show"
+    );
+  }
 }
 
 
-/* =====================================================
-   IMPORT / EXPORT
-===================================================== */
+/* =========================
+   EXPORT
+========================= */
 
 function exportData(){
 
   const blob =
     new Blob(
-      [JSON.stringify(data,null,2)],
-      {type:"application/json"}
+      [
+        JSON.stringify(
+          data,
+          null,
+          2
+        )
+      ],
+      {
+        type:"application/json"
+      }
     );
 
+
   const url =
-    URL.createObjectURL(blob);
+    URL.createObjectURL(
+      blob
+    );
 
-  const a =
-    document.createElement("a");
 
-  a.href = url;
-  a.download =
+  const link =
+    document.createElement(
+      "a"
+    );
+
+
+  link.href = url;
+
+  link.download =
     "yks-kocum-yedek-" +
     todayKey() +
     ".json";
 
-  a.click();
 
-  URL.revokeObjectURL(url);
+  document.body.appendChild(
+    link
+  );
 
-  showToast("Yedek dosyası hazırlandı.");
+  link.click();
+
+  link.remove();
+
+
+  URL.revokeObjectURL(
+    url
+  );
+
+
+  showToast(
+    "Yedek dosyası hazırlandı."
+  );
 }
 
 
+/* =========================
+   IMPORT
+========================= */
+
 function importData(){
 
-  document
-    .getElementById("importFile")
-    .click();
+  document.getElementById(
+    "importFile"
+  ).click();
 }
 
 
@@ -3310,36 +4835,60 @@ function readImport(event){
   const file =
     event.target.files[0];
 
-  if(!file) return;
+
+  if(!file)
+    return;
+
 
   const reader =
     new FileReader();
+
 
   reader.onload = ()=>{
 
     try{
 
       const imported =
-        JSON.parse(reader.result);
+        JSON.parse(
+          reader.result
+        );
 
-      if(!imported.questions){
-        throw new Error("Geçersiz dosya");
+
+      if(
+        !imported ||
+        !Array.isArray(
+          imported.questions
+        )
+      ){
+
+        throw new Error(
+          "Geçersiz dosya"
+        );
       }
 
+
       data = {
+
         ...defaultData(),
+
         ...imported
+
       };
+
 
       saveLocal();
 
       renderAll();
 
+
       showToast(
         "Veriler içeri aktarıldı."
       );
 
+
     }catch(error){
+
+      console.error(error);
 
       showToast(
         "Dosya okunamadı."
@@ -3347,60 +4896,112 @@ function readImport(event){
     }
   };
 
-  reader.readAsText(file);
+
+  reader.readAsText(
+    file
+  );
 }
 
 
-/* =====================================================
-   HELPERS
-===================================================== */
+/* =========================
+   SUBJECTS
+========================= */
 
 function populateSubjects(){
 
   const select =
-    document.getElementById("qSubject");
+    document.getElementById(
+      "qSubject"
+    );
+
+
+  if(!select)
+    return;
+
 
   select.innerHTML =
-    SUBJECTS.map(x=>
-      `<option>${x}</option>`
+    SUBJECTS.map(
+      subject=>
+        `<option>${subject}</option>`
     ).join("");
 }
 
 
+/* =========================
+   HTML ESCAPE
+========================= */
+
 function escapeHtml(value){
 
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+  return String(
+    value ?? ""
+  )
+  .replaceAll(
+    "&",
+    "&amp;"
+  )
+  .replaceAll(
+    "<",
+    "&lt;"
+  )
+  .replaceAll(
+    ">",
+    "&gt;"
+  )
+  .replaceAll(
+    '"',
+    "&quot;"
+  )
+  .replaceAll(
+    "'",
+    "&#039;"
+  );
 }
 
 
-let toastTimer;
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer = null;
+
 
 function showToast(text){
 
   const toast =
-    document.getElementById("toast");
+    document.getElementById(
+      "toast"
+    );
 
-  toast.textContent = text;
 
-  toast.classList.add("show");
+  toast.textContent =
+    text;
 
-  clearTimeout(toastTimer);
+
+  toast.classList.add(
+    "show"
+  );
+
+
+  clearTimeout(
+    toastTimer
+  );
+
 
   toastTimer =
     setTimeout(()=>{
-      toast.classList.remove("show");
+
+      toast.classList.remove(
+        "show"
+      );
+
     },2500);
 }
 
 
-/* =====================================================
+/* =========================
    START
-===================================================== */
+========================= */
 
 init();
 
