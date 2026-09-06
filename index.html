@@ -10,8 +10,11 @@
   <meta name="description" content="YKS çalışma ve takip uygulaması">
 
   <link rel="manifest" href="manifest.json">
-
   <link rel="stylesheet" href="style.css">
+
+  <!-- SCRIPTS (DEFER EKLENDİ) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="app.js" defer></script>
 </head>
 
 <body>
@@ -34,7 +37,6 @@
       <div class="auth-subtitle">Hedefine birlikte ulaşalım.</div>
 
       <div class="auth-tabs">
-
         <button
           id="loginTab"
           class="auth-tab active"
@@ -48,45 +50,36 @@
           onclick="switchAuth('register')">
           Kayıt Ol
         </button>
-
       </div>
 
       <div id="usernameField" class="field hidden">
-
-        <label>Kullanıcı adı</label>
-
+        <label for="authUsername">Kullanıcı adı</label>
         <input
           id="authUsername"
           class="input"
           type="text"
+          autocomplete="username"
           placeholder="Örneğin: Ahmet">
-
       </div>
 
       <div class="field">
-
-        <label>E-posta</label>
-
+        <label for="authEmail">E-posta</label>
         <input
           id="authEmail"
           class="input"
           type="email"
           autocomplete="email"
           placeholder="ornek@mail.com">
-
       </div>
 
       <div class="field">
-
-        <label>Şifre</label>
-
+        <label for="authPassword">Şifre</label>
         <input
           id="authPassword"
           class="input"
           type="password"
           autocomplete="current-password"
           placeholder="••••••••">
-
       </div>
 
       <button
@@ -97,7 +90,6 @@
       </button>
 
       <div id="resendBox" class="resend-box hidden">
-
         <button
           id="resendEmailBtn"
           class="resend-btn"
@@ -110,7 +102,6 @@
           Mail gelmediyse önce e-posta adresini kontrol et.
           Spam/Gereksiz klasörüne de bakabilirsin.
         </div>
-
       </div>
 
       <div
@@ -129,353 +120,138 @@
 
       <!-- TOPBAR -->
       <div class="topbar">
-
         <div class="hello">
-
           <small>YKS Koçum</small>
-
-          <h1 id="helloName">
-            Merhaba 👋
-          </h1>
-
-          <div
-            id="adminBadge"
-            class="admin-badge hidden">
-            👑 ADMIN
-          </div>
-
+          <h1 id="helloName">Merhaba 👋</h1>
+          <div id="adminBadge" class="admin-badge hidden">👑 ADMIN</div>
         </div>
 
         <div class="top-actions">
-
-          <button
-            class="icon-btn"
-            onclick="toggleTheme()"
-            title="Tema">
-            🌙
-          </button>
-
-          <button
-            class="icon-btn"
-            onclick="logout()"
-            title="Çıkış">
-            ↪
-          </button>
-
+          <button class="icon-btn" onclick="toggleTheme()" title="Tema">🌙</button>
+          <button class="icon-btn" onclick="logout()" title="Çıkış">↪</button>
         </div>
-
       </div>
 
 
       <!-- HOME -->
       <section id="page-home">
-
         <div class="card hero">
-
-          <div class="hero-title">
-            Bugünkü hedefin
-          </div>
-
-          <div
-            class="hero-value"
-            id="heroQuestions">
-            0 soru
-          </div>
-
-          <div
-            class="hero-sub"
-            id="heroHours">
-            Hedeflerini profilinden ayarlayabilirsin.
-          </div>
-
+          <div class="hero-title">Bugünkü hedefin</div>
+          <div class="hero-value" id="heroQuestions">0 soru</div>
+          <div class="hero-sub" id="heroHours">Hedeflerini profilinden ayarlayabilirsin.</div>
         </div>
 
         <div class="section-title">
-
           <h2>Genel durum</h2>
-
-          <span id="streakText">
-            0 gün seri
-          </span>
-
+          <span id="streakText">0 gün seri</span>
         </div>
 
         <div class="stats">
-
           <div class="stat">
-
-            <div class="stat-label">
-              Toplam Soru
-            </div>
-
-            <div
-              class="stat-value"
-              id="totalQuestions">
-              0
-            </div>
-
+            <div class="stat-label">Toplam Soru</div>
+            <div class="stat-value" id="totalQuestions">0</div>
           </div>
 
           <div class="stat">
-
-            <div class="stat-label">
-              Toplam Net
-            </div>
-
-            <div
-              class="stat-value"
-              id="totalNet">
-              0
-            </div>
-
+            <div class="stat-label">Toplam Net</div>
+            <div class="stat-value" id="totalNet">0</div>
           </div>
 
           <div class="stat">
-
-            <div class="stat-label">
-              Deneme
-            </div>
-
-            <div
-              class="stat-value"
-              id="totalExams">
-              0
-            </div>
-
+            <div class="stat-label">Deneme</div>
+            <div class="stat-value" id="totalExams">0</div>
           </div>
 
           <div class="stat">
-
-            <div class="stat-label">
-              Çalışma
-            </div>
-
-            <div
-              class="stat-value"
-              id="totalMinutes">
-              0 dk
-            </div>
-
+            <div class="stat-label">Çalışma</div>
+            <div class="stat-value" id="totalMinutes">0 dk</div>
           </div>
-
         </div>
 
         <div class="section-title">
-
           <h2>Bugünkü plan</h2>
-
-          <span id="todayPlanProgress">
-            0%
-          </span>
-
+          <span id="todayPlanProgress">0%</span>
         </div>
 
         <div class="card">
-
           <div class="progress">
-
-            <div
-              id="todayProgressBar"
-              style="width:0%">
-            </div>
-
+            <div id="todayProgressBar" style="width:0%"></div>
           </div>
-
-          <div
-            id="todayTasks"
-            style="margin-top:10px">
-
-            <div
-              style="color:var(--muted);font-size:13px">
-              Bugün için görev yok.
-            </div>
-
+          <div id="todayTasks" style="margin-top:10px">
+            <div style="color:var(--muted);font-size:13px">Bugün için görev yok.</div>
           </div>
-
         </div>
-
       </section>
 
 
       <!-- PLAN -->
       <section id="page-plan" class="hidden">
-
         <div class="section-title">
-
           <h2>Günlük Plan</h2>
-
           <span id="planDateLabel"></span>
-
         </div>
-
 
         <!-- PLAN AYARLARI -->
         <div class="card">
-
           <div class="form-grid">
-
             <div class="field">
-
-              <label>Çalışma saati</label>
-
-              <input
-                id="planHours"
-                class="input"
-                type="number"
-                min="0"
-                step=".5">
-
+              <label for="planHours">Çalışma saati</label>
+              <input id="planHours" class="input" type="number" min="0" step=".5">
             </div>
 
             <div class="field">
-
-              <label>Başlangıç</label>
-
-              <input
-                id="planStart"
-                class="input"
-                type="time">
-
+              <label for="planStart">Başlangıç</label>
+              <input id="planStart" class="input" type="time">
             </div>
-
           </div>
-
 
           <!-- DERSLERİ DÜZENLE -->
           <div class="plan-editor">
-
             <div class="plan-editor-header">
-
               <div>
-
-                <div class="plan-editor-title">
-                  📚 Dersleri Düzenle
-                </div>
-
-                <div class="plan-editor-subtitle">
-                  Günlük planında görmek istediğin dersleri seç.
-                </div>
-
+                <div class="plan-editor-title">📚 Dersleri Düzenle</div>
+                <div class="plan-editor-subtitle">Günlük planında görmek istediğin dersleri seç.</div>
               </div>
-
-              <div
-                id="selectedPlanCount"
-                class="selected-count">
-                0
-              </div>
-
+              <div id="selectedPlanCount" class="selected-count">0</div>
             </div>
 
-            <div
-              id="planSubjectEditor"
-              class="subject-editor">
-            </div>
+            <div id="planSubjectEditor" class="subject-editor"></div>
 
             <div class="plan-editor-actions">
-
-              <button
-                type="button"
-                class="secondary-btn"
-                onclick="saveSelectedPlanSubjects()">
-                💾 Dersleri Kaydet
-              </button>
-
-              <button
-                type="button"
-                class="primary-btn"
-                onclick="refreshTodayPlan()">
-                🔄 Planı Yenile
-              </button>
-
+              <button type="button" class="secondary-btn" onclick="saveSelectedPlanSubjects()">💾 Dersleri Kaydet</button>
+              <button type="button" class="primary-btn" onclick="refreshTodayPlan()">🔄 Planı Yenile</button>
             </div>
 
-            <div
-              id="planSaveStatus"
-              class="plan-save-status">
-            </div>
+            <div id="planSaveStatus" class="plan-save-status"></div>
 
             <div class="plan-note">
-              💡 <strong>Planı Yenile</strong> seçtiğin derslerden
-              bugünün görevlerini yeniden oluşturur.
-              Mevcut tamamlanmış görevlerin yerine yeni görevler gelir.
+              💡 <strong>Planı Yenile</strong> seçtiğin derslerden bugünün görevlerini yeniden oluşturur. Mevcut tamamlanmış görevlerin yerine yeni görevler gelir.
             </div>
-
           </div>
 
-          <!-- ESKİ MULTI SELECT DE KORUNDU -->
-          <div class="field" style="margin-top:18px;">
-
-            <label>
-              Plan dersleri
-            </label>
-
-            <select
-              id="planSubjects"
-              class="input"
-              multiple
-              size="5">
-
-              <option>TYT Türkçe</option>
-              <option>TYT Matematik</option>
-              <option>TYT Fen</option>
-              <option>TYT Sosyal</option>
-              <option>AYT Matematik</option>
-              <option>AYT Fizik</option>
-              <option>AYT Kimya</option>
-              <option>AYT Biyoloji</option>
-              <option>AYT Edebiyat</option>
-              <option>AYT Tarih</option>
-              <option>AYT Coğrafya</option>
-
-            </select>
-
-          </div>
-
-          <button
-            class="primary-btn"
-            onclick="savePlan()">
-            Planı Kaydet
-          </button>
-
+          <button class="primary-btn" style="margin-top:18px;" onclick="savePlan()">Planı Kaydet</button>
         </div>
-
 
         <div class="section-title">
-
           <h2>Görevler</h2>
-
-          <span id="planProgressText">
-            0 / 0
-          </span>
-
+          <span id="planProgressText">0 / 0</span>
         </div>
 
-        <div
-          class="card"
-          id="planTaskList">
-          Görev bulunmuyor.
-        </div>
-
+        <div class="card" id="planTaskList">Görev bulunmuyor.</div>
       </section>
 
 
       <!-- QUESTIONS -->
       <section id="page-questions" class="hidden">
-
         <div class="section-title">
           <h2>Soru Takibi</h2>
         </div>
 
         <div class="card">
-
           <div class="form-grid">
-
             <div class="field full">
-
-              <label>Ders</label>
-
-              <select id="qSubject">
-
+              <label for="qSubject">Ders</label>
+              <select id="qSubject" class="input">
                 <option>TYT Türkçe</option>
                 <option>TYT Matematik</option>
                 <option>TYT Fen</option>
@@ -487,521 +263,237 @@
                 <option>AYT Edebiyat</option>
                 <option>AYT Tarih</option>
                 <option>AYT Coğrafya</option>
-
               </select>
-
             </div>
 
             <div class="field full">
-
-              <label>Konu</label>
-
-              <input
-                id="qTopic"
-                class="input"
-                placeholder="Örn. Problemler">
-
+              <label for="qTopic">Konu</label>
+              <input id="qTopic" class="input" placeholder="Örn. Problemler">
             </div>
 
             <div class="field">
-
-              <label>Toplam</label>
-
-              <input
-                id="qTotal"
-                class="input"
-                type="number"
-                min="0"
-                value="20">
-
+              <label for="qTotal">Toplam</label>
+              <input id="qTotal" class="input" type="number" min="0" value="20">
             </div>
 
             <div class="field">
-
-              <label>Doğru</label>
-
-              <input
-                id="qCorrect"
-                class="input"
-                type="number"
-                min="0"
-                value="15">
-
+              <label for="qCorrect">Doğru</label>
+              <input id="qCorrect" class="input" type="number" min="0" value="15">
             </div>
 
             <div class="field">
-
-              <label>Yanlış</label>
-
-              <input
-                id="qWrong"
-                class="input"
-                type="number"
-                min="0"
-                value="3">
-
+              <label for="qWrong">Yanlış</label>
+              <input id="qWrong" class="input" type="number" min="0" value="3">
             </div>
 
             <div class="field">
-
-              <label>Boş</label>
-
-              <input
-                id="qBlank"
-                class="input"
-                type="number"
-                min="0"
-                value="2">
-
+              <label for="qBlank">Boş</label>
+              <input id="qBlank" class="input" type="number" min="0" value="2">
             </div>
-
           </div>
 
-          <button
-            class="primary-btn"
-            onclick="addQuestion()">
-            Soruları Kaydet
-          </button>
-
+          <button class="primary-btn" onclick="addQuestion()">Soruları Kaydet</button>
         </div>
 
         <div class="section-title">
           <h2>Son Kayıtlar</h2>
         </div>
 
-        <div
-          class="card"
-          id="questionList">
-          Henüz kayıt yok.
-        </div>
-
+        <div class="card" id="questionList">Henüz kayıt yok.</div>
       </section>
 
 
       <!-- EXAMS -->
       <section id="page-exams" class="hidden">
-
         <div class="section-title">
           <h2>Denemeler</h2>
         </div>
 
         <div class="card">
-
           <div class="field">
-
-            <label>Deneme adı</label>
-
-            <input
-              id="examName"
-              class="input"
-              placeholder="TYT Denemesi #1">
-
+            <label for="examName">Deneme adı</label>
+            <input id="examName" class="input" placeholder="TYT Denemesi #1">
           </div>
 
           <div class="form-grid">
-
             <div class="field">
-
-              <label>Tür</label>
-
-              <select id="examType">
+              <label for="examType">Tür</label>
+              <select id="examType" class="input">
                 <option>TYT</option>
                 <option>AYT</option>
               </select>
-
             </div>
 
             <div class="field">
-
-              <label>Tarih</label>
-
-              <input
-                id="examDate"
-                class="input"
-                type="date">
-
+              <label for="examDate">Tarih</label>
+              <input id="examDate" class="input" type="date">
             </div>
 
             <div class="field">
-
-              <label>Türkçe</label>
-
-              <input
-                id="examTurkish"
-                class="input"
-                type="number"
-                step=".01"
-                value="0">
-
+              <label for="examTurkish">Türkçe</label>
+              <input id="examTurkish" class="input" type="number" step=".01" value="0">
             </div>
 
             <div class="field">
-
-              <label>Matematik</label>
-
-              <input
-                id="examMath"
-                class="input"
-                type="number"
-                step=".01"
-                value="0">
-
+              <label for="examMath">Matematik</label>
+              <input id="examMath" class="input" type="number" step=".01" value="0">
             </div>
 
             <div class="field">
-
-              <label>Fen</label>
-
-              <input
-                id="examScience"
-                class="input"
-                type="number"
-                step=".01"
-                value="0">
-
+              <label for="examScience">Fen</label>
+              <input id="examScience" class="input" type="number" step=".01" value="0">
             </div>
 
             <div class="field">
-
-              <label>Sosyal</label>
-
-              <input
-                id="examSocial"
-                class="input"
-                type="number"
-                step=".01"
-                value="0">
-
+              <label for="examSocial">Sosyal</label>
+              <input id="examSocial" class="input" type="number" step=".01" value="0">
             </div>
-
           </div>
 
-          <button
-            class="primary-btn"
-            onclick="addExam()">
-            Denemeyi Kaydet
-          </button>
-
+          <button class="primary-btn" onclick="addExam()">Denemeyi Kaydet</button>
         </div>
 
         <div class="section-title">
           <h2>Deneme geçmişi</h2>
         </div>
 
-        <div
-          class="card"
-          id="examList">
-          Henüz deneme yok.
-        </div>
-
+        <div class="card" id="examList">Henüz deneme yok.</div>
       </section>
 
 
       <!-- FOCUS -->
       <section id="page-focus" class="hidden">
-
         <div class="section-title">
-
           <h2>Odaklan</h2>
-
-          <span>
-            25 dakika
-          </span>
-
+          <span>25 dakika</span>
         </div>
 
         <div class="card focus-card">
-
-          <div class="focus-label">
-            Telefonu bırak, derse odaklan.
-          </div>
-
-          <div
-            id="timer"
-            class="timer">
-            25:00
-          </div>
+          <div class="focus-label">Telefonu bırak, derse odaklan.</div>
+          <div id="timer" class="timer">25:00</div>
 
           <div class="timer-buttons">
-
-            <button
-              id="timerStart"
-              class="primary-btn"
-              onclick="toggleFocus()">
-              Başlat
-            </button>
-
-            <button
-              class="secondary-btn"
-              onclick="resetFocus()">
-              Sıfırla
-            </button>
-
+            <button id="timerStart" class="primary-btn" onclick="toggleFocus()">Başlat</button>
+            <button class="secondary-btn" onclick="resetFocus()">Sıfırla</button>
           </div>
-
         </div>
-
       </section>
 
 
       <!-- BADGES -->
       <section id="page-badges" class="hidden">
-
         <div class="section-title">
-
           <h2>Rozetler</h2>
-
-          <span id="badgeCount">
-            0 / 8
-          </span>
-
+          <span id="badgeCount">0 / 8</span>
         </div>
 
-        <div
-          class="badges"
-          id="badgeList">
-        </div>
-
+        <div class="badges" id="badgeList"></div>
       </section>
 
 
       <!-- PROFILE -->
       <section id="page-profile" class="hidden">
-
         <div class="section-title">
           <h2>Profil</h2>
         </div>
 
         <div class="card">
-
           <div class="field">
-
-            <label>Kullanıcı adı</label>
-
-            <input
-              id="profileUsername"
-              class="input">
-
+            <label for="profileUsername">Kullanıcı adı</label>
+            <input id="profileUsername" class="input">
           </div>
 
           <div class="form-grid">
-
             <div class="field">
-
-              <label>Alan</label>
-
-              <select id="profileField">
-
+              <label for="profileField">Alan</label>
+              <select id="profileField" class="input">
                 <option>Sayısal</option>
                 <option>Eşit Ağırlık</option>
                 <option>Sözel</option>
                 <option>Dil</option>
-
               </select>
-
             </div>
 
             <div class="field">
-
-              <label>Hedef sıralama</label>
-
-              <input
-                id="profileRank"
-                class="input"
-                type="number"
-                placeholder="10000">
-
+              <label for="profileRank">Hedef sıralama</label>
+              <input id="profileRank" class="input" type="number" placeholder="10000">
             </div>
 
             <div class="field">
-
-              <label>Günlük saat</label>
-
-              <input
-                id="profileHours"
-                class="input"
-                type="number"
-                min="0"
-                step=".5">
-
+              <label for="profileHours">Günlük saat</label>
+              <input id="profileHours" class="input" type="number" min="0" step=".5">
             </div>
 
             <div class="field">
-
-              <label>Günlük soru</label>
-
-              <input
-                id="profileQuestions"
-                class="input"
-                type="number"
-                min="0">
-
+              <label for="profileQuestions">Günlük soru</label>
+              <input id="profileQuestions" class="input" type="number" min="0">
             </div>
 
             <div class="field full">
-
-              <label>Hedef üniversite</label>
-
-              <input
-                id="profileUniversity"
-                class="input"
-                placeholder="Üniversite">
-
+              <label for="profileUniversity">Hedef üniversite</label>
+              <input id="profileUniversity" class="input" placeholder="Üniversite">
             </div>
 
             <div class="field full">
-
-              <label>Hedef bölüm</label>
-
-              <input
-                id="profileDepartment"
-                class="input"
-                placeholder="Bölüm">
-
+              <label for="profileDepartment">Hedef bölüm</label>
+              <input id="profileDepartment" class="input" placeholder="Bölüm">
             </div>
 
             <div class="field full">
-
-              <label>Sınav tarihi</label>
-
-              <input
-                id="profileExamDate"
-                class="input"
-                type="date">
-
+              <label for="profileExamDate">Sınav tarihi</label>
+              <input id="profileExamDate" class="input" type="date">
             </div>
-
           </div>
 
-          <button
-            class="primary-btn"
-            onclick="saveProfile()">
-            Profili Kaydet
-          </button>
-
+          <button class="primary-btn" onclick="saveProfile()">Profili Kaydet</button>
         </div>
 
-
         <div class="card">
-
-          <div
-            class="section-title"
-            style="margin-top:0">
-
+          <div class="section-title" style="margin-top:0">
             <h2>Veriler</h2>
-
           </div>
 
           <div class="row-buttons">
-
-            <button
-              class="secondary-btn"
-              onclick="exportData()">
-              Dışa Aktar
-            </button>
-
-            <button
-              class="secondary-btn"
-              onclick="document.getElementById('importFile').click()">
-              İçe Aktar
-            </button>
-
+            <button class="secondary-btn" onclick="exportData()">Dışa Aktar</button>
+            <button class="secondary-btn" onclick="document.getElementById('importFile').click()">İçe Aktar</button>
           </div>
 
-          <input
-            id="importFile"
-            class="hidden"
-            type="file"
-            accept=".json"
-            onchange="importData(event)">
-
+          <input id="importFile" class="hidden" type="file" accept=".json" onchange="importData(event)">
         </div>
 
 
         <!-- ADMIN PANEL -->
-        <div
-          id="adminSection"
-          class="hidden">
-
+        <div id="adminSection" class="hidden">
           <div class="section-title">
-
             <h2>👑 Admin Paneli</h2>
-
           </div>
 
           <div class="card">
-
             <div class="stats">
-
               <div class="stat">
-
-                <div class="stat-label">
-                  Kullanıcı
-                </div>
-
-                <div
-                  id="adminUsers"
-                  class="stat-value">
-                  0
-                </div>
-
+                <div class="stat-label">Kullanıcı</div>
+                <div id="adminUsers" class="stat-value">0</div>
               </div>
 
               <div class="stat">
-
-                <div class="stat-label">
-                  Soru
-                </div>
-
-                <div
-                  id="adminQuestions"
-                  class="stat-value">
-                  0
-                </div>
-
+                <div class="stat-label">Soru</div>
+                <div id="adminQuestions" class="stat-value">0</div>
               </div>
 
               <div class="stat">
-
-                <div class="stat-label">
-                  Deneme
-                </div>
-
-                <div
-                  id="adminExams"
-                  class="stat-value">
-                  0
-                </div>
-
+                <div class="stat-label">Deneme</div>
+                <div id="adminExams" class="stat-value">0</div>
               </div>
 
               <div class="stat">
-
-                <div class="stat-label">
-                  Çalışma
-                </div>
-
-                <div
-                  id="adminMinutes"
-                  class="stat-value">
-                  0
-                </div>
-
+                <div class="stat-label">Çalışma</div>
+                <div id="adminMinutes" class="stat-value">0</div>
               </div>
-
             </div>
 
-            <button
-              style="margin-top:12px"
-              class="secondary-btn"
-              onclick="loadAdminStats()">
-              İstatistikleri Yenile
-            </button>
-
+            <button style="margin-top:12px" class="secondary-btn" onclick="loadAdminStats()">İstatistikleri Yenile</button>
           </div>
-
         </div>
-
       </section>
 
     </main>
@@ -1009,79 +501,40 @@
 
     <!-- NAV -->
     <nav class="bottom-nav">
-
-      <button
-        class="nav-btn active"
-        data-page="home"
-        onclick="showPage('home')">
-
+      <button class="nav-btn active" data-page="home" onclick="showPage('home')">
         <span>⌂</span>
         Ana Sayfa
-
       </button>
 
-      <button
-        class="nav-btn"
-        data-page="plan"
-        onclick="showPage('plan')">
-
+      <button class="nav-btn" data-page="plan" onclick="showPage('plan')">
         <span>📅</span>
         Plan
-
       </button>
 
-      <button
-        class="nav-btn"
-        data-page="questions"
-        onclick="showPage('questions')">
-
+      <button class="nav-btn" data-page="questions" onclick="showPage('questions')">
         <span>✏️</span>
         Soru
-
       </button>
 
-      <button
-        class="nav-btn"
-        data-page="exams"
-        onclick="showPage('exams')">
-
+      <button class="nav-btn" data-page="exams" onclick="showPage('exams')">
         <span>📊</span>
         Deneme
-
       </button>
 
-      <button
-        class="nav-btn"
-        data-page="focus"
-        onclick="showPage('focus')">
-
+      <button class="nav-btn" data-page="focus" onclick="showPage('focus')">
         <span>⏱️</span>
         Odak
-
       </button>
 
-      <button
-        class="nav-btn"
-        data-page="profile"
-        onclick="showPage('profile')">
-
+      <button class="nav-btn" data-page="profile" onclick="showPage('profile')">
         <span>👤</span>
         Profil
-
       </button>
-
     </nav>
 
   </section>
 
-
   <div id="toast"></div>
-
-
-  <!-- SUPABASE -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script src="app.js"></script>
 
 </body>
 </html>
