@@ -2,7 +2,7 @@
 // SUPABASE İSTEMCİ KURULUMU
 // ==========================================
 const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/';
-const SUPABASE_ANON_KEY = 'https://m2achilles-web.github.io/yks-kocum/';
+const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
 let supabase = null;
 if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'https://YOUR_SUPABASE_URL.supabase.co') {
