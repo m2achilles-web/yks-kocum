@@ -1,1022 +1,1024 @@
 /* =====================================================
-       SUPABASE
-    ===================================================== */
+   SUPABASE
+===================================================== */
 
-    const SUPABASE_URL =
-      "https://wcjusyzrlnnbtwyjypnm.supabase.co";
+const SUPABASE_URL =
+  "https://wcjusyzrlnnbtwyjypnm.supabase.co";
 
-    const SUPABASE_KEY =
-      "sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi";
+const SUPABASE_KEY =
+  "sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi";
 
-    const SITE_URL =
-      "https://m2achilles-web.github.io/yks-kocum/";
+const SITE_URL =
+  "https://m2achilles-web.github.io/yks-kocum/";
 
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY,
-        {
-          auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: true
-          }
-        }
-      );
-
-
-    /* =====================================================
-       GLOBAL STATE
-    ===================================================== */
-
-    let currentUser = null;
-    let currentRole = "user";
-    let currentAuthMode = "login";
-
-    let profile = null;
-
-    let questions = [];
-    let exams = [];
-    let wrongs = [];
-    let topics = {};
-    let studySessions = [];
-    let dailyPlan = null;
-    let badges = [];
-
-    let focusSeconds = 1500;
-    let focusRunning = false;
-    let focusInterval = null;
-
-
-    /*
-      Yeni:
-      Kullanıcının seçtiği plan dersleri
-    */
-
-    let selectedPlanSubjects = [];
-
-
-    const today = () =>
-      new Date().toISOString().slice(0,10);
-
-
-    /* =====================================================
-       DEFAULT PROFILE
-    ===================================================== */
-
-    const DEFAULT_PROFILE = {
-
-      username: "Öğrenci",
-
-      field: "Sayısal",
-
-      exam_date: "",
-
-      university: "",
-
-      department: "",
-
-      target_rank: "",
-
-      daily_hours: 4,
-
-      daily_questions: 100,
-
-      daily_topics: 2
-
-    };
-
-
-    /* =====================================================
-       SUBJECTS
-    ===================================================== */
-
-    const SUBJECTS = [
-
-      "TYT Türkçe",
-      "TYT Matematik",
-      "TYT Fen",
-      "TYT Sosyal",
-
-      "AYT Matematik",
-      "AYT Fizik",
-      "AYT Kimya",
-      "AYT Biyoloji",
-
-      "AYT Edebiyat",
-      "AYT Tarih",
-      "AYT Coğrafya"
-
-    ];
-
-
-    /* =====================================================
-       DEFAULT PLAN SUBJECTS
-    ===================================================== */
-
-    const DEFAULT_PLAN_SUBJECTS = [
-
-      "TYT Matematik",
-      "TYT Türkçe"
-
-    ];
-
-
-    /* =====================================================
-       BADGES
-    ===================================================== */
-
-    const BADGE_DEFINITIONS = [
-
-      {
-        key:"first",
-        icon:"🎯",
-        name:"İlk Adım",
-        description:"İlk soru kaydını oluştur."
-      },
-
-      {
-        key:"q100",
-        icon:"💯",
-        name:"100 Soru",
-        description:"Toplam 100 soru çöz."
-      },
-
-      {
-        key:"q500",
-        icon:"🔥",
-        name:"500 Soru",
-        description:"Toplam 500 soru çöz."
-      },
-
-      {
-        key:"q1000",
-        icon:"🚀",
-        name:"1000 Soru",
-        description:"Toplam 1000 soru çöz."
-      },
-
-      {
-        key:"exam",
-        icon:"📊",
-        name:"İlk Deneme",
-        description:"İlk denemeni kaydet."
-      },
-
-      {
-        key:"streak7",
-        icon:"⚡",
-        name:"7 Gün Seri",
-        description:"7 gün çalışma serisine ulaş."
-      },
-
-      {
-        key:"topics25",
-        icon:"📚",
-        name:"25 Konu",
-        description:"25 konuyu tamamla."
-      },
-
-      {
-        key:"net100",
-        icon:"🏆",
-        name:"100 Net",
-        description:"Bir denemede 100 nete ulaş."
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
       }
-
-    ];
-
-
-    /* =====================================================
-       PLAN SUBJECT LOCAL KEY
-    ===================================================== */
-
-    function planSubjectsKey(){
-
-      if(!currentUser)
-        return "yksKocumV6_plan_subjects";
-
-      return (
-        "yksKocumV6_plan_subjects_" +
-        currentUser.id
-      );
     }
+  );
 
 
-    /* =====================================================
-       LOAD PLAN SUBJECTS
-    ===================================================== */
+/* =====================================================
+   GLOBAL STATE
+===================================================== */
 
-    function loadPlanSubjects(){
+let currentUser = null;
+let currentRole = "user";
+let currentAuthMode = "login";
 
-      let loaded = null;
+let profile = null;
 
-      /*
-        Önce günlük planın subjects alanına bak.
-      */
+let questions = [];
+let exams = [];
+let wrongs = [];
+let topics = {};
+let studySessions = [];
+let dailyPlan = null;
+let badges = [];
 
-      if(
-        dailyPlan &&
-        Array.isArray(
-          dailyPlan.subjects
-        ) &&
-        dailyPlan.subjects.length
-      ){
-
-        loaded =
-          dailyPlan.subjects;
-      }
+let focusSeconds = 1500;
+let focusRunning = false;
+let focusInterval = null;
 
 
-      /*
-        Sonra localStorage'a bak.
-      */
+/*
+  Yeni:
+  Kullanıcının seçtiği plan dersleri
+*/
 
-      if(!loaded){
-
-        try{
-
-          const raw =
-            localStorage.getItem(
-              planSubjectsKey()
-            );
-
-          if(raw){
-
-            const parsed =
-              JSON.parse(raw);
-
-            if(
-              Array.isArray(parsed) &&
-              parsed.length
-            ){
-
-              loaded = parsed;
-            }
-
-          }
-
-        }catch(error){
-
-          console.warn(
-            "Plan dersleri okunamadı:",
-            error
-          );
-
-        }
-
-      }
+let selectedPlanSubjects = [];
 
 
-      /*
-        Hiçbir şey yoksa varsayılan dersler.
-      */
-
-      selectedPlanSubjects =
-        loaded
-          ? loaded.filter(
-              subject =>
-                SUBJECTS.includes(
-                  subject
-                )
-            )
-          : [...DEFAULT_PLAN_SUBJECTS];
+const today = () =>
+  new Date().toISOString().slice(0,10);
 
 
-      if(!selectedPlanSubjects.length){
+/* =====================================================
+   DEFAULT PROFILE
+===================================================== */
 
-        selectedPlanSubjects =
-          [...DEFAULT_PLAN_SUBJECTS];
-      }
+const DEFAULT_PROFILE = {
 
-    }
+  username: "Öğrenci",
+
+  field: "Sayısal",
+
+  exam_date: "",
+
+  university: "",
+
+  department: "",
+
+  target_rank: "",
+
+  daily_hours: 4,
+
+  daily_questions: 100,
+
+  daily_topics: 2
+
+};
 
 
-    /* =====================================================
-       SAVE PLAN SUBJECTS LOCAL
-    ===================================================== */
+/* =====================================================
+   SUBJECTS
+===================================================== */
 
-    function savePlanSubjectsLocal(){
+const SUBJECTS = [
 
-      try{
+  "TYT Türkçe",
+  "TYT Matematik",
+  "TYT Fen",
+  "TYT Sosyal",
 
-        localStorage.setItem(
+  "AYT Matematik",
+  "AYT Fizik",
+  "AYT Kimya",
+  "AYT Biyoloji",
 
-          planSubjectsKey(),
+  "AYT Edebiyat",
+  "AYT Tarih",
+  "AYT Coğrafya"
 
-          JSON.stringify(
-            selectedPlanSubjects
-          )
+];
 
+
+/* =====================================================
+   DEFAULT PLAN SUBJECTS
+===================================================== */
+
+const DEFAULT_PLAN_SUBJECTS = [
+
+  "TYT Matematik",
+  "TYT Türkçe"
+
+];
+
+
+/* =====================================================
+   BADGES
+===================================================== */
+
+const BADGE_DEFINITIONS = [
+
+  {
+    key:"first",
+    icon:"🎯",
+    name:"İlk Adım",
+    description:"İlk soru kaydını oluştur."
+  },
+
+  {
+    key:"q100",
+    icon:"💯",
+    name:"100 Soru",
+    description:"Toplam 100 soru çöz."
+  },
+
+  {
+    key:"q500",
+    icon:"🔥",
+    name:"500 Soru",
+    description:"Toplam 500 soru çöz."
+  },
+
+  {
+    key:"q1000",
+    icon:"🚀",
+    name:"1000 Soru",
+    description:"Toplam 1000 soru çöz."
+  },
+
+  {
+    key:"exam",
+    icon:"📊",
+    name:"İlk Deneme",
+    description:"İlk denemeni kaydet."
+  },
+
+  {
+    key:"streak7",
+    icon:"⚡",
+    name:"7 Gün Seri",
+    description:"7 gün çalışma serisine ulaş."
+  },
+
+  {
+    key:"topics25",
+    icon:"📚",
+    name:"25 Konu",
+    description:"25 konuyu tamamla."
+  },
+
+  {
+    key:"net100",
+    icon:"🏆",
+    name:"100 Net",
+    description:"Bir denemede 100 nete ulaş."
+  }
+
+];
+
+
+/* =====================================================
+   PLAN SUBJECT LOCAL KEY
+===================================================== */
+
+function planSubjectsKey(){
+
+  if(!currentUser)
+    return "yksKocumV6_plan_subjects";
+
+  return (
+    "yksKocumV6_plan_subjects_" +
+    currentUser.id
+  );
+
+}
+
+
+/* =====================================================
+   LOAD PLAN SUBJECTS
+===================================================== */
+
+function loadPlanSubjects(){
+
+  let loaded = null;
+
+  /*
+    Önce günlük planın subjects alanına bak.
+  */
+
+  if(
+    dailyPlan &&
+    Array.isArray(
+      dailyPlan.subjects
+    ) &&
+    dailyPlan.subjects.length
+  ){
+
+    loaded =
+      dailyPlan.subjects;
+
+  }
+
+
+  /*
+    Sonra localStorage'a bak.
+  */
+
+  if(!loaded){
+
+    try{
+
+      const raw =
+        localStorage.getItem(
+          planSubjectsKey()
         );
 
-      }catch(error){
+      if(raw){
 
-        console.warn(
-          "Plan dersleri kaydedilemedi:",
-          error
-        );
-
-      }
-    }
-
-
-    /* =====================================================
-       LOCAL CACHE
-    ===================================================== */
-
-    function localKey(name){
-
-      return "yksKocumV6_" + name;
-
-    }
-
-
-    function saveLocal(){
-
-      try{
-
-        localStorage.setItem(
-
-          localKey("cache"),
-
-          JSON.stringify({
-
-            profile,
-
-            questions,
-
-            exams,
-
-            wrongs,
-
-            topics,
-
-            studySessions,
-
-            dailyPlan,
-
-            badges,
-
-            selectedPlanSubjects
-
-          })
-
-        );
-
-      }catch(e){}
-
-    }
-
-
-    function loadLocal(){
-
-      try{
-
-        const raw =
-          localStorage.getItem(
-            localKey("cache")
-          );
-
-        if(!raw)
-          return;
-
-        const data =
+        const parsed =
           JSON.parse(raw);
 
-        profile =
-          data.profile || null;
-
-        questions =
-          data.questions || [];
-
-        exams =
-          data.exams || [];
-
-        wrongs =
-          data.wrongs || [];
-
-        topics =
-          data.topics || {};
-
-        studySessions =
-          data.studySessions || [];
-
-        dailyPlan =
-          data.dailyPlan || null;
-
-        badges =
-          data.badges || [];
-
         if(
-          Array.isArray(
-            data.selectedPlanSubjects
-          )
+          Array.isArray(parsed) &&
+          parsed.length
         ){
 
-          selectedPlanSubjects =
-            data.selectedPlanSubjects;
+          loaded = parsed;
 
         }
 
-      }catch(e){
-
-        console.error(e);
-
       }
 
-    }
+    }catch(error){
 
-
-    /* =====================================================
-       AUTH UI
-    ===================================================== */
-
-    function switchAuth(mode){
-
-      currentAuthMode = mode;
-
-      document
-        .getElementById("loginTab")
-        .classList
-        .toggle(
-          "active",
-          mode === "login"
-        );
-
-      document
-        .getElementById("registerTab")
-        .classList
-        .toggle(
-          "active",
-          mode === "register"
-        );
-
-      document
-        .getElementById("usernameField")
-        .classList
-        .toggle(
-          "hidden",
-          mode !== "register"
-        );
-
-      document
-        .getElementById("authButton")
-        .textContent =
-          mode === "register"
-            ? "Kayıt Ol"
-            : "Giriş Yap";
-
-      document
-        .getElementById("resendBox")
-        .classList
-        .toggle(
-          "hidden",
-          mode !== "register"
-        );
-
-      document
-        .getElementById("authMessage")
-        .classList
-        .add("hidden");
-
-    }
-
-
-    function showAuthMessage(message){
-
-      const el =
-        document.getElementById(
-          "authMessage"
-        );
-
-      el.textContent =
-        message;
-
-      el.classList.remove(
-        "hidden"
+      console.warn(
+        "Plan dersleri okunamadı:",
+        error
       );
 
     }
 
+  }
 
-    /* =====================================================
-       RESEND VERIFICATION EMAIL
-    ===================================================== */
 
-    async function resendVerificationEmail(){
+  /*
+    Hiçbir şey yoksa varsayılan dersler.
+  */
 
-      const email =
-        document
-          .getElementById("authEmail")
-          .value
-          .trim();
+  selectedPlanSubjects =
+    loaded
+      ? loaded.filter(
+          subject =>
+            SUBJECTS.includes(
+              subject
+            )
+        )
+      : [...DEFAULT_PLAN_SUBJECTS];
 
-      if(!email){
+
+  if(!selectedPlanSubjects.length){
+
+    selectedPlanSubjects =
+      [...DEFAULT_PLAN_SUBJECTS];
+
+  }
+
+}
+
+
+/* =====================================================
+   SAVE PLAN SUBJECTS LOCAL
+===================================================== */
+
+function savePlanSubjectsLocal(){
+
+  try{
+
+    localStorage.setItem(
+      planSubjectsKey(),
+      JSON.stringify(
+        selectedPlanSubjects
+      )
+    );
+
+  }catch(error){
+
+    console.warn(
+      "Plan dersleri kaydedilemedi:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   LOCAL CACHE
+===================================================== */
+
+function localKey(name){
+
+  return "yksKocumV6_" + name;
+
+}
+
+
+function saveLocal(){
+
+  try{
+
+    localStorage.setItem(
+      localKey("cache"),
+      JSON.stringify({
+
+        profile,
+        questions,
+        exams,
+        wrongs,
+        topics,
+        studySessions,
+        dailyPlan,
+        badges,
+        selectedPlanSubjects
+
+      })
+    );
+
+  }catch(e){}
+
+}
+
+
+function loadLocal(){
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        localKey("cache")
+      );
+
+    if(!raw)
+      return;
+
+    const data =
+      JSON.parse(raw);
+
+    profile =
+      data.profile || null;
+
+    questions =
+      data.questions || [];
+
+    exams =
+      data.exams || [];
+
+    wrongs =
+      data.wrongs || [];
+
+    topics =
+      data.topics || {};
+
+    studySessions =
+      data.studySessions || [];
+
+    dailyPlan =
+      data.dailyPlan || null;
+
+    badges =
+      data.badges || [];
+
+    if(
+      Array.isArray(
+        data.selectedPlanSubjects
+      )
+    ){
+
+      selectedPlanSubjects =
+        data.selectedPlanSubjects;
+
+    }
+
+  }catch(e){
+
+    console.error(e);
+
+  }
+
+}
+
+
+/* =====================================================
+   AUTH UI
+===================================================== */
+
+function switchAuth(mode){
+
+  currentAuthMode = mode;
+
+  document
+    .getElementById("loginTab")
+    .classList
+    .toggle(
+      "active",
+      mode === "login"
+    );
+
+  document
+    .getElementById("registerTab")
+    .classList
+    .toggle(
+      "active",
+      mode === "register"
+    );
+
+  document
+    .getElementById("usernameField")
+    .classList
+    .toggle(
+      "hidden",
+      mode !== "register"
+    );
+
+  document
+    .getElementById("authButton")
+    .textContent =
+      mode === "register"
+        ? "Kayıt Ol"
+        : "Giriş Yap";
+
+  document
+    .getElementById("resendBox")
+    .classList
+    .toggle(
+      "hidden",
+      mode !== "register"
+    );
+
+  document
+    .getElementById("authMessage")
+    .classList
+    .add("hidden");
+
+}
+
+
+function showAuthMessage(message){
+
+  const el =
+    document.getElementById(
+      "authMessage"
+    );
+
+  el.textContent =
+    message;
+
+  el.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+/* =====================================================
+   RESEND VERIFICATION EMAIL
+===================================================== */
+
+async function resendVerificationEmail(){
+
+  const email =
+    document
+      .getElementById("authEmail")
+      .value
+      .trim();
+
+  if(!email){
+
+    showAuthMessage(
+      "Önce e-posta adresini yaz kankam."
+    );
+
+    return;
+
+  }
+
+  const button =
+    document.getElementById(
+      "resendEmailBtn"
+    );
+
+  button.disabled = true;
+
+  button.textContent =
+    "📨 Gönderiliyor...";
+
+  try{
+
+    const {
+      error
+    } =
+      await supabaseClient.auth.resend({
+
+        type:"signup",
+
+        email:email,
+
+        options:{
+          emailRedirectTo:SITE_URL
+        }
+
+      });
+
+    if(error)
+      throw error;
+
+    showAuthMessage(
+      "✅ Doğrulama e-postası tekrar gönderildi. Gelen kutunu ve Spam/Gereksiz klasörünü kontrol et."
+    );
+
+    toast(
+      "Doğrulama maili tekrar gönderildi 📩"
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    showAuthMessage(
+      "❌ Mail tekrar gönderilemedi: " +
+      (
+        error?.message ||
+        "Bilinmeyen hata"
+      )
+    );
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "📩 Doğrulama e-postasını tekrar gönder";
+
+  }
+
+}
+
+
+/* =====================================================
+   AUTH
+===================================================== */
+
+async function handleAuth(){
+
+  const email =
+    document
+      .getElementById("authEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("authPassword")
+      .value;
+
+  const username =
+    document
+      .getElementById("authUsername")
+      .value
+      .trim();
+
+  if(!email || !password){
+
+    showAuthMessage(
+      "E-posta ve şifre gerekli."
+    );
+
+    return;
+
+  }
+
+  if(password.length < 6){
+
+    showAuthMessage(
+      "Şifre en az 6 karakter olmalı."
+    );
+
+    return;
+
+  }
+
+  const button =
+    document.getElementById(
+      "authButton"
+    );
+
+  button.disabled = true;
+
+  button.textContent =
+    "Bekleyin...";
+
+  try{
+
+    if(
+      currentAuthMode ===
+      "register"
+    ){
+
+      if(!username){
 
         showAuthMessage(
-          "Önce e-posta adresini yaz kankam."
+          "Kullanıcı adı gir."
         );
-
-        return;
-      }
-
-      const button =
-        document.getElementById(
-          "resendEmailBtn"
-        );
-
-      button.disabled = true;
-
-      button.textContent =
-        "📨 Gönderiliyor...";
-
-      try{
-
-        const {
-          error
-        } =
-          await supabaseClient.auth.resend({
-
-            type:"signup",
-
-            email:email,
-
-            options:{
-              emailRedirectTo:SITE_URL
-            }
-
-          });
-
-        if(error)
-          throw error;
-
-        showAuthMessage(
-          "✅ Doğrulama e-postası tekrar gönderildi. Gelen kutunu ve Spam/Gereksiz klasörünü kontrol et."
-        );
-
-        toast(
-          "Doğrulama maili tekrar gönderildi 📩"
-        );
-
-      }catch(error){
-
-        console.error(error);
-
-        showAuthMessage(
-          "❌ Mail tekrar gönderilemedi: " +
-          (
-            error?.message ||
-            "Bilinmeyen hata"
-          )
-        );
-
-      }finally{
 
         button.disabled = false;
 
         button.textContent =
-          "📩 Doğrulama e-postasını tekrar gönder";
-
-      }
-
-    }
-
-
-    /* =====================================================
-       AUTH
-    ===================================================== */
-
-    async function handleAuth(){
-
-      const email =
-        document
-          .getElementById("authEmail")
-          .value
-          .trim();
-
-      const password =
-        document
-          .getElementById("authPassword")
-          .value;
-
-      const username =
-        document
-          .getElementById("authUsername")
-          .value
-          .trim();
-
-      if(!email || !password){
-
-        showAuthMessage(
-          "E-posta ve şifre gerekli."
-        );
+          "Kayıt Ol";
 
         return;
+
       }
 
-      if(password.length < 6){
+      const result =
+        await supabaseClient.auth.signUp({
 
-        showAuthMessage(
-          "Şifre en az 6 karakter olmalı."
-        );
+          email,
 
-        return;
-      }
+          password,
 
-      const button =
-        document.getElementById(
-          "authButton"
-        );
+          options:{
 
-      button.disabled = true;
+            emailRedirectTo:
+              SITE_URL,
 
-      button.textContent =
-        "Bekleyin...";
+            data:{
+              username
+            }
 
-      try{
-
-        if(
-          currentAuthMode ===
-          "register"
-        ){
-
-          if(!username){
-
-            showAuthMessage(
-              "Kullanıcı adı gir."
-            );
-
-            button.disabled = false;
-
-            button.textContent =
-              "Kayıt Ol";
-
-            return;
           }
 
-          const result =
-            await supabaseClient.auth.signUp({
+        });
 
-              email,
+      if(result.error)
+        throw result.error;
 
-              password,
-
-              options:{
-
-                emailRedirectTo:
-                  SITE_URL,
-
-                data:{
-                  username
-                }
-
-              }
-
-            });
-
-          if(result.error)
-            throw result.error;
-
-          showAuthMessage(
-            "Kayıt başarılı! 📩 E-posta adresine doğrulama bağlantısı gönderildi. Mail gelmezse aşağıdaki butondan tekrar gönderebilirsin."
-          );
-
-          document
-            .getElementById("resendBox")
-            .classList
-            .remove("hidden");
-
-          button.textContent =
-            "E-posta Gönderildi";
-
-        }else{
-
-          const result =
-            await supabaseClient.auth.signInWithPassword({
-
-              email,
-
-              password
-
-            });
-
-          if(result.error)
-            throw result.error;
-
-          currentUser =
-            result.data.user;
-
-          await bootApp();
-
-        }
-
-      }catch(error){
-
-        console.error(error);
-
-        showAuthMessage(
-          getFriendlyAuthError(error)
-        );
-
-      }finally{
-
-        if(
-          currentAuthMode ===
-          "login"
-        ){
-
-          button.disabled = false;
-
-          button.textContent =
-            "Giriş Yap";
-
-        }
-
-      }
-
-    }
-
-
-    function getFriendlyAuthError(error){
-
-      const message =
-        error?.message || "";
-
-      const lower =
-        message.toLowerCase();
-
-      if(
-        lower.includes(
-          "email not confirmed"
-        )
-      ){
-
-        document
-          .getElementById("resendBox")
-          .classList
-          .remove("hidden");
-
-        return "E-posta adresin henüz doğrulanmamış. Doğrulama mailini tekrar gönderebilirsin.";
-
-      }
-
-      if(
-        lower.includes(
-          "invalid login credentials"
-        )
-      ){
-
-        return "E-posta veya şifre hatalı.";
-
-      }
-
-      if(
-        lower.includes(
-          "user already registered"
-        )
-      ){
-
-        document
-          .getElementById("resendBox")
-          .classList
-          .remove("hidden");
-
-        return "Bu e-posta zaten kayıtlı. Giriş yapmayı dene veya doğrulama mailini tekrar gönder.";
-
-      }
-
-      return (
-        message ||
-        "Bir hata oluştu."
+      showAuthMessage(
+        "Kayıt başarılı! 📩 E-posta adresine doğrulama bağlantısı gönderildi. Mail gelmezse aşağıdaki butondan tekrar gönderebilirsin."
       );
 
-    }
-
-
-    async function logout(){
-
-      await supabaseClient.auth.signOut();
-
-      currentUser = null;
-
-      currentRole = "user";
-
-      selectedPlanSubjects = [];
-
       document
-        .getElementById("appScreen")
-        .classList
-        .add("hidden");
-
-      document
-        .getElementById("authScreen")
+        .getElementById("resendBox")
         .classList
         .remove("hidden");
 
-      document
-        .getElementById("adminBadge")
-        .classList
-        .add("hidden");
+      button.textContent =
+        "E-posta Gönderildi";
 
-      document
-        .getElementById("adminSection")
-        .classList
-        .add("hidden");
+    }else{
 
-      switchAuth("login");
+      const result =
+        await supabaseClient.auth.signInWithPassword({
 
-    }
+          email,
 
+          password
 
-    /* =====================================================
-       PROFILE
-    ===================================================== */
+        });
 
-    async function loadProfile(){
+      if(result.error)
+        throw result.error;
 
-      if(!currentUser)
-        return;
+      currentUser =
+        result.data.user;
 
-      const {
-        data,
-        error
-      } =
-        await supabaseClient
-          .from("profiles")
-          .select("*")
-          .eq(
-            "id",
-            currentUser.id
-          )
-          .maybeSingle();
-
-      if(error)
-        console.error(error);
-
-      if(data){
-
-        profile = data;
-
-      }else{
-
-        profile = {
-
-          id:
-            currentUser.id,
-
-          ...DEFAULT_PROFILE
-
-        };
-
-        const {
-          error:insertError
-        } =
-          await supabaseClient
-            .from("profiles")
-            .upsert(profile);
-
-        if(insertError)
-          console.error(
-            insertError
-          );
-
-      }
-
-      fillProfileUI();
+      await bootApp();
 
     }
 
+  }catch(error){
 
-    function fillProfileUI(){
+    console.error(error);
 
-      profile =
-        Object.assign(
-          {},
-          DEFAULT_PROFILE,
-          profile || {}
-        );
+    showAuthMessage(
+      getFriendlyAuthError(error)
+    );
 
-      document.getElementById(
-        "helloName"
-      ).textContent =
-        "Merhaba, " +
-        (
-          profile.username ||
-          "Öğrenci"
-        ) +
-        " 👋";
+  }finally{
 
-      updateAdminBadge();
+    if(
+      currentAuthMode ===
+      "login"
+    ){
 
-      document.getElementById(
-        "profileUsername"
-      ).value =
-        profile.username || "";
+      button.disabled = false;
 
-      document.getElementById(
-        "profileField"
-      ).value =
-        profile.field ||
-        "Sayısal";
-
-      document.getElementById(
-        "profileRank"
-      ).value =
-        profile.target_rank ||
-        "";
-
-      document.getElementById(
-        "profileHours"
-      ).value =
-        profile.daily_hours ??
-        4;
-
-      document.getElementById(
-        "profileQuestions"
-      ).value =
-        profile.daily_questions ??
-        100;
-
-      document.getElementById(
-        "profileUniversity"
-      ).value =
-        profile.university ||
-        "";
-
-      document.getElementById(
-        "profileDepartment"
-      ).value =
-        profile.department ||
-        "";
-
-      document.getElementById(
-        "profileExamDate"
-      ).value =
-        profile.exam_date ||
-        "";
-
-      document.getElementById(
-        "heroQuestions"
-      ).textContent =
-        (
-          profile.daily_questions ||
-          0
-        ) +
-        " soru";
-
-      document.getElementById(
-        "heroHours"
-      ).textContent =
-        "Günlük hedef: " +
-        (
-          profile.daily_hours ||
-          0
-        ) +
-        " saat";
+      button.textContent =
+        "Giriş Yap";
 
     }
 
+  }
 
-    /* =====================================================
-       ADMIN BADGE
-    ===================================================== */
+}
 
-    function updateAdminBadge(){
 
-      const badge =
-        document.getElementById(
-          "adminBadge"
-        );
+function getFriendlyAuthError(error){
 
-      const section =
-        document.getElementById(
-          "adminSection"
-        );
+  const message =
+    error?.message || "";
 
-      if(
-        currentRole === "admin" ||
-        currentRole === "coach"
-      ){
+  const lower =
+    message.toLowerCase();
 
-        badge.classList.remove(
-          "hidden"
-        );
+  if(
+    lower.includes(
+      "email not confirmed"
+    )
+  ){
 
-        section.classList.remove(
-          "hidden"
-        );
+    document
+      .getElementById("resendBox")
+      .classList
+      .remove("hidden");
 
-      }else{
+    return "E-posta adresin henüz doğrulanmamış. Doğrulama mailini tekrar gönderebilirsin.";
 
-        badge.classList.add(
-          "hidden"
-        );
+  }
 
-        section.classList.add(
-          "hidden"
-        );
+  if(
+    lower.includes(
+      "invalid login credentials"
+    )
+  ){
 
+    return "E-posta veya şifre hatalı.";
+
+  }
+
+  if(
+    lower.includes(
+      "user already registered"
+    )
+  ){
+
+    document
+      .getElementById("resendBox")
+      .classList
+      .remove("hidden");
+
+    return "Bu e-posta zaten kayıtlı. Giriş yapmayı dene veya doğrulama mailini tekrar gönder.";
+
+  }
+
+  return (
+    message ||
+    "Bir hata oluştu."
+  );
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  currentUser = null;
+
+  currentRole = "user";
+
+  selectedPlanSubjects = [];
+
+  document
+    .getElementById("appScreen")
+    .classList
+    .add("hidden");
+
+  document
+    .getElementById("authScreen")
+    .classList
+    .remove("hidden");
+
+  document
+    .getElementById("adminBadge")
+    .classList
+    .add("hidden");
+
+  document
+    .getElementById("adminSection")
+    .classList
+    .add("hidden");
+
+  switchAuth("login");
+
+}
+
+
+/* =====================================================
+   PROFILE
+===================================================== */
+
+async function loadProfile(){
+
+  if(!currentUser)
+    return;
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+  if(error)
+    console.error(error);
+
+  if(data){
+
+    profile = data;
+
+  }else{
+
+    profile = {
+
+      id:
+        currentUser.id,
+
+      ...DEFAULT_PROFILE
+
+    };
+
+    const {
+      error:insertError
+    } =
+      await supabaseClient
+        .from("profiles")
+        .upsert(profile);
+
+    if(insertError)
+      console.error(
+        insertError
+      );
+
+  }
+
+  fillProfileUI();
+
+}
+
+
+function fillProfileUI(){
+
+  profile =
+    Object.assign(
+      {},
+      DEFAULT_PROFILE,
+      profile || {}
+    );
+
+  document.getElementById(
+    "helloName"
+  ).textContent =
+    "Merhaba, " +
+    (
+      profile.username ||
+      "Öğrenci"
+    ) +
+    " 👋";
+
+  updateAdminBadge();
+
+  document.getElementById(
+    "profileUsername"
+  ).value =
+    profile.username || "";
+
+  document.getElementById(
+    "profileField"
+  ).value =
+    profile.field ||
+    "Sayısal";
+
+  document.getElementById(
+    "profileRank"
+  ).value =
+    profile.target_rank ||
+    "";
+
+  document.getElementById(
+    "profileHours"
+  ).value =
+    profile.daily_hours ??
+    4;
+
+  document.getElementById(
+    "profileQuestions"
+  ).value =
+    profile.daily_questions ??
+    100;
+
+  document.getElementById(
+    "profileUniversity"
+  ).value =
+    profile.university ||
+    "";
+
+  document.getElementById(
+    "profileDepartment"
+  ).value =
+    profile.department ||
+    "";
+
+  document.getElementById(
+    "profileExamDate"
+  ).value =
+    profile.exam_date ||
+    "";
+
+  document.getElementById(
+    "heroQuestions"
+  ).textContent =
+    (
+      profile.daily_questions ||
+      0
+    ) +
+    " soru";
+
+  document.getElementById(
+    "heroHours"
+  ).textContent =
+    "Günlük hedef: " +
+    (
+      profile.daily_hours ||
+      0
+    ) +
+    " saat";
+
+}
+
+
+/* =====================================================
+   ADMIN BADGE
+===================================================== */
+
+function updateAdminBadge(){
+
+  const badge =
+    document.getElementById(
+      "adminBadge"
+    );
+
+  const section =
+    document.getElementById(
+      "adminSection"
+    );
+
+  if(
+    currentRole === "admin" ||
+    currentRole === "coach"
+  ){
+
+    badge.classList.remove(
+      "hidden"
+    );
+
+    section.classList.remove(
+      "hidden"
+    );
+
+  }else{
+
+    badge.classList.add(
+      "hidden"
+    );
+
+    section.classList.add(
+      "hidden"
+    );
+
+  }
+
+}
       }
 
     }
@@ -1430,37 +1432,26 @@
 
     function showPage(page){
 
-      const pages = [
+      document
+        .querySelectorAll(
+          ".page"
+        )
+        .forEach(
+          el =>
+            el.classList.add(
+              "hidden"
+            )
+        );
 
-        "home",
-        "plan",
-        "questions",
-        "exams",
-        "focus",
-        "badges",
-        "profile"
+      const target =
+        document.getElementById(
+          page
+        );
 
-      ];
-
-      pages.forEach(
-        p => {
-
-          const element =
-            document.getElementById(
-              "page-" + p
-            );
-
-          if(element){
-
-            element.classList.toggle(
-              "hidden",
-              p !== page
-            );
-
-          }
-
-        }
-      );
+      if(target)
+        target.classList.remove(
+          "hidden"
+        );
 
       document
         .querySelectorAll(
@@ -1471,46 +1462,73 @@
 
             btn.classList.toggle(
               "active",
-              btn.dataset.page === page
+              btn.dataset.page ===
+              page
             );
 
           }
         );
 
-      window.scrollTo({
-
-        top:0,
-
-        behavior:"smooth"
-
-      });
-
       if(page === "home")
         renderHome();
-
-      if(page === "plan")
-        renderPlan();
 
       if(page === "questions")
         renderQuestions();
 
-      if(page === "exams")
+      if(page === "wrong")
+        renderWrongQuestions();
+
+      if(page === "exam")
         renderExams();
 
-      if(page === "badges")
-        renderBadges();
+      if(page === "study")
+        renderStudy();
+
+      if(page === "plan")
+        renderPlan();
+
+      if(page === "stats")
+        renderStats();
+
+      if(page === "focus")
+        restoreFocusTimer();
+
+      if(page === "profile")
+        fillProfileUI();
 
       if(
-        page === "profile" &&
-        (
-          currentRole === "admin" ||
-          currentRole === "coach"
-        )
+        page === "admin" &&
+        isStaff()
       ){
 
         loadAdminStats(false);
 
       }
+
+    }
+
+
+    function renderAll(){
+
+      fillProfileUI();
+
+      renderHome();
+
+      renderQuestions();
+
+      renderWrongQuestions();
+
+      renderExams();
+
+      renderStudy();
+
+      renderPlan();
+
+      renderStats();
+
+      renderFocusPage();
+
+      updateAdminBadge();
 
     }
 
@@ -1521,70 +1539,66 @@
 
     function renderHome(){
 
-      const totalQuestions =
-        questions.reduce(
+      const todayQuestions =
+        questions.filter(
+          q =>
+            q.date ===
+            today()
+        ).length;
 
-          (sum,q) =>
-            sum +
-            Number(
-              q.total || 0
-            ),
+      const todayStudy =
+        studySessions
+          .filter(
+            s =>
+              s.date ===
+              today()
+          )
+          .reduce(
+            (
+              sum,
+              s
+            ) =>
+              sum +
+              Number(
+                s.minutes || 0
+              ),
+            0
+          );
 
-          0
+      const todayExams =
+        exams.filter(
+          e =>
+            e.date ===
+            today()
+        ).length;
 
+      const qEl =
+        document.getElementById(
+          "homeQuestions"
         );
 
-      const totalNet =
-        questions.reduce(
-
-          (sum,q) =>
-            sum +
-            Number(
-              q.net || 0
-            ),
-
-          0
-
+      const sEl =
+        document.getElementById(
+          "homeStudy"
         );
 
-      const totalMinutes =
-        studySessions.reduce(
-
-          (sum,s) =>
-            sum +
-            Number(
-              s.minutes || 0
-            ) +
-            Number(
-              s.seconds || 0
-            ) / 60,
-
-          0
-
+      const eEl =
+        document.getElementById(
+          "homeExams"
         );
 
-      document.getElementById(
-        "totalQuestions"
-      ).textContent =
-        totalQuestions;
+      if(qEl)
+        qEl.textContent =
+          todayQuestions;
 
-      document.getElementById(
-        "totalNet"
-      ).textContent =
-        totalNet.toFixed(2);
+      if(sEl)
+        sEl.textContent =
+          todayStudy +
+          " dk";
 
-      document.getElementById(
-        "totalExams"
-      ).textContent =
-        exams.length;
-
-      document.getElementById(
-        "totalMinutes"
-      ).textContent =
-        Math.round(
-          totalMinutes
-        ) +
-        " dk";
+      if(eEl)
+        eEl.textContent =
+          todayExams;
 
       const streak =
         calculateStreak();
@@ -2047,742 +2061,175 @@
             .single();
 
 
-        if(error){
+        if(!error && data){
 
-          console.error(error);
+          dailyPlan = data;
+
+        }else if(error){
+
+          console.error(
+            "Ders planı kaydedilemedi:",
+            error
+          );
 
           toast(
-            "Dersler kaydedilemedi: " +
-            error.message
+            error.message ||
+            "Plan kaydedilemedi."
           );
 
           return;
 
         }
 
-
-        if(data){
-
-          dailyPlan =
-            data;
-
-        }
-
       }
 
-
-      saveLocal();
-
-
-      const status =
-        document.getElementById(
-          "planSaveStatus"
-        );
-
-      if(status){
-
-        status.textContent =
-          "✓ Ders tercihlerin kaydedildi.";
-
-        setTimeout(
-          () => {
-
-            status.textContent = "";
-
-          },
-          3000
-        );
-
-      }
-
-
-      renderPlan();
-
-      toast(
-        "Dersler kaydedildi 📚"
-      );
-
-    }
-
-
-    /* =====================================================
-       PLAN - REFRESH
-    ===================================================== */
-
-    async function refreshTodayPlan(){
-
-      if(!currentUser)
-        return;
-
-
-      if(
-        !selectedPlanSubjects.length
-      ){
-
-        toast(
-          "Önce en az bir ders seç."
-        );
-
-        return;
-
-      }
-
-
-      const hours =
-        Number(
-          document.getElementById(
-            "planHours"
-          ).value
-        ) ||
-        Number(
-          profile?.daily_hours ||
-          4
-        );
-
-
-      const start =
-        document.getElementById(
-          "planStart"
-        ).value ||
-        dailyPlan?.start_time ||
-        "18:00";
-
-
-      const totalMinutes =
-        Math.max(
-          15,
-          Math.round(
-            hours * 60
-          )
-        );
-
-
-      const minutesPerSubject =
-        Math.max(
-          15,
-          Math.floor(
-            totalMinutes /
-            selectedPlanSubjects.length
-          )
-        );
-
-
-      const tasks =
-        selectedPlanSubjects.map(
-          (
-            subject,
-            index
-          ) => {
-
-            const startMinutes =
-              timeToMinutes(start) +
-              index *
-              minutesPerSubject;
-
-            return {
-
-              id:
-                "task_" +
-                Date.now() +
-                "_" +
-                index,
-
-              date:
-                today(),
-
-              time:
-                minutesToTime(
-                  startMinutes
-                ),
-
-              subject,
-
-              topic:"",
-
-              minutes:
-                minutesPerSubject,
-
-              done:false
-
-            };
-
-          }
-        );
-
-
-      const newPlan = {
-
-        user_id:
-          currentUser.id,
-
-        plan_date:
-          today(),
-
-        hours,
-
-        start_time:
-          start,
-
-        subjects:
-          [...selectedPlanSubjects],
-
-        tasks,
-
-        updated_at:
-          new Date()
-            .toISOString()
-
-      };
-
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient
-          .from("daily_plans")
-          .upsert(
-
-            newPlan,
-
-            {
-              onConflict:
-                "user_id,plan_date"
-            }
-
-          )
-          .select()
-          .single();
-
-
-      if(error){
-
-        console.error(error);
-
-        toast(
-          "Plan yenilenemedi: " +
-          error.message
-        );
-
-        return;
-
-      }
-
-
-      dailyPlan =
-        data || newPlan;
-
-
-      savePlanSubjectsLocal();
-
-      saveLocal();
-
-      renderPlan();
-
-      renderHome();
-
-      toast(
-        "Plan seçtiğin derslere göre yenilendi 🔄"
-      );
-
-    }
-
-
-    /* =====================================================
-       PLAN
-    ===================================================== */
-
-    function renderPlan(){
-
-      document.getElementById(
-        "planDateLabel"
-      ).textContent =
-        new Date()
-          .toLocaleDateString(
-            "tr-TR"
-          );
-
-
-      /*
-        Dersleri yükle
-      */
-
-      loadPlanSubjects();
-
-
-      /*
-        Editor
-      */
 
       renderPlanSubjectEditor();
 
+      renderPlan();
 
-      if(!dailyPlan){
-
-        document.getElementById(
-          "planTaskList"
-        ).innerHTML =
-          "Bugün için plan yok.";
-
-        return;
-
-      }
-
-
-      document.getElementById(
-        "planHours"
-      ).value =
-        dailyPlan.hours ||
-        0;
-
-
-      document.getElementById(
-        "planStart"
-      ).value =
-        dailyPlan.start_time ||
-        "18:00";
-
-
-      /*
-        Eski multi-select'i de
-        seçilen derslerle senkron tut.
-      */
-
-      const selected =
-        dailyPlan.subjects ||
-        selectedPlanSubjects ||
-        [];
-
-
-      Array.from(
-        document
-          .getElementById(
-            "planSubjects"
-          )
-          .options
-      ).forEach(
-        option => {
-
-          option.selected =
-            selected.includes(
-              option.value
-            );
-
-        }
+      toast(
+        "Ders planı kaydedildi ✅"
       );
 
-
-      renderPlanTasks();
-
     }
-
-
-    function renderPlanTasks(){
-
-      const list =
-        document.getElementById(
-          "planTaskList"
-        );
-
-
-      const tasks =
-        dailyPlan?.tasks ||
-        [];
-
-
-      if(!tasks.length){
-
-        list.innerHTML =
-          `<div style="color:var(--muted)">
-            Görev bulunmuyor.
-          </div>`;
-
-        document.getElementById(
-          "planProgressText"
-        ).textContent =
-          "0 / 0";
-
-        return;
-
-      }
-
-
-      const done =
-        tasks.filter(
-          t => t.done
-        ).length;
-
-
-      document.getElementById(
-        "planProgressText"
-      ).textContent =
-        done +
-        " / " +
-        tasks.length;
-
-
-      list.innerHTML =
-        tasks.map(
-          task => `
-
-          <div
-            class="task ${
-              task.done
-                ? "done"
-                : ""
-            }"
-            onclick="toggleTask('${escapeAttr(task.id)}')">
-
-            <div class="task-check">
-              ${
-                task.done
-                  ? "✓"
-                  : ""
-              }
-            </div>
-
-            <div class="task-info">
-
-              <div class="task-name">
-
-                ${
-                  escapeHtml(
-                    task.subject ||
-                    "Ders"
-                  )
-                }
-
-              </div>
-
-              <div class="task-meta">
-
-                ${
-                  escapeHtml(
-                    task.time ||
-                    ""
-                  )
-                }
-
-                ·
-
-                ${
-                  Number(
-                    task.minutes ||
-                    0
-                  )
-                }
-
-                dakika
-
-              </div>
-
-            </div>
-
-          </div>
-
-        `
-        ).join("");
-
-    }
-
-
-    function renderTodayTasks(){
+    function renderPlan(){
 
       const container =
         document.getElementById(
-          "todayTasks"
+          "planTasks"
         );
 
+      if(!container)
+        return;
+
+      if(!dailyPlan){
+
+        container.innerHTML =
+          `<div class="empty-state">
+             Henüz günlük plan yok.
+           </div>`;
+
+        return;
+      }
 
       const tasks =
-        dailyPlan?.tasks ||
-        [];
-
+        Array.isArray(
+          dailyPlan.tasks
+        )
+          ? dailyPlan.tasks
+          : [];
 
       if(!tasks.length){
 
         container.innerHTML =
-          `<div style="color:var(--muted);font-size:13px">
-            Bugün için görev yok.
-          </div>`;
-
-
-        document.getElementById(
-          "todayProgressBar"
-        ).style.width =
-          "0%";
-
-
-        document.getElementById(
-          "todayPlanProgress"
-        ).textContent =
-          "0%";
-
+          `<div class="empty-state">
+             Bugün için görev bulunmuyor.
+           </div>`;
 
         return;
-
       }
-
-
-      const done =
-        tasks.filter(
-          t => t.done
-        ).length;
-
-
-      const percent =
-        Math.round(
-          done /
-          tasks.length *
-          100
-        );
-
-
-      document.getElementById(
-        "todayProgressBar"
-      ).style.width =
-        percent +
-        "%";
-
-
-      document.getElementById(
-        "todayPlanProgress"
-      ).textContent =
-        percent +
-        "%";
-
 
       container.innerHTML =
         tasks
-          .slice(0,4)
           .map(
-            task => `
+            task => {
 
-          <div
-            class="task ${
-              task.done
-                ? "done"
-                : ""
-            }"
-            onclick="toggleTask('${escapeAttr(task.id)}')">
+              const done =
+                Boolean(
+                  task.done
+                );
 
-            <div class="task-check">
+              return `
+                <div class="task-card ${
+                  done ? "completed" : ""
+                }">
 
-              ${
-                task.done
-                  ? "✓"
-                  : ""
-              }
+                  <div class="task-check"
+                       onclick="toggleTask('${escapeAttr(task.id)}')">
+                    ${done ? "✓" : ""}
+                  </div>
 
-            </div>
+                  <div class="task-main">
 
-            <div class="task-info">
+                    <div class="task-title">
+                      ${escapeHtml(
+                        task.title ||
+                        task.subject ||
+                        "Görev"
+                      )}
+                    </div>
 
-              <div class="task-name">
+                    <div class="task-meta">
 
-                ${
-                  escapeHtml(
-                    task.subject ||
-                    "Ders"
-                  )
-                }
+                      ${
+                        task.time
+                          ? `<span>🕐 ${escapeHtml(task.time)}</span>`
+                          : ""
+                      }
 
-              </div>
+                      ${
+                        task.subject
+                          ? `<span>📚 ${escapeHtml(task.subject)}</span>`
+                          : ""
+                      }
 
-              <div class="task-meta">
+                      ${
+                        task.minutes
+                          ? `<span>⏱️ ${Number(task.minutes)} dk</span>`
+                          : ""
+                      }
 
-                ${
-                  escapeHtml(
-                    task.time ||
-                    ""
-                  )
-                }
+                    </div>
 
-                ·
+                    ${
+                      task.topic
+                        ? `<div class="task-topic">
+                             ${escapeHtml(task.topic)}
+                           </div>`
+                        : ""
+                    }
 
-                ${
-                  task.minutes ||
-                  0
-                }
+                  </div>
 
-                dk
+                  <button
+                    class="task-delete"
+                    onclick="deleteTask('${escapeAttr(task.id)}')"
+                    title="Görevi sil">
+                    🗑️
+                  </button>
 
-              </div>
+                </div>
+              `;
 
-            </div>
-
-          </div>
-
-        `
+            }
           )
           .join("");
 
     }
 
 
-    /* =====================================================
-       PLAN - NORMAL SAVE
-    ===================================================== */
+    async function toggleTask(id){
 
-    async function savePlan(){
-
-      const select =
-        document.getElementById(
-          "planSubjects"
-        );
-
-
-      const subjects =
-        Array.from(
-          select.selectedOptions
-        )
-        .map(
-          option =>
-            option.value
-        );
-
-
-      if(!subjects.length){
-
-        toast(
-          "En az bir ders seç."
-        );
-
+      if(!dailyPlan)
         return;
 
-      }
-
-
-      const hours =
-        Number(
-          document.getElementById(
-            "planHours"
-          ).value
-        ) || 0;
-
-
-      const start =
-        document.getElementById(
-          "planStart"
-        ).value ||
-        "18:00";
-
-
-      /*
-        Yeni ders seçimlerini ana sisteme aktar.
-      */
-
-      selectedPlanSubjects =
-        [...subjects];
-
-
-      savePlanSubjectsLocal();
-
-
-      const minutesPerSubject =
-        Math.max(
-          15,
-          Math.floor(
-            hours *
-            60 /
-            subjects.length
-          )
+      const task =
+        dailyPlan.tasks?.find(
+          t =>
+            String(t.id) ===
+            String(id)
         );
 
+      if(!task)
+        return;
 
-      /*
-        Mevcut görevlerin tamamlanma durumunu koru.
-      */
+      task.done =
+        !task.done;
 
-      const oldTasks =
-        dailyPlan?.tasks ||
-        [];
-
-
-      const tasks =
-        subjects.map(
-          (
-            subject,
-            index
-          ) => {
-
-            const previous =
-              oldTasks.find(
-                task =>
-                  task.subject ===
-                  subject
-              );
-
-
-            const startMinutes =
-              timeToMinutes(
-                start
-              ) +
-              index *
-              minutesPerSubject;
-
-
-            return {
-
-              id:
-                previous?.id ||
-                (
-                  "task_" +
-                  Date.now() +
-                  "_" +
-                  index
-                ),
-
-              date:
-                today(),
-
-              time:
-                minutesToTime(
-                  startMinutes
-                ),
-
-              subject,
-
-              topic:
-                previous?.topic ||
-                "",
-
-              minutes:
-                minutesPerSubject,
-
-              done:
-                previous?.done ||
-                false
-
-            };
-
-          }
-        );
-
-
-      const newPlan = {
-
-        user_id:
-          currentUser.id,
-
-        plan_date:
-          today(),
-
-        hours,
-
-        start_time:
-          start,
-
-        subjects,
-
-        tasks,
-
-        updated_at:
-          new Date()
-            .toISOString()
-
-      };
-
+      dailyPlan.updated_at =
+        new Date()
+          .toISOString();
 
       const {
         data,
@@ -2791,95 +2238,14 @@
         await supabaseClient
           .from("daily_plans")
           .upsert(
-
-            newPlan,
-
+            dailyPlan,
             {
               onConflict:
                 "user_id,plan_date"
             }
-
           )
           .select()
           .single();
-
-
-      if(error){
-
-        console.error(error);
-
-        toast(
-          error.message
-        );
-
-        return;
-
-      }
-
-
-      dailyPlan =
-        data || newPlan;
-
-
-      saveLocal();
-
-      renderPlan();
-
-      renderHome();
-
-      toast(
-        "Plan kaydedildi 📅"
-      );
-
-    }
-
-
-    async function toggleTask(id){
-
-      if(!dailyPlan?.tasks)
-        return;
-
-
-      const task =
-        dailyPlan.tasks.find(
-          t =>
-            String(t.id) ===
-            String(id)
-        );
-
-
-      if(!task)
-        return;
-
-
-      task.done =
-        !task.done;
-
-
-      const {
-        error
-      } =
-        await supabaseClient
-          .from("daily_plans")
-          .upsert(
-
-            {
-
-              ...dailyPlan,
-
-              updated_at:
-                new Date()
-                  .toISOString()
-
-            },
-
-            {
-              onConflict:
-                "user_id,plan_date"
-            }
-
-          );
-
 
       if(error){
 
@@ -2893,15 +2259,409 @@
         );
 
         return;
-
       }
 
+      if(data)
+        dailyPlan = data;
 
       saveLocal();
 
-      renderPlanTasks();
+      renderTodayTasks();
+
+      renderPlan();
+
+      toast(
+        task.done
+          ? "Görev tamamlandı ✅"
+          : "Görev geri alındı"
+      );
+
+    }
+
+
+    async function deleteTask(id){
+
+      if(!dailyPlan)
+        return;
+
+      const oldTasks =
+        Array.isArray(
+          dailyPlan.tasks
+        )
+          ? [...dailyPlan.tasks]
+          : [];
+
+      const exists =
+        oldTasks.some(
+          task =>
+            String(task.id) ===
+            String(id)
+        );
+
+      if(!exists)
+        return;
+
+      dailyPlan.tasks =
+        oldTasks.filter(
+          task =>
+            String(task.id) !==
+            String(id)
+        );
+
+      dailyPlan.updated_at =
+        new Date()
+          .toISOString();
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("daily_plans")
+          .upsert(
+            dailyPlan,
+            {
+              onConflict:
+                "user_id,plan_date"
+            }
+          )
+          .select()
+          .single();
+
+      if(error){
+
+        console.error(
+          "Görev silinemedi:",
+          error
+        );
+
+        dailyPlan.tasks =
+          oldTasks;
+
+        toast(
+          "Görev silinemedi."
+        );
+
+        return;
+      }
+
+      if(data)
+        dailyPlan = data;
+
+      saveLocal();
 
       renderTodayTasks();
+
+      renderPlan();
+
+      toast(
+        "Görev silindi 🗑️"
+      );
+
+    }
+
+
+    async function clearAllTasks(){
+
+      if(!dailyPlan)
+        return;
+
+      const tasks =
+        Array.isArray(
+          dailyPlan.tasks
+        )
+          ? dailyPlan.tasks
+          : [];
+
+      if(!tasks.length){
+
+        toast(
+          "Silinecek görev yok."
+        );
+
+        return;
+      }
+
+      const confirmed =
+        confirm(
+          "Bugünkü tüm görevler silinsin mi?"
+        );
+
+      if(!confirmed)
+        return;
+
+      const oldTasks =
+        [...tasks];
+
+      dailyPlan.tasks =
+        [];
+
+      dailyPlan.updated_at =
+        new Date()
+          .toISOString();
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("daily_plans")
+          .upsert(
+            dailyPlan,
+            {
+              onConflict:
+                "user_id,plan_date"
+            }
+          )
+          .select()
+          .single();
+
+      if(error){
+
+        console.error(
+          "Görevler temizlenemedi:",
+          error
+        );
+
+        dailyPlan.tasks =
+          oldTasks;
+
+        toast(
+          "Görevler silinemedi."
+        );
+
+        return;
+      }
+
+      if(data)
+        dailyPlan = data;
+
+      saveLocal();
+
+      renderTodayTasks();
+
+      renderPlan();
+
+      toast(
+        "Tüm görevler temizlendi 🧹"
+      );
+
+    }
+
+
+    function renderTodayTasks(){
+
+      const container =
+        document.getElementById(
+          "todayTasks"
+        );
+
+      if(!container)
+        return;
+
+      const tasks =
+        Array.isArray(
+          dailyPlan?.tasks
+        )
+          ? dailyPlan.tasks
+          : [];
+
+      if(!tasks.length){
+
+        container.innerHTML =
+          `<div class="empty-state">
+             Bugün için görev yok.
+           </div>`;
+
+      }else{
+
+        container.innerHTML =
+          tasks
+            .map(
+              task => {
+
+                const done =
+                  Boolean(
+                    task.done
+                  );
+
+                return `
+                  <div class="today-task ${
+                    done ? "done" : ""
+                  }">
+
+                    <button
+                      class="today-task-check"
+                      onclick="toggleTask('${escapeAttr(task.id)}')">
+                      ${done ? "✓" : ""}
+                    </button>
+
+                    <div class="today-task-content">
+
+                      <div class="today-task-title">
+                        ${escapeHtml(
+                          task.title ||
+                          task.subject ||
+                          "Görev"
+                        )}
+                      </div>
+
+                      <div class="today-task-meta">
+
+                        ${
+                          task.time
+                            ? `🕐 ${escapeHtml(task.time)}`
+                            : ""
+                        }
+
+                        ${
+                          task.minutes
+                            ? ` · ${Number(task.minutes)} dk`
+                            : ""
+                        }
+
+                      </div>
+
+                    </div>
+
+                    <button
+                      class="today-task-delete"
+                      onclick="deleteTask('${escapeAttr(task.id)}')">
+                      🗑️
+                    </button>
+
+                  </div>
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+      renderAssignedHomeworks();
+
+    }
+
+
+    function renderAssignedHomeworks(){
+
+      const container =
+        document.getElementById(
+          "adminAssignedHomework"
+        );
+
+      if(!container)
+        return;
+
+      const tasks =
+        Array.isArray(
+          dailyPlan?.tasks
+        )
+          ? dailyPlan.tasks
+          : [];
+
+      const assigned =
+        tasks.filter(
+          task =>
+            task.assigned_by
+        );
+
+      if(!assigned.length){
+
+        container.classList.add(
+          "hidden"
+        );
+
+        container.innerHTML =
+          "";
+
+        return;
+      }
+
+      container.classList.remove(
+        "hidden"
+      );
+
+      container.innerHTML = `
+        <div class="assigned-homework-title">
+          🎓 Admin tarafından verilen ödevler
+        </div>
+
+        <div class="assigned-homework-list">
+
+          ${
+            assigned
+              .map(
+                task => {
+
+                  const done =
+                    Boolean(
+                      task.done
+                    );
+
+                  return `
+                    <div class="assigned-homework-card ${
+                      done ? "done" : ""
+                    }">
+
+                      <div class="assigned-homework-icon">
+                        📚
+                      </div>
+
+                      <div class="assigned-homework-content">
+
+                        <div class="assigned-homework-name">
+                          ${escapeHtml(
+                            task.title ||
+                            "Ödev"
+                          )}
+                        </div>
+
+                        ${
+                          task.subject
+                            ? `<div class="assigned-homework-subject">
+                                 ${escapeHtml(task.subject)}
+                               </div>`
+                            : ""
+                        }
+
+                        ${
+                          task.topic
+                            ? `<div class="assigned-homework-topic">
+                                 ${escapeHtml(task.topic)}
+                               </div>`
+                            : ""
+                        }
+
+                        ${
+                          task.minutes
+                            ? `<div class="assigned-homework-time">
+                                 ⏱️ ${Number(task.minutes)} dk
+                               </div>`
+                            : ""
+                        }
+
+                      </div>
+
+                      <div class="assigned-homework-status">
+                        ${
+                          done
+                            ? "Tamamlandı ✅"
+                            : "Bekliyor"
+                        }
+                      </div>
+
+                    </div>
+                  `;
+
+                }
+              )
+              .join("")
+          }
+
+        </div>
+      `;
 
     }
 
@@ -2910,78 +2670,128 @@
        QUESTIONS
     ===================================================== */
 
-    async function addQuestion(){
+    function renderQuestions(){
 
-      const subject =
+      const list =
         document.getElementById(
-          "qSubject"
-        ).value;
-
-      const topic =
-        document.getElementById(
-          "qTopic"
-        ).value.trim();
-
-      const total =
-        Number(
-          document.getElementById(
-            "qTotal"
-          ).value
-        ) || 0;
-
-      const correct =
-        Number(
-          document.getElementById(
-            "qCorrect"
-          ).value
-        ) || 0;
-
-      const wrong =
-        Number(
-          document.getElementById(
-            "qWrong"
-          ).value
-        ) || 0;
-
-      const blank =
-        Number(
-          document.getElementById(
-            "qBlank"
-          ).value
-        ) || 0;
-
-
-      if(total <= 0){
-
-        toast(
-          "Toplam soru sayısını gir."
+          "questionList"
         );
 
+      if(!list)
         return;
 
+      const sorted =
+        [...questions]
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              String(
+                b.date || ""
+              ).localeCompare(
+                String(
+                  a.date || ""
+                )
+              )
+          );
+
+      if(!sorted.length){
+
+        list.innerHTML =
+          `<div class="empty-state">
+             Henüz soru kaydı yok.
+           </div>`;
+
+        return;
       }
 
+      list.innerHTML =
+        sorted
+          .map(
+            q => `
+
+              <div class="data-card">
+
+                <div class="data-card-main">
+
+                  <strong>
+                    ${escapeHtml(
+                      q.subject ||
+                      "Ders"
+                    )}
+                  </strong>
+
+                  ${
+                    q.topic
+                      ? `<span>
+                           ${escapeHtml(q.topic)}
+                         </span>`
+                      : ""
+                  }
+
+                </div>
+
+                <div class="data-card-value">
+                  ${Number(q.count || 0)}
+                </div>
+
+                <div class="data-card-date">
+                  ${escapeHtml(
+                    q.date || ""
+                  )}
+                </div>
+
+              </div>
+
+            `
+          )
+          .join("");
+
+    }
+
+
+    async function addQuestions(){
+
+      if(!currentUser)
+        return;
+
+      const subject =
+        document
+          .getElementById(
+            "questionSubject"
+          )
+          ?.value;
+
+      const topic =
+        document
+          .getElementById(
+            "questionTopic"
+          )
+          ?.value
+          .trim();
+
+      const count =
+        Number(
+          document
+            .getElementById(
+              "questionCount"
+            )
+            ?.value
+        );
 
       if(
-        correct +
-        wrong +
-        blank >
-        total
+        !subject ||
+        !count ||
+        count < 1
       ){
 
         toast(
-          "Doğru + yanlış + boş toplamı soru sayısını geçemez."
+          "Ders ve soru sayısını gir."
         );
 
         return;
-
       }
-
-
-      const net =
-        correct -
-        wrong / 4;
-
 
       const row = {
 
@@ -2993,23 +2803,12 @@
 
         subject,
 
-        topic,
+        topic:
+          topic || "",
 
-        total,
-
-        correct,
-
-        wrong,
-
-        blank,
-
-        net:
-          Number(
-            net.toFixed(2)
-          )
+        count
 
       };
-
 
       const {
         data,
@@ -3021,157 +2820,189 @@
           .select()
           .single();
 
+      if(error){
+
+        console.error(error);
+
+        toast(
+          error.message ||
+          "Sorular kaydedilemedi."
+        );
+
+        return;
+      }
+
+      if(data)
+        questions.unshift(
+          data
+        );
+
+      saveLocal();
+
+      const input =
+        document.getElementById(
+          "questionCount"
+        );
+
+      if(input)
+        input.value =
+          "";
+
+      renderQuestions();
+
+      renderHome();
+
+      renderStats();
+
+      toast(
+        `${count} soru kaydedildi ✅`
+      );
+
+    }
+
+
+    /* =====================================================
+       WRONG QUESTIONS
+    ===================================================== */
+
+    function renderWrongQuestions(){
+
+      const list =
+        document.getElementById(
+          "wrongList"
+        );
+
+      if(!list)
+        return;
+
+      if(!wrongs.length){
+
+        list.innerHTML =
+          `<div class="empty-state">
+             Yanlış soru kaydı yok.
+           </div>`;
+
+        return;
+      }
+
+      list.innerHTML =
+        wrongs
+          .map(
+            wrong => `
+
+              <div class="data-card">
+
+                <div class="data-card-main">
+
+                  <strong>
+                    ${escapeHtml(
+                      wrong.subject ||
+                      "Ders"
+                    )}
+                  </strong>
+
+                  <span>
+                    ${escapeHtml(
+                      wrong.topic ||
+                      "Konu belirtilmedi"
+                    )}
+                  </span>
+
+                </div>
+
+                <div class="data-card-date">
+                  ${escapeHtml(
+                    wrong.date || ""
+                  )}
+                </div>
+
+              </div>
+
+            `
+          )
+          .join("");
+
+    }
+
+
+    async function addWrongQuestion(){
+
+      if(!currentUser)
+        return;
+
+      const subject =
+        document
+          .getElementById(
+            "wrongSubject"
+          )
+          ?.value;
+
+      const topic =
+        document
+          .getElementById(
+            "wrongTopic"
+          )
+          ?.value
+          .trim();
+
+      if(!subject){
+
+        toast(
+          "Ders seç."
+        );
+
+        return;
+      }
+
+      const row = {
+
+        user_id:
+          currentUser.id,
+
+        date:
+          today(),
+
+        subject,
+
+        topic:
+          topic || ""
+
+      };
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("wrongs")
+          .insert(row)
+          .select()
+          .single();
 
       if(error){
 
         console.error(error);
 
         toast(
-          error.message
+          error.message ||
+          "Yanlış kaydedilemedi."
         );
 
         return;
-
       }
 
-
-      questions.unshift(
-        data
-      );
-
+      if(data)
+        wrongs.unshift(
+          data
+        );
 
       saveLocal();
 
-
-      document.getElementById(
-        "qTopic"
-      ).value = "";
-
-
-      checkBadges();
-
-      renderQuestions();
-
-      renderHome();
-
+      renderWrongQuestions();
 
       toast(
-        "Soru kaydı eklendi 🎯"
+        "Yanlış soru kaydedildi ✅"
       );
-
-    }
-
-
-    function renderQuestions(){
-
-      const container =
-        document.getElementById(
-          "questionList"
-        );
-
-
-      if(!questions.length){
-
-        container.innerHTML =
-          `<div style="color:var(--muted)">
-            Henüz soru kaydı yok.
-          </div>`;
-
-        return;
-
-      }
-
-
-      container.innerHTML =
-        questions
-          .slice(0,15)
-          .map(
-            q => `
-
-            <div class="list-item">
-
-              <div class="list-top">
-
-                <div>
-
-                  <div class="list-title">
-
-                    ${
-                      escapeHtml(
-                        q.subject
-                      )
-                    }
-
-                  </div>
-
-                  <div class="list-meta">
-
-                    ${
-                      escapeHtml(
-                        q.topic ||
-                        "Konu belirtilmedi"
-                      )
-                    }
-
-                    ·
-
-                    ${
-                      q.date ||
-                      ""
-                    }
-
-                  </div>
-
-                </div>
-
-                <div class="net">
-
-                  ${
-                    Number(
-                      q.net ||
-                      0
-                    ).toFixed(2)
-                  }
-
-                </div>
-
-              </div>
-
-              <div class="list-meta">
-
-                ${
-                  q.total
-                }
-                soru
-
-                ·
-
-                ${
-                  q.correct
-                }
-                doğru
-
-                ·
-
-                ${
-                  q.wrong
-                }
-                yanlış
-
-                ·
-
-                ${
-                  q.blank
-                }
-                boş
-
-              </div>
-
-            </div>
-
-          `
-          )
-          .join("");
 
     }
 
@@ -3180,103 +3011,155 @@
        EXAMS
     ===================================================== */
 
+    function renderExams(){
+
+      const list =
+        document.getElementById(
+          "examList"
+        );
+
+      if(!list)
+        return;
+
+      if(!exams.length){
+
+        list.innerHTML =
+          `<div class="empty-state">
+             Henüz deneme kaydı yok.
+           </div>`;
+
+        return;
+      }
+
+      list.innerHTML =
+        exams
+          .map(
+            exam => `
+
+              <div class="data-card">
+
+                <div class="data-card-main">
+
+                  <strong>
+                    ${escapeHtml(
+                      exam.name ||
+                      exam.title ||
+                      "Deneme"
+                    )}
+                  </strong>
+
+                  <span>
+                    ${
+                      exam.net != null
+                        ? `Net: ${Number(exam.net).toFixed(2)}`
+                        : ""
+                    }
+                  </span>
+
+                </div>
+
+                <div class="data-card-value">
+                  ${
+                    exam.total != null
+                      ? Number(exam.total)
+                      : "-"
+                  }
+                </div>
+
+                <div class="data-card-date">
+                  ${escapeHtml(
+                    exam.date || ""
+                  )}
+                </div>
+
+              </div>
+
+            `
+          )
+          .join("");
+
+    }
+
+
     async function addExam(){
 
+      if(!currentUser)
+        return;
+
       const name =
-        document.getElementById(
-          "examName"
-        ).value.trim();
+        document
+          .getElementById(
+            "examName"
+          )
+          ?.value
+          .trim();
 
-
-      const date =
-        document.getElementById(
-          "examDate"
-        ).value ||
-        today();
-
-
-      const type =
-        document.getElementById(
-          "examType"
-        ).value;
-
-
-      const turkish =
+      const correct =
         Number(
-          document.getElementById(
-            "examTurkish"
-          ).value
+          document
+            .getElementById(
+              "examCorrect"
+            )
+            ?.value
         ) || 0;
 
-
-      const math =
+      const wrong =
         Number(
-          document.getElementById(
-            "examMath"
-          ).value
+          document
+            .getElementById(
+              "examWrong"
+            )
+            ?.value
         ) || 0;
 
-
-      const science =
+      const empty =
         Number(
-          document.getElementById(
-            "examScience"
-          ).value
+          document
+            .getElementById(
+              "examEmpty"
+            )
+            ?.value
         ) || 0;
-
-
-      const social =
-        Number(
-          document.getElementById(
-            "examSocial"
-          ).value
-        ) || 0;
-
 
       if(!name){
 
         toast(
-          "Deneme adı gir."
+          "Deneme adını gir."
         );
 
         return;
-
       }
 
-
       const net =
-        turkish +
-        math +
-        science +
-        social;
+        correct -
+        wrong / 4;
 
+      const total =
+        correct +
+        wrong +
+        empty;
 
       const row = {
 
         user_id:
           currentUser.id,
 
+        date:
+          today(),
+
         name,
 
-        date,
+        correct,
 
-        type,
+        wrong,
 
-        turkish,
+        empty,
 
-        math,
+        total,
 
-        science,
-
-        social,
-
-        net:
-          Number(
-            net.toFixed(2)
-          )
+        net
 
       };
-
 
       const {
         data,
@@ -3288,159 +3171,494 @@
           .select()
           .single();
 
-
       if(error){
 
         console.error(error);
 
         toast(
-          error.message
+          error.message ||
+          "Deneme kaydedilemedi."
         );
 
         return;
-
       }
 
-
-      exams.unshift(
-        data
-      );
-
+      if(data)
+        exams.unshift(
+          data
+        );
 
       saveLocal();
 
+      [
+        "examName",
+        "examCorrect",
+        "examWrong",
+        "examEmpty"
+      ].forEach(
+        id => {
 
-      document.getElementById(
-        "examName"
-      ).value = "";
+          const el =
+            document.getElementById(
+              id
+            );
 
+          if(el)
+            el.value = "";
 
-      checkBadges();
+        }
+      );
 
       renderExams();
 
       renderHome();
 
+      renderStats();
 
       toast(
-        "Deneme kaydedildi 📊"
+        "Deneme kaydedildi ✅"
       );
 
     }
 
 
-    function renderExams(){
+    /* =====================================================
+       STUDY
+    ===================================================== */
 
-      const container =
+    function renderStudy(){
+
+      const list =
         document.getElementById(
-          "examList"
+          "studyList"
         );
 
-
-      if(!exams.length){
-
-        container.innerHTML =
-          `<div style="color:var(--muted)">
-            Henüz deneme yok.
-          </div>`;
-
+      if(!list)
         return;
 
+      if(!studySessions.length){
+
+        list.innerHTML =
+          `<div class="empty-state">
+             Henüz çalışma kaydı yok.
+           </div>`;
+
+        return;
       }
 
-
-      container.innerHTML =
-        exams
+      list.innerHTML =
+        studySessions
           .map(
-            e => `
+            session => `
 
-          <div class="list-item">
+              <div class="data-card">
 
-            <div class="list-top">
+                <div class="data-card-main">
 
-              <div>
+                  <strong>
+                    ${escapeHtml(
+                      session.subject ||
+                      "Ders"
+                    )}
+                  </strong>
 
-                <div class="list-title">
-
-                  ${
-                    escapeHtml(
-                      e.name
-                    )
-                  }
+                  <span>
+                    ${escapeHtml(
+                      session.topic ||
+                      ""
+                    )}
+                  </span>
 
                 </div>
 
-                <div class="list-meta">
+                <div class="data-card-value">
+                  ${Number(
+                    session.minutes || 0
+                  )} dk
+                </div>
 
-                  ${
-                    e.type ||
-                    ""
-                  }
-
-                  ·
-
-                  ${
-                    e.date ||
-                    ""
-                  }
-
+                <div class="data-card-date">
+                  ${escapeHtml(
+                    session.date || ""
+                  )}
                 </div>
 
               </div>
 
-              <div class="net">
-
-                ${
-                  Number(
-                    e.net ||
-                    0
-                  ).toFixed(2)
-                }
-
-              </div>
-
-            </div>
-
-            <div class="list-meta">
-
-              Türkçe ${
-                e.turkish ||
-                0
-              }
-
-              · Mat ${
-                e.math ||
-                0
-              }
-
-              · Fen ${
-                e.science ||
-                0
-              }
-
-              · Sosyal ${
-                e.social ||
-                0
-              }
-
-            </div>
-
-          </div>
-
-        `
+            `
           )
           .join("");
 
     }
 
 
+    async function addStudySession(){
+
+      if(!currentUser)
+        return;
+
+      const subject =
+        document
+          .getElementById(
+            "studySubject"
+          )
+          ?.value;
+
+      const topic =
+        document
+          .getElementById(
+            "studyTopic"
+          )
+          ?.value
+          .trim();
+
+      const minutes =
+        Number(
+          document
+            .getElementById(
+              "studyMinutes"
+            )
+            ?.value
+        );
+
+      if(
+        !minutes ||
+        minutes < 1
+      ){
+
+        toast(
+          "Çalışma süresini gir."
+        );
+
+        return;
+      }
+
+      const row = {
+
+        user_id:
+          currentUser.id,
+
+        date:
+          today(),
+
+        subject:
+          subject || "Genel",
+
+        topic:
+          topic || "",
+
+        minutes
+
+      };
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("study_sessions")
+          .insert(row)
+          .select()
+          .single();
+
+      if(error){
+
+        console.error(error);
+
+        toast(
+          error.message ||
+          "Çalışma kaydı eklenemedi."
+        );
+
+        return;
+      }
+
+      if(data)
+        studySessions.unshift(
+          data
+        );
+
+      saveLocal();
+
+      renderStudy();
+
+      renderHome();
+
+      renderStats();
+
+      const minutesInput =
+        document.getElementById(
+          "studyMinutes"
+        );
+
+      if(minutesInput)
+        minutesInput.value =
+          "";
+
+      toast(
+        "Çalışma kaydedildi ✅"
+      );
+
+    }
+
+
     /* =====================================================
-       FOCUS
+       STATS
     ===================================================== */
+
+    function renderStats(){
+
+      const totalQuestions =
+        questions.reduce(
+          (
+            sum,
+            q
+          ) =>
+            sum +
+            Number(
+              q.count || 0
+            ),
+          0
+        );
+
+      const totalStudy =
+        studySessions.reduce(
+          (
+            sum,
+            s
+          ) =>
+            sum +
+            Number(
+              s.minutes || 0
+            ),
+          0
+        );
+
+      const totalExams =
+        exams.length;
+
+      const qEl =
+        document.getElementById(
+          "statsQuestions"
+        );
+
+      const sEl =
+        document.getElementById(
+          "statsStudy"
+        );
+
+      const eEl =
+        document.getElementById(
+          "statsExams"
+        );
+
+      if(qEl)
+        qEl.textContent =
+          totalQuestions;
+
+      if(sEl)
+        sEl.textContent =
+          totalStudy +
+          " dk";
+
+      if(eEl)
+        eEl.textContent =
+          totalExams;
+
+      const weekly =
+        {};
+
+      studySessions.forEach(
+        session => {
+
+          const date =
+            session.date;
+
+          if(!date)
+            return;
+
+          weekly[date] =
+            (
+              weekly[date] ||
+              0
+            ) +
+            Number(
+              session.minutes || 0
+            );
+
+        }
+      );
+
+      const weekList =
+        document.getElementById(
+          "weeklyStudy"
+        );
+
+      if(
+        weekList
+      ){
+
+        const entries =
+          Object.entries(
+            weekly
+          )
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              b[0].localeCompare(
+                a[0]
+              )
+          )
+          .slice(
+            0,
+            7
+          );
+
+        weekList.innerHTML =
+          entries.length
+            ? entries
+                .map(
+                  item => `
+                    <div class="stat-row">
+
+                      <span>
+                        ${escapeHtml(
+                          item[0]
+                        )}
+                      </span>
+
+                      <strong>
+                        ${Number(
+                          item[1]
+                        )} dk
+                      </strong>
+
+                    </div>
+                  `
+                )
+                .join("")
+            : `
+                <div class="empty-state">
+                  Henüz çalışma verisi yok.
+                </div>
+              `;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       FOCUS MODE
+    ===================================================== */
+
+    function renderFocusPage(){
+
+      restoreFocusTimer();
+
+    }
+
+
+    function saveFocusState(){
+
+      localStorage.setItem(
+        "yks_focus_remaining",
+        String(
+          Math.max(
+            0,
+            Math.ceil(
+              focusSeconds
+            )
+          )
+        )
+      );
+
+      localStorage.setItem(
+        "yks_focus_running",
+        focusRunning
+          ? "1"
+          : "0"
+      );
+
+      localStorage.setItem(
+        "yks_focus_end_at",
+        String(
+          focusEndAt || 0
+        )
+      );
+
+      localStorage.setItem(
+        "yks_focus_duration",
+        String(
+          focusDuration
+        )
+      );
+
+    }
+
+
+    function setFocusDuration(minutes){
+
+      const value =
+        Math.min(
+          600,
+          Math.max(
+            1,
+            Number(minutes) ||
+            25
+          )
+        );
+
+      if(focusRunning){
+
+        toast(
+          "Önce odak modunu duraklat."
+        );
+
+        const input =
+          document.getElementById(
+            "focusMinutes"
+          );
+
+        if(input){
+
+          input.value =
+            Math.round(
+              focusDuration /
+              60
+            );
+
+        }
+
+        return;
+
+      }
+
+      focusDuration =
+        Math.round(
+          value * 60
+        );
+
+      focusSeconds =
+        focusDuration;
+
+      focusEndAt =
+        0;
+
+      saveFocusState();
+
+      updateTimer();
+
+    }
+
 
     function toggleFocus(){
 
-      if(focusRunning){
+      if(
+        focusRunning
+      ){
 
         pauseFocus();
 
@@ -3455,62 +3673,142 @@
 
     function startFocus(){
 
-      focusRunning = true;
+      if(
+        focusSeconds <= 0 ||
+        focusSeconds >
+          focusDuration
+      ){
 
-      document.getElementById(
-        "timerStart"
-      ).textContent =
-        "Durdur";
+        focusSeconds =
+          focusDuration;
 
+      }
+
+      focusRunning =
+        true;
+
+      focusEndAt =
+        Date.now() +
+        focusSeconds * 1000;
+
+      saveFocusState();
+
+      if(
+        focusInterval
+      )
+        clearInterval(
+          focusInterval
+        );
 
       focusInterval =
         setInterval(
-          () => {
-
-            if(
-              focusSeconds >
-              0
-            ){
-
-              focusSeconds--;
-
-              updateTimer();
-
-            }else{
-
-              finishFocus();
-
-            }
-
-          },
-          1000
+          updateFocusFromClock,
+          250
         );
+
+      updateFocusFromClock();
+
+    }
+
+
+    function updateFocusFromClock(){
+
+      if(!focusRunning)
+        return;
+
+      const remaining =
+        Math.max(
+          0,
+          (
+            focusEndAt -
+            Date.now()
+          ) / 1000
+        );
+
+      focusSeconds =
+        remaining;
+
+      updateTimer();
+
+      saveFocusState();
+
+      if(
+        remaining <= 0
+      ){
+
+        finishFocus();
+
+      }
 
     }
 
 
     function pauseFocus(){
 
-      focusRunning = false;
+      if(
+        !focusRunning
+      )
+        return;
 
-      clearInterval(
+      updateFocusFromClock();
+
+      focusRunning =
+        false;
+
+      focusSeconds =
+        Math.max(
+          0,
+          focusSeconds
+        );
+
+      focusEndAt =
+        0;
+
+      saveFocusState();
+
+      if(
         focusInterval
-      );
+      ){
 
-      document.getElementById(
-        "timerStart"
-      ).textContent =
-        "Başlat";
+        clearInterval(
+          focusInterval
+        );
+
+        focusInterval =
+          null;
+
+      }
+
+      updateTimer();
 
     }
 
 
     function resetFocus(){
 
-      pauseFocus();
+      focusRunning =
+        false;
 
       focusSeconds =
-        1500;
+        focusDuration;
+
+      focusEndAt =
+        0;
+
+      saveFocusState();
+
+      if(
+        focusInterval
+      ){
+
+        clearInterval(
+          focusInterval
+        );
+
+        focusInterval =
+          null;
+
+      }
 
       updateTimer();
 
@@ -3519,66 +3817,123 @@
 
     async function finishFocus(){
 
-      pauseFocus();
+      if(
+        !focusRunning &&
+        focusSeconds > 0
+      )
+        return;
+
+      focusRunning =
+        false;
 
       focusSeconds =
-        1500;
+        0;
 
-      updateTimer();
+      focusEndAt =
+        0;
 
-
-      const row = {
-
-        user_id:
-          currentUser.id,
-
-        date:
-          today(),
-
-        minutes:25,
-
-        seconds:0,
-
-        task_id:null,
-
-        label:
-          "Odak çalışması"
-
-      };
-
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient
-          .from("study_sessions")
-          .insert(row)
-          .select()
-          .single();
-
+      saveFocusState();
 
       if(
-        !error &&
-        data
+        focusInterval
       ){
 
-        studySessions.unshift(
-          data
+        clearInterval(
+          focusInterval
         );
+
+        focusInterval =
+          null;
 
       }
 
+      updateTimer();
 
-      saveLocal();
+      if(currentUser){
 
-      checkBadges();
+        const minutes =
+          Math.max(
+            1,
+            Math.round(
+              focusDuration /
+              60
+            )
+          );
 
-      renderHome();
+        const row = {
 
+          user_id:
+            currentUser.id,
+
+          date:
+            today(),
+
+          subject:
+            "Odak Modu",
+
+          topic:
+            "Odaklanma çalışması",
+
+          minutes
+
+        };
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from(
+              "study_sessions"
+            )
+            .insert(row)
+            .select()
+            .single();
+
+        if(!error && data){
+
+          studySessions.unshift(
+            data
+          );
+
+          saveLocal();
+
+          renderStudy();
+
+          renderHome();
+
+          renderStats();
+
+        }else if(error){
+
+          console.error(
+            "Odak çalışması kaydedilemedi:",
+            error
+          );
+
+        }
+
+      }
 
       toast(
-        "25 dakikalık çalışma tamamlandı! 🔥"
+        "Odak süresi tamamlandı 🎯"
+      );
+
+      setTimeout(
+        () => {
+
+          focusSeconds =
+            focusDuration;
+
+          focusEndAt =
+            0;
+
+          saveFocusState();
+
+          updateTimer();
+
+        },
+        500
       );
 
     }
@@ -3586,573 +3941,280 @@
 
     function updateTimer(){
 
-      const minutes =
-        Math.floor(
-          focusSeconds /
-          60
-        )
-        .toString()
-        .padStart(
-          2,
-          "0"
+      const timer =
+        document.getElementById(
+          "timer"
         );
 
+      if(!timer)
+        return;
 
       const seconds =
-        (
-          focusSeconds %
-          60
-        )
-        .toString()
-        .padStart(
-          2,
-          "0"
+        Math.max(
+          0,
+          Math.ceil(
+            focusSeconds
+          )
         );
 
+      const minutes =
+        Math.floor(
+          seconds / 60
+        );
 
-      document.getElementById(
-        "timer"
-      ).textContent =
-        minutes +
+      const remaining =
+        seconds % 60;
+
+      timer.textContent =
+        String(minutes)
+          .padStart(2,"0") +
         ":" +
-        seconds;
+        String(remaining)
+          .padStart(2,"0");
+
+      const button =
+        document.getElementById(
+          "focusButton"
+        );
+
+      if(button){
+
+        button.textContent =
+          focusRunning
+            ? "⏸️ Duraklat"
+            : "▶️ Başlat";
+
+      }
+
+      const status =
+        document.getElementById(
+          "focusStatus"
+        );
+
+      if(status){
+
+        status.textContent =
+          focusRunning
+            ? "Odaklanıyorsun..."
+            : "Hazır";
+
+      }
+
+      const input =
+        document.getElementById(
+          "focusMinutes"
+        );
+
+      if(
+        input &&
+        !focusRunning
+      ){
+
+        input.value =
+          Math.round(
+            focusDuration /
+            60
+          );
+
+      }
 
     }
 
 
-    /* =====================================================
-       BADGES
-    ===================================================== */
+    function restoreFocusTimer(){
 
-    async function checkBadges(){
-
-      const totalQuestions =
-        questions.reduce(
-
-          (sum,q) =>
-            sum +
-            Number(
-              q.total ||
-              0
-            ),
-
-          0
-
-        );
-
-
-      const keys = [];
-
-
-      if(totalQuestions >= 1)
-        keys.push("first");
-
-
-      if(totalQuestions >= 100)
-        keys.push("q100");
-
-
-      if(totalQuestions >= 500)
-        keys.push("q500");
-
-
-      if(totalQuestions >= 1000)
-        keys.push("q1000");
-
-
-      if(exams.length >= 1)
-        keys.push("exam");
-
-
-      if(
-        calculateStreak() >= 7
-      )
-        keys.push("streak7");
-
-
-      const doneTopics =
-        Object.values(topics)
-          .filter(
-            state =>
-              state ===
-              "done"
+      focusDuration =
+        Number(
+          localStorage.getItem(
+            "yks_focus_duration"
           )
-          .length;
+        ) ||
+        1500;
 
+      focusRunning =
+        localStorage.getItem(
+          "yks_focus_running"
+        ) === "1";
+
+      focusEndAt =
+        Number(
+          localStorage.getItem(
+            "yks_focus_end_at"
+          )
+        ) ||
+        0;
+
+      focusSeconds =
+        Number(
+          localStorage.getItem(
+            "yks_focus_remaining"
+          )
+        ) ||
+        focusDuration;
 
       if(
-        doneTopics >= 25
-      )
-        keys.push("topics25");
-
-
-      if(
-        exams.some(
-          exam =>
-            Number(
-              exam.net ||
-              0
-            ) >= 100
-        )
+        focusRunning &&
+        focusEndAt
       ){
 
-        keys.push("net100");
-
-      }
-
-
-      for(
-        const key of keys
-      ){
-
-        const exists =
-          badges.some(
-            b =>
-              b.badge_key ===
-              key
+        const remaining =
+          Math.max(
+            0,
+            (
+              focusEndAt -
+              Date.now()
+            ) / 1000
           );
 
-
-        if(exists)
-          continue;
-
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient
-            .from("badges")
-            .insert({
-
-              user_id:
-                currentUser.id,
-
-              badge_key:
-                key
-
-            })
-            .select()
-            .single();
-
+        focusSeconds =
+          remaining;
 
         if(
-          !error &&
-          data
+          remaining <= 0
         ){
 
-          badges.push(
-            data
-          );
+          finishFocus();
+
+          return;
 
         }
 
+        if(
+          focusInterval
+        )
+          clearInterval(
+            focusInterval
+          );
+
+        focusInterval =
+          setInterval(
+            updateFocusFromClock,
+            250
+          );
+
       }
 
-
-      saveLocal();
-
-      renderBadges();
+      updateTimer();
 
     }
 
 
-    function renderBadges(){
-
-      const container =
-        document.getElementById(
-          "badgeList"
-        );
-
-
-      const earned =
-        new Set(
-
-          badges.map(
-            b =>
-              b.badge_key
-          )
-
-        );
-
-
-      document.getElementById(
-        "badgeCount"
-      ).textContent =
-        earned.size +
-        " / " +
-        BADGE_DEFINITIONS.length;
-
-
-      container.innerHTML =
-        BADGE_DEFINITIONS
-          .map(
-            badge => {
-
-              const unlocked =
-                earned.has(
-                  badge.key
-                );
-
-
-              return `
-
-              <div
-                class="badge ${
-                  unlocked
-                    ? ""
-                    : "locked"
-                }">
-
-                <div class="badge-icon">
-
-                  ${
-                    badge.icon
-                  }
-
-                </div>
-
-                <div class="badge-name">
-
-                  ${
-                    badge.name
-                  }
-
-                </div>
-
-                <div
-                  style="
-                    margin-top:5px;
-                    color:var(--muted);
-                    font-size:10px;
-                  ">
-
-                  ${
-                    badge.description
-                  }
-
-                </div>
-
-              </div>
-
-            `;
-
-            }
-          )
-          .join("");
-
-    }
+    window.addEventListener(
+      "load",
+      restoreFocusTimer
+    );
 
 
     /* =====================================================
        ADMIN
     ===================================================== */
 
+    function isStaff(){
+
+      return (
+        currentRole ===
+          "admin" ||
+        currentRole ===
+          "coach"
+      );
+
+    }
+
+
     async function loadAdminStats(
-      showMessage = true
+      showLoading = true
     ){
 
-      if(
-        currentRole !== "admin" &&
-        currentRole !== "coach"
-      ){
-
-        if(showMessage)
-          toast(
-            "Yetkin yok."
-          );
-
+      if(!isStaff())
         return;
 
-      }
-
+      if(showLoading)
+        toast(
+          "Admin verileri yükleniyor..."
+        );
 
       try{
 
         const [
-
-          profilesResult,
-
-          questionsResult,
-
-          examsResult,
-
-          sessionsResult
-
+          usersRes,
+          questionsRes,
+          examsRes,
+          studyRes
         ] =
           await Promise.all([
 
             supabaseClient
               .from("profiles")
-              .select("id"),
+              .select(
+                "*"
+              )
+              .order(
+                "username",
+                {
+                  ascending:true
+                }
+              ),
 
             supabaseClient
               .from("questions")
-              .select("id"),
+              .select(
+                "user_id,count"
+              ),
 
             supabaseClient
               .from("exams")
-              .select("id"),
+              .select(
+                "user_id,net"
+              ),
 
             supabaseClient
               .from("study_sessions")
               .select(
-                "minutes,seconds"
+                "user_id,minutes,date,subject,topic"
               )
 
           ]);
 
-
         if(
-          profilesResult.error
+          usersRes.error
         )
-          throw profilesResult.error;
+          throw usersRes.error;
 
+        adminStudents =
+          usersRes.data ||
+          [];
 
-        if(
-          questionsResult.error
-        )
-          throw questionsResult.error;
+        adminQuestions =
+          questionsRes.data ||
+          [];
 
+        adminExams =
+          examsRes.data ||
+          [];
 
-        if(
-          examsResult.error
-        )
-          throw examsResult.error;
+        adminStudySessions =
+          studyRes.data ||
+          [];
 
+        renderAdminStats();
 
-        if(
-          sessionsResult.error
-        )
-          throw sessionsResult.error;
-
-
-        document.getElementById(
-          "adminUsers"
-        ).textContent =
-          profilesResult.data
-            ?.length ||
-          0;
-
-
-        document.getElementById(
-          "adminQuestions"
-        ).textContent =
-          questionsResult.data
-            ?.length ||
-          0;
-
-
-        document.getElementById(
-          "adminExams"
-        ).textContent =
-          examsResult.data
-            ?.length ||
-          0;
-
-
-        const minutes =
-          (
-            sessionsResult.data ||
-            []
-          )
-          .reduce(
-
-            (
-              sum,
-              s
-            ) =>
-              sum +
-              Number(
-                s.minutes ||
-                0
-              ) +
-              Number(
-                s.seconds ||
-                0
-              ) / 60,
-
-            0
-
-          );
-
-
-        document.getElementById(
-          "adminMinutes"
-        ).textContent =
-          Math.round(
-            minutes
-          );
-
-
-        if(showMessage)
-          toast(
-            "Admin istatistikleri güncellendi."
-          );
-
+        renderAdminStudents();
 
       }catch(error){
 
-        console.error(error);
+        console.error(
+          "Admin verileri yüklenemedi:",
+          error
+        );
 
-        if(showMessage)
-          toast(
-            error.message
-          );
+        toast(
+          error.message ||
+          "Admin verileri yüklenemedi."
+        );
 
       }
 
     }
-
-
-    /* =====================================================
-       EXPORT / IMPORT
-    ===================================================== */
-
-    function exportData(){
-
-      const data = {
-
-        version:6,
-
-        exportedAt:
-          new Date()
-            .toISOString(),
-
-        profile,
-
-        questions,
-
-        exams,
-
-        wrongs,
-
-        topics,
-
-        studySessions,
-
-        dailyPlan,
-
-        badges,
-
-        selectedPlanSubjects
-
-      };
-
-
-      const blob =
-        new Blob(
-
-          [
-            JSON.stringify(
-              data,
-              null,
-              2
-            )
-          ],
-
-          {
-            type:
-              "application/json"
-          }
-
-        );
-
-
-      const url =
-        URL.createObjectURL(
-          blob
-        );
-
-
-      const a =
-        document.createElement(
-          "a"
-        );
-
-
-      a.href =
-        url;
-
-
-      a.download =
-        "yks-kocum-yedek.json";
-
-
-      a.click();
-
-
-      URL.revokeObjectURL(
-        url
-      );
-
-
-      toast(
-        "Yedek dışa aktarıldı."
-      );
-
-    }
-
-
-    async function importData(
-      event
-    ){
-
-      const file =
-        event.target.files?.[0];
-
-
-      if(!file)
-        return;
-
-
-      try{
-
-        const text =
-          await file.text();
-
-
-        const data =
-          JSON.parse(text);
-
-
-        if(data.profile)
-          profile =
-            data.profile;
-
-
-        if(
-          Array.isArray(
-            data.questions
-          )
-        )
-          questions =
-            data.questions;
-
-
-        if(
-          Array.isArray(
-            data.exams
-          )
-        )
-          exams =
-            data.exams;
-
-
-        if(
-          Array.isArray(
-            data.wrongs
-          )
-        )
-          wrongs =
-            data.wrongs;
-
-
-        if(data.topics)
-          topics =
-            data.topics;
-
-
         if(
           Array.isArray(
             data.studySessions
