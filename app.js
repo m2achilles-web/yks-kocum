@@ -1,5 +1,5 @@
 // Supabase İstemci Yapılandırması (Kendi URL ve Anon Key bilgilerini buraya eklediğinden emin ol)
-const SUPABASE_URL = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
+const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/';
 const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Kayıt Hatası: ' + error.message);
             } else {
                 alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
-                // Eğer otomatik oturum açılıyorsa checkUserSession çağrılabilir
             }
         });
     }
@@ -124,14 +123,14 @@ async function loadCoachDashboard() {
         return;
     }
 
-    if.students = students || [];
-    if (students.length === 0) {
+    const studentList = students || [];
+    if (studentList.length === 0) {
         studentListEl.innerHTML = '<li>Kayıtlı öğrenci bulunmuyor.</li>';
         return;
     }
 
     studentListEl.innerHTML = '';
-    students.forEach(student => {
+    studentList.forEach(student => {
         const li = document.createElement('li');
         li.textContent = `Öğrenci ID: ${student.id} (Rol: ${student.role})`;
         studentListEl.appendChild(li);
