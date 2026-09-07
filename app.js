@@ -1,9 +1,10 @@
-// SUPABASE BAĞLANTI AYARLARI (Kendi anahtarlarını yapıştır)
-const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/';
-const SUPABASE_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
+// ==========================================
+// SUPABASE BAĞLANTI AYARLARI
+// ==========================================
+const SUPABASE_URL = 'https://xxxx.supabase.co'; // Buraya kendi Supabase URL'ini yapıştır
+const SUPABASE_KEY = 'eyJhbGciOi...';          // Buraya kendi Supabase Anon Key'ini yapıştır
 
-// Supabase İstemcisi
-const _supabase = (typeof supabase !== 'undefined' && SUPABASE_URL !== 'https://xxxx.supabase.co') 
+const _supabase = (typeof supabase !== 'undefined' && SUPABASE_URL.includes('supabase.co')) 
   ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
   : null;
 
@@ -35,9 +36,12 @@ const LESSON_DATA = {
 let studentsList = [];
 
 let appState = {
-  profile: { name: "Öğrenci", field: "Sayısal", uni: "", dept: "", rank: "" },
+  profile: { name: "Öğrenci (Sen)", field: "Sayısal", uni: "İTÜ", dept: "Yazılım Mühendisliği", rank: 5000 },
   timer: { startTime: 0, accumulatedTime: 0, isRunning: false },
-  plans: [],
+  plans: [
+    { id: 101, lesson: "Matematik", hours: 3, completed: true },
+    { id: 102, lesson: "Türkçe", hours: 2, completed: false }
+  ],
   questions: [],
   exams: []
 };
@@ -52,7 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateSoruLessons();
   renderExamInputs();
   renderAll();
-  
+
+  // Supabase'den öğrencileri çek
   await fetchStudentsFromSupabase();
 
   if (appState.timer.isRunning) {
@@ -60,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// SAYFA GEÇİŞİ (Eksik Sayfa Hatasını Engeller)
+// SAYFA GEÇİŞİ
 function switchPage(pageId, btnElement) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   
@@ -78,13 +83,13 @@ function switchPage(pageId, btnElement) {
   if (pageId === 'exams') renderChart();
 }
 
-// SUPABASE'DEN ÖĞRENCİ ÇEKME (profiles Tablosu)
+// SUPABASE'DEN ÖĞRENCİLERİ ÇEK
 async function fetchStudentsFromSupabase() {
   const select = document.getElementById('coachStudentSelect');
 
   if (!_supabase) {
-    console.warn("Supabase URL ve KEY bilgileri eksik!");
-    if (select) select.innerHTML = `<option value="">Supabase Bilgileri Eksik</option>`;
+    console.warn("Supabase bilgileri girilmediği için yerel örnek veriler kullanılıyor.");
+    loadFallbackStudents();
     return;
   }
 
@@ -92,8 +97,8 @@ async function fetchStudentsFromSupabase() {
     const { data, error } = await _supabase.from('profiles').select('*');
     
     if (error) {
-      console.error("Supabase Hatası:", error);
-      if (select) select.innerHTML = `<option value="">Hata: ${error.message}</option>`;
+      console.error("Supabase Veri Çekme Hatası:", error);
+      loadFallbackStudents();
       return;
     }
 
@@ -101,42 +106,49 @@ async function fetchStudentsFromSupabase() {
       studentsList = data;
       populateStudentDropdown();
     } else {
-      if (select) select.innerHTML = `<option value="">profiles Tablosunda Öğrenci Yok</option>`;
+      loadFallbackStudents();
     }
   } catch (err) {
     console.error("Bağlantı Hatası:", err);
-    if (select) select.innerHTML = `<option value="">Bağlantı Sağlanamadı</option>`;
+    loadFallbackStudents();
   }
+}
+
+function loadFallbackStudents() {
+  studentsList = [
+    { id: 1, full_name: "Ahmet Yılmaz (Örnek)", field: "Sayısal", target_uni: "Boğaziçi", target_dept: "Bilgisayar", target_rank: 1500 },
+    { id: 2, full_name: "Zeynep Demir (Örnek)", field: "Eşit Ağırlık", target_uni: "Galatasaray", target_dept: "Hukuk", target_rank: 3000 }
+  ];
+  populateStudentDropdown();
 }
 
 function populateStudentDropdown() {
   const select = document.getElementById('coachStudentSelect');
   if (!select) return;
 
-  if (studentsList.length === 0) {
-    select.innerHTML = `<option value="">Kayıtlı öğrenci bulunamadı</option>`;
-    return;
-  }
-
-  select.innerHTML = studentsList.map(s => {
-    const name = s.full_name || s.name || s.email || 'Öğrenci #' + s.id;
-    return `<option value="${s.id}">${name}</option>`;
+  select.innerHTML = `<option value="">-- Bir Öğrenci Seçin --</option>` + studentsList.map(s => {
+    const name = s.full_name || s.name || ('Öğrenci #' + s.id);
+    return `<option value="${s.id}">${name} (${s.field || 'Genel'})</option>`;
   }).join('');
-
-  renderCoachPanel();
 }
 
 function renderCoachPanel() {
   const select = document.getElementById('coachStudentSelect');
-  if (!select || !select.value) return;
+  const overview = document.getElementById('coachOverview');
+  if (!select || !overview) return;
+
+  if (!select.value) {
+    overview.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">Lütfen yukarıdan bir öğrenci seçin.</p>`;
+    return;
+  }
 
   const selectedStudent = studentsList.find(s => String(s.id) === String(select.value));
   if (!selectedStudent) return;
 
-  document.getElementById('coachOverview').innerHTML = `
-    <div class="list-item"><span>Alan / Hedef Sıralama:</span> <strong>${selectedStudent.field || '-'} / ${selectedStudent.target_rank || '-'}</strong></div>
-    <div class="list-item"><span>Hedef Üniversite:</span> <strong>${selectedStudent.target_uni || '-'} ${selectedStudent.target_dept || ''}</strong></div>
-    <div class="list-item"><span>E-posta:</span> <strong>${selectedStudent.email || '-'}</strong></div>
+  overview.innerHTML = `
+    <div class="list-item"><span>Ad Soyad:</span> <strong>${selectedStudent.full_name || selectedStudent.name || '-'}</strong></div>
+    <div class="list-item"><span>Alan / Sıralama:</span> <strong>${selectedStudent.field || '-'} / ${selectedStudent.target_rank || '-'}</strong></div>
+    <div class="list-item"><span>Hedef:</span> <strong>${selectedStudent.target_uni || '-'} - ${selectedStudent.target_dept || ''}</strong></div>
   `;
 }
 
@@ -144,29 +156,37 @@ function renderCoachPanel() {
 function updatePlanLessons() {
   const type = document.getElementById('planExamType').value;
   const select = document.getElementById('planLessonSelect');
-  select.innerHTML = Object.keys(LESSON_DATA[type]).map(l => `<option value="${l}">${l}</option>`).join('');
+  if(select && LESSON_DATA[type]) {
+    select.innerHTML = Object.keys(LESSON_DATA[type]).map(l => `<option value="${l}">${l}</option>`).join('');
+  }
 }
 
 function updateSoruLessons() {
   const type = document.getElementById('soruExamType').value;
   const select = document.getElementById('soruLessonSelect');
-  select.innerHTML = Object.keys(LESSON_DATA[type]).map(l => `<option value="${l}">${l}</option>`).join('');
-  updateSoruTopics();
+  if(select && LESSON_DATA[type]) {
+    select.innerHTML = Object.keys(LESSON_DATA[type]).map(l => `<option value="${l}">${l}</option>`).join('');
+    updateSoruTopics();
+  }
 }
 
 function updateSoruTopics() {
   const type = document.getElementById('soruExamType').value;
-  const lesson = document.getElementById('soruLessonSelect').value;
+  const lessonSelect = document.getElementById('soruLessonSelect');
   const select = document.getElementById('soruTopicSelect');
-  const topics = LESSON_DATA[type][lesson] || [];
+  if(!lessonSelect || !select) return;
+  
+  const lesson = lessonSelect.value;
+  const topics = LESSON_DATA[type]?.[lesson] || [];
   select.innerHTML = topics.map(t => `<option value="${t}">${t}</option>`).join('');
 }
 
 function renderExamInputs() {
   const cat = document.getElementById('examCategory').value;
   const container = document.getElementById('examLessonInputs');
+  if(!container || !LESSON_DATA[cat]) return;
+  
   const lessons = Object.keys(LESSON_DATA[cat]);
-
   container.innerHTML = lessons.map(l => `
     <div>
       <label style="font-size:10px;">${l}</label>
@@ -292,8 +312,10 @@ function renderAll() {
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
   
   const bar = document.getElementById('dailyProgressBar');
-  bar.style.width = `${percent}%`;
-  bar.innerText = `${percent}%`;
+  if(bar) {
+    bar.style.width = `${percent}%`;
+    bar.innerText = `${percent}%`;
+  }
 
   const planHtml = appState.plans.map(p => `
     <div class="list-item">
@@ -302,24 +324,28 @@ function renderAll() {
     </div>
   `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Plan yok.</p>';
 
-  document.getElementById('planList').innerHTML = planHtml;
-  document.getElementById('homeTaskList').innerHTML = planHtml;
+  if(document.getElementById('planList')) document.getElementById('planList').innerHTML = planHtml;
+  if(document.getElementById('homeTaskList')) document.getElementById('homeTaskList').innerHTML = planHtml;
 
   // Soru Geçmişi
-  document.getElementById('questionHistoryList').innerHTML = appState.questions.slice(-5).reverse().map(q => `
-    <div class="list-item">
-      <div><strong>${q.lesson}</strong> (${q.topic})</div>
-      <div style="color:var(--success);">${q.d}D / ${q.y}Y / ${q.b}B</div>
-    </div>
-  `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Kayıt yok.</p>';
+  if(document.getElementById('questionHistoryList')) {
+    document.getElementById('questionHistoryList').innerHTML = appState.questions.slice(-5).reverse().map(q => `
+      <div class="list-item">
+        <div><strong>${q.lesson}</strong> (${q.topic})</div>
+        <div style="color:var(--success);">${q.d}D / ${q.y}Y / ${q.b}B</div>
+      </div>
+    `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Kayıt yok.</p>';
+  }
 
   // Deneme Geçmişi
-  document.getElementById('examHistoryList').innerHTML = appState.exams.slice(-5).reverse().map(e => `
-    <div class="list-item">
-      <div><strong>${e.title} (${e.cat.toUpperCase()})</strong></div>
-      <div style="color:#818cf8; font-weight:bold;">${e.totalNet} Net</div>
-    </div>
-  `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Deneme yok.</p>';
+  if(document.getElementById('examHistoryList')) {
+    document.getElementById('examHistoryList').innerHTML = appState.exams.slice(-5).reverse().map(e => `
+      <div class="list-item">
+        <div><strong>${e.title} (${e.cat.toUpperCase()})</strong></div>
+        <div style="color:#818cf8; font-weight:bold;">${e.totalNet} Net</div>
+      </div>
+    `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Deneme yok.</p>';
+  }
 
   renderChart();
 }
