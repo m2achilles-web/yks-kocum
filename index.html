@@ -5,41 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YKS Koçluk Uygulaması</title>
   <link rel="stylesheet" href="style.css">
-  
-  <!-- Supabase & Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Kütüphaneler -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <!-- AUTH EKRANI (Giriş / Kayıt) -->
+  <!-- AUTH EKRANI -->
   <div id="authOverlay" class="auth-modal">
     <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
       
-      <!-- Tab Geçiş Butonları -->
+      <!-- Tab Butonları -->
       <div class="tab-group" style="margin-bottom: 20px;">
-        <button id="tabLoginBtn" class="tab-btn active" onclick="switchAuthTab('login')">Giriş Yap</button>
-        <button id="tabRegisterBtn" class="tab-btn" onclick="switchAuthTab('register')">Kayıt Ol</button>
+        <button type="button" id="tabLoginBtn" class="tab-btn active" onclick="switchAuthTab('login')">Giriş Yap</button>
+        <button type="button" id="tabRegisterBtn" class="tab-btn" onclick="switchAuthTab('register')">Kayıt Ol</button>
       </div>
 
-      <!-- Ortak / Giriş Alanları -->
-      <input type="email" id="authEmail" placeholder="E-posta Adresi">
-      <input type="password" id="authPassword" placeholder="Şifre">
-      
-      <!-- Sadece Kayıt Olurken Açılan Alanlar -->
-      <div id="registerExtraFields" class="hidden">
-        <input type="text" id="authName" placeholder="Adınız Soyadınız">
-        <select id="authRole">
-          <option value="student">Öğrenci</option>
-          <option value="coach">Koç / Admin</option>
-        </select>
+      <!-- Form -->
+      <div id="authForm">
+        <input type="email" id="authEmail" placeholder="E-posta Adresi" required>
+        <input type="password" id="authPassword" placeholder="Şifre" required>
+        
+        <div id="registerExtraFields" class="hidden">
+          <input type="text" id="authName" placeholder="Adınız Soyadınız">
+          <select id="authRole">
+            <option value="student">Öğrenci</option>
+            <option value="coach">Koç / Admin</option>
+          </select>
+        </div>
+
+        <button type="button" id="authPrimaryBtn" class="btn-primary" onclick="handleAuth()">Giriş Yap</button>
       </div>
 
-      <button id="authPrimaryBtn" class="btn-primary" onclick="handleAuth()">Giriş Yap</button>
     </div>
   </div>
 
-  <!-- ANA UYGULAMA CONTAINER -->
+  <!-- ANA UYGULAMA -->
   <div id="appContainer" class="app-container hidden">
     <div class="topbar">
       <div class="topbar-left">
@@ -125,7 +127,6 @@
         <div id="assignmentList"></div>
       </div>
 
-      <!-- Sadece Koç Görebilir -->
       <div id="adminPanelCard" class="card hidden">
         <div class="card-title">Öğrenciye Ödev At (Koç Paneli)</div>
         <select id="selectStudentForAssignment">
@@ -144,7 +145,6 @@
 
     <!-- 5. DAHA FAZLA -->
     <div id="page-more" class="page hidden">
-      <!-- Kronometre -->
       <div class="card" style="text-align: center;">
         <div class="card-title" style="justify-content: center;">Çalışma Kronometresi</div>
         <div id="timerDisplay" style="font-size: 44px; font-weight: 900; margin: 12px 0; font-family: monospace;">00:00:00</div>
@@ -155,7 +155,6 @@
         </div>
       </div>
 
-      <!-- Öğrenci Hedef Girme -->
       <div id="studentTargetCard" class="card">
         <div class="card-title">Hedeflerimi Belirle</div>
         <input type="text" id="targetDepartmentInput" placeholder="Hedef Bölüm (Örn: İTÜ Bilgisayar Müh.)">
@@ -163,7 +162,6 @@
         <button class="btn-primary" onclick="saveTarget()">Hedefleri Kaydet</button>
       </div>
 
-      <!-- SADECE KOÇUN GÖREBİLECEĞİ İLERLEME PANELİ -->
       <div id="coachAnalyticsCard" class="card hidden">
         <div class="card-title">Öğrenci İlerleme Takibi (Sadece Koç)</div>
         <select id="coachStudentSelect" onchange="loadStudentProgress(this.value)">
