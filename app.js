@@ -1,5 +1,5 @@
 // Supabase İstemci Yapılandırması (Kendi URL ve Anon Key bilgilerini buraya eklediğinden emin ol)
-const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/';
+const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/';
 const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
