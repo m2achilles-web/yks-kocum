@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderExamInputs();
   renderAll();
 
-  // Supabase'den öğrencileri çek
+  // Supabase'den gerçek öğrencileri çek
   await fetchStudentsFromSupabase();
 
   if (appState.timer.isRunning) {
@@ -83,13 +83,13 @@ function switchPage(pageId, btnElement) {
   if (pageId === 'exams') renderChart();
 }
 
-// SUPABASE'DEN ÖĞRENCİLERİ ÇEK
+// SUPABASE'DEN GERÇEK ÖĞRENCİLERİ ÇEK
 async function fetchStudentsFromSupabase() {
   const select = document.getElementById('coachStudentSelect');
 
   if (!_supabase) {
-    console.warn("Supabase bilgileri girilmediği için yerel örnek veriler kullanılıyor.");
-    loadFallbackStudents();
+    console.warn("Supabase bilgileri girilmedi.");
+    if (select) select.innerHTML = `<option value="">Supabase Bağlantısı Yok</option>`;
     return;
   }
 
@@ -98,7 +98,7 @@ async function fetchStudentsFromSupabase() {
     
     if (error) {
       console.error("Supabase Veri Çekme Hatası:", error);
-      loadFallbackStudents();
+      if (select) select.innerHTML = `<option value="">Veri Çekilemedi</option>`;
       return;
     }
 
@@ -106,25 +106,23 @@ async function fetchStudentsFromSupabase() {
       studentsList = data;
       populateStudentDropdown();
     } else {
-      loadFallbackStudents();
+      studentsList = [];
+      if (select) select.innerHTML = `<option value="">Kayıtlı öğrenci bulunamadı</option>`;
     }
   } catch (err) {
     console.error("Bağlantı Hatası:", err);
-    loadFallbackStudents();
+    if (select) select.innerHTML = `<option value="">Bağlantı Kurulamadı</option>`;
   }
-}
-
-function loadFallbackStudents() {
-  studentsList = [
-    { id: 1, full_name: "Ahmet Yılmaz (Örnek)", field: "Sayısal", target_uni: "Boğaziçi", target_dept: "Bilgisayar", target_rank: 1500 },
-    { id: 2, full_name: "Zeynep Demir (Örnek)", field: "Eşit Ağırlık", target_uni: "Galatasaray", target_dept: "Hukuk", target_rank: 3000 }
-  ];
-  populateStudentDropdown();
 }
 
 function populateStudentDropdown() {
   const select = document.getElementById('coachStudentSelect');
   if (!select) return;
+
+  if (studentsList.length === 0) {
+    select.innerHTML = `<option value="">Kayıtlı öğrenci bulunamadı</option>`;
+    return;
+  }
 
   select.innerHTML = `<option value="">-- Bir Öğrenci Seçin --</option>` + studentsList.map(s => {
     const name = s.full_name || s.name || ('Öğrenci #' + s.id);
