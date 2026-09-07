@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YKS Koçluk Uygulaması</title>
+  <title>YKS Kocum </title>
   <link rel="stylesheet" href="./style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -99,7 +99,11 @@
           <button class="tab-btn" onclick="switchExamTab('ayt', this)">AYT</button>
           <button class="tab-btn" onclick="switchExamTab('ydt', this)">YDT</button>
         </div>
-        <div style="height: 180px;"><canvas id="netChart"></canvas></div>
+        
+        <!-- Grafiğin Tıklanması İçin Z-Index ve Kapsayıcı Düzeltmesi Yapıldı -->
+        <div style="position: relative; height: 220px; width: 100%; z-index: 10;">
+          <canvas id="netChart"></canvas>
+        </div>
       </div>
 
       <div class="card">
@@ -177,12 +181,12 @@
         <button class="btn-primary" onclick="saveProfile()">Bilgileri Kaydet</button>
       </div>
 
-      <!-- KOÇ PANELİ (GÜNCELLENDİ) -->
+      <!-- KOÇ PANELİ -->
       <div class="card" style="border: 1px solid #818cf8;">
         <div class="card-title" style="color: #818cf8;">👨‍🏫 Koç Paneli (Öğrenci İnceleme)</div>
         <label style="font-size: 11px; color: var(--text-muted);">İncelenecek Öğrenciyi Seçin:</label>
         <select id="coachStudentSelect" onchange="renderCoachPanel()">
-          <!-- Dinamik öğrenci listesi eklenecek -->
+          <!-- Dinamik öğrenci listesi gelecek -->
         </select>
         <div id="coachOverview" style="margin-top: 10px;"></div>
       </div>
