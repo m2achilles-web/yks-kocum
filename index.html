@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YKS Koçluk Uygulaması</title>
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Supabase & Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -13,22 +15,27 @@
   <!-- AUTH EKRANI (Giriş / Kayıt) -->
   <div id="authOverlay" class="auth-modal">
     <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
-      <h2 id="authTitle" style="margin-top:0;">Giriş Yap</h2>
+      
+      <!-- Tab Geçiş Butonları -->
+      <div class="tab-group" style="margin-bottom: 20px;">
+        <button id="tabLoginBtn" class="tab-btn active" onclick="switchAuthTab('login')">Giriş Yap</button>
+        <button id="tabRegisterBtn" class="tab-btn" onclick="switchAuthTab('register')">Kayıt Ol</button>
+      </div>
+
+      <!-- Ortak / Giriş Alanları -->
       <input type="email" id="authEmail" placeholder="E-posta Adresi">
       <input type="password" id="authPassword" placeholder="Şifre">
       
-      <div id="roleSelectGroup" class="hidden">
+      <!-- Sadece Kayıt Olurken Açılan Alanlar -->
+      <div id="registerExtraFields" class="hidden">
+        <input type="text" id="authName" placeholder="Adınız Soyadınız">
         <select id="authRole">
           <option value="student">Öğrenci</option>
           <option value="coach">Koç / Admin</option>
         </select>
-        <input type="text" id="authName" placeholder="Adınız Soyadınız">
       </div>
 
       <button id="authPrimaryBtn" class="btn-primary" onclick="handleAuth()">Giriş Yap</button>
-      <p style="font-size: 13px; color: var(--muted); margin-top: 15px; cursor: pointer;" onclick="toggleAuthMode()" id="authToggleText">
-        Hesabın yok mu? **Kayıt Ol**
-      </p>
     </div>
   </div>
 
@@ -111,7 +118,7 @@
       </div>
     </div>
 
-    <!-- 4. KOÇUM (ÖDEVLER) -->
+    <!-- 4. KOÇUM -->
     <div id="page-koc" class="page hidden">
       <div class="card">
         <div class="card-title">Gelen Ödevler</div>
