@@ -1,5 +1,4 @@
 // SUPABASE BAĞLANTI AYARLARI
-// Buraya kendi Supabase Proje URL ve ANON KEY değerlerini yapıştır kanka:
 const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/';
 const SUPABASE_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
@@ -37,7 +36,7 @@ const LESSON_DATA = {
   }
 };
 
-// DİNAMİK ÖĞRENCİ LİSTESİ (Örnek isimler kaldırıldı, Supabase'den çekilecek)
+// DİNAMİK ÖĞRENCİ LİSTESİ
 let studentsList = [];
 
 // GLOBAL STATE
@@ -61,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderExamInputs();
   renderAll();
   
-  // Supabase'den öğrencileri çek
+  // Supabase'den öğrencileri çek (profiles tablosundan)
   await fetchStudentsFromSupabase();
 
   if (appState.timer.isRunning) {
@@ -69,28 +68,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// SUPABASE'DEN ÖĞRENCİ ÇEKME
+// SUPABASE'DEN ÖĞRENCİ ÇEKME (profiles Tablosu Güncellendi)
 async function fetchStudentsFromSupabase() {
+  const select = document.getElementById('coachStudentSelect');
+
   if (!_supabase) {
-    console.warn("Supabase bağlantısı henüz kurulmadı. URL ve Key bilgilerini girin.");
+    console.warn("Supabase URL ve KEY bilgileri eksik!");
+    if (select) select.innerHTML = `<option value="">Supabase Bilgileri Eksik</option>`;
     return;
   }
 
   try {
-    // Supabase üzerindeki 'students' veya 'profiles' tablonuzdan çekebilirsiniz
-    const { data, error } = await _supabase.from('students').select('*');
+    // Tablo adı 'profiles' olarak güncellendi:
+    const { data, error } = await _supabase.from('profiles').select('*');
     
     if (error) {
-      console.error("Supabase veri çekme hatası:", error.message);
+      console.error("Supabase Hatası:", error);
+      if (select) select.innerHTML = `<option value="">Hata: ${error.message}</option>`;
       return;
     }
 
-    if (data) {
+    if (data && data.length > 0) {
       studentsList = data;
       populateStudentDropdown();
+    } else {
+      if (select) select.innerHTML = `<option value="">profiles Tablosunda Veri Yok</option>`;
     }
   } catch (err) {
-    console.error("Supabase bağlantı hatası:", err);
+    console.error("Bağlantı Hatası:", err);
+    if (select) select.innerHTML = `<option value="">Bağlantı Sağlanamadı</option>`;
   }
 }
 
@@ -104,7 +110,12 @@ function populateStudentDropdown() {
     return;
   }
 
-  select.innerHTML = studentsList.map(s => `<option value="${s.id}">${s.name || s.email || 'Öğrenci'}</option>`).join('');
+  // full_name, name veya email hangisi varsa onu gösterir:
+  select.innerHTML = studentsList.map(s => {
+    const displayName = s.full_name || s.name || s.email || 'Öğrenci #' + s.id;
+    return `<option value="${s.id}">${displayName}</option>`;
+  }).join('');
+
   renderCoachPanel();
 }
 
@@ -279,7 +290,7 @@ function saveProfile() {
   alert('Profil güncellendi!');
 }
 
-// KOÇ PANELİ RENDER (Dinamik Supabase verisine uyumlu)
+// KOÇ PANELİ RENDER
 function renderCoachPanel() {
   const select = document.getElementById('coachStudentSelect');
   if (!select || !select.value) return;
