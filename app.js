@@ -1,10 +1,23 @@
-// Supabase İstemci Yapılandırması (Kendi URL ve Anon Key bilgilerini buraya eklediğinden emin ol)
-const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/';
+// Supabase İstemci Yapılandırması (Kendi URL ve Anon Key bilgilerini eklediğinden emin ol)
+const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/';
 const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
-const supabase = window.supabase.createClient(https://wcjusyzrlnnbtwyjypnm.supabase.co/, sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi);
+// Supabase kütüphanesinin yüklenip yüklenmediğini kontrol edelim
+if (!window.supabase) {
+    console.error('Supabase kütüphanesi yüklenemedi! HTML dosyanda Supabase CDN script linkinin olduğundan emin ol.');
+}
 
-document.addEventListener('DOMContentLoaded', () => {
+const supabase = window.supabase.createClient(https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/, sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi);
+
+// DOM tamamen yüklendiğinde çalıştır
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+
+function initApp() {
+    console.log('Uygulama başlatılıyor...');
     checkUserSession();
 
     // Giriş Formu Dinleyicisi
@@ -12,8 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+            const emailField = document.getElementById('login-email');
+            const passwordField = document.getElementById('login-password');
+            
+            if (!emailField || !passwordField) return;
+
+            const email = emailField.value;
+            const password = passwordField.value;
 
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             
@@ -23,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 checkUserSession();
             }
         });
+    } else {
+        console.warn('login-form ID li element bulunamadı!');
     }
 
     // Kayıt Formu Dinleyicisi
@@ -30,8 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
+            const emailField = document.getElementById('signup-email');
+            const passwordField = document.getElementById('signup-password');
+
+            if (!emailField || !passwordField) return;
+
+            const email = emailField.value;
+            const password = passwordField.value;
 
             const { data, error } = await supabase.auth.signUp({ 
                 email, 
@@ -47,6 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
             }
         });
+    } else {
+        console.warn('signup-form ID li element bulunamadı!');
     }
 
     // Çıkış Butonu
@@ -57,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.reload();
         });
     }
-});
+}
 
 // Oturum ve Rol Kontrolü Fonksiyonu
 async function checkUserSession() {
@@ -72,11 +99,9 @@ async function checkUserSession() {
         return;
     }
 
-    // Kullanıcı oturum açtıysa arayüzü değiştir
     if (authContainer) authContainer.style.display = 'none';
     if (appContainer) appContainer.style.display = 'block';
 
-    // Profiles tablosundan kullanıcının rolünü çekelim
     const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
@@ -90,7 +115,6 @@ async function checkUserSession() {
 
     const userRole = profile ? profile.role : 'student';
 
-    // Role göre panelleri yönet
     const coachPanel = document.getElementById('coach-panel');
     const studentPanel = document.getElementById('student-panel');
 
@@ -105,14 +129,13 @@ async function checkUserSession() {
     }
 }
 
-// Koç Paneli Verilerini Yükleme (Öğrenci Listesi)
+// Koç Paneli Verilerini Yükleme
 async function loadCoachDashboard() {
     const studentListEl = document.getElementById('student-list');
     if (!studentListEl) return;
 
     studentListEl.innerHTML = '<li>Öğrenciler yükleniyor...</li>';
 
-    // Sadece rolü student olanları çekiyoruz
     const { data: students, error } = await supabase
         .from('profiles')
         .select('*')
