@@ -27,9 +27,31 @@ const LESSON_DATA = {
   }
 };
 
+// DEMO ÖĞRENCİ LİSTESİ (Koç Panelinde Seçilebilecek Öğrenciler)
+let studentsList = [
+  {
+    id: "me",
+    profile: { name: "Ahmet Yılmaz (Siz)", field: "Sayısal", uni: "İTÜ", dept: "Bilgisayar Müh.", rank: "3500" },
+    dailyTime: "04:15:00", weeklyTime: "28:30:00", monthlyTime: "112:00:00",
+    questionsSolved: 1420, examsCount: 8
+  },
+  {
+    id: "std_1",
+    profile: { name: "Zeynep Kaya", field: "Eşit Ağırlık", uni: "Boğaziçi", dept: "Hukuk", rank: "1200" },
+    dailyTime: "05:40:00", weeklyTime: "34:10:00", monthlyTime: "135:40:00",
+    questionsSolved: 2150, examsCount: 12
+  },
+  {
+    id: "std_2",
+    profile: { name: "Mehmet Demir", field: "Sayısal", uni: "ODTÜ", dept: "Makine Müh.", rank: "5000" },
+    dailyTime: "03:10:00", weeklyTime: "21:00:00", monthlyTime: "88:20:00",
+    questionsSolved: 980, examsCount: 5
+  }
+];
+
 // GLOBAL DATA STRUCTURES
 let appState = {
-  profile: { name: "Öğrenci", field: "Sayısal", uni: "", dept: "", rank: "" },
+  profile: { name: "Ahmet Yılmaz (Siz)", field: "Sayısal", uni: "İTÜ", dept: "Bilgisayar Müh.", rank: "3500" },
   timer: { startTime: 0, accumulatedTime: 0, isRunning: false },
   plans: [],
   questions: [],
@@ -48,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderExamInputs();
   renderAll();
   
-  // Kronometre durumu kontrolü (Sayfa yenilense de arka planda devam eder)
   if (appState.timer.isRunning) {
     runTimerLoop();
   }
@@ -64,7 +85,7 @@ function switchPage(pageId, btnElement) {
   if (btnElement) btnElement.classList.add('active');
 }
 
-// 1. DERS YARDIMCILARI
+// DERS YARDIMCILARI
 function updatePlanLessons() {
   const type = document.getElementById('planExamType').value;
   const select = document.getElementById('planLessonSelect');
@@ -92,7 +113,7 @@ function updateWrongLessons() {
   select.innerHTML = Object.keys(LESSON_DATA[type]).map(l => `<option value="${l}">${l}</option>`).join('');
 }
 
-// 2. PLAN EKLEME
+// PLAN EKLEME
 function addPlan() {
   const lesson = document.getElementById('planLessonSelect').value;
   const hours = parseFloat(document.getElementById('planHoursInput').value);
@@ -109,7 +130,7 @@ function togglePlan(id) {
   saveAndRender();
 }
 
-// 3. SORU EKLEME
+// SORU EKLEME
 function addQuestionRecord() {
   const type = document.getElementById('soruExamType').value;
   const lesson = document.getElementById('soruLessonSelect').value;
@@ -127,7 +148,7 @@ function addQuestionRecord() {
   document.getElementById('soruBos').value = '';
 }
 
-// 4. DENEME DERS DERS DOLDURMA
+// DENEME DERS DERS DOLDURMA
 function renderExamInputs() {
   const cat = document.getElementById('examCategory').value;
   const container = document.getElementById('examLessonInputs');
@@ -162,7 +183,7 @@ function addExam() {
   renderExamInputs();
 }
 
-// 5. KRONOMETRE (Arka Planda/Telefon Kapansa da Kesintisiz Çalışır)
+// KRONOMETRE
 function startTimer() {
   if (appState.timer.isRunning) return;
   appState.timer.isRunning = true;
@@ -213,24 +234,69 @@ function runTimerLoop() {
   }, 1000);
 }
 
-// 6. PROFİL KAYIT
+// PROFİL KAYIT
 function saveProfile() {
   appState.profile.name = document.getElementById('profileName').value || "Öğrenci";
   appState.profile.field = document.getElementById('profileField').value;
   appState.profile.uni = document.getElementById('targetUni').value;
   appState.profile.dept = document.getElementById('targetDept').value;
   appState.profile.rank = document.getElementById('targetRank').value;
+  
+  // Demo listede kendi ismimizi güncelleyelim
+  studentsList[0].profile = { ...appState.profile };
+
   saveAndRender();
   alert('Profil güncellendi!');
 }
 
+// KOÇ PANELİ RENDER (ÖĞRENCİ SEÇİM SİSTEMİ)
+function renderCoachPanel() {
+  const select = document.getElementById('coachStudentSelect');
+  
+  // Seçenekleri doldur (Eğer boşsa)
+  if (select.children.length === 0) {
+    select.innerHTML = studentsList.map(s => `<option value="${s.id}">${s.profile.name}</option>`).join('');
+  }
+
+  const selectedId = select.value || "me";
+  const selectedStudent = studentsList.find(s => s.id === selectedId) || studentsList[0];
+
+  // Aktif kullanıcının gerçek anlık verilerini "Ben" seçildiğinde güncelle
+  if (selectedId === "me") {
+    const totalMs = getCalculatedTotalMs();
+    const hrs = Math.floor(totalMs / (1000 * 60 * 60));
+    const mins = Math.floor((totalMs / (1000 * 60)) % 60);
+    
+    selectedStudent.dailyTime = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:00`;
+    selectedStudent.questionsSolved = appState.questions.reduce((acc, q) => acc + q.d + q.y + q.b, 0);
+    selectedStudent.examsCount = appState.exams.length;
+  }
+
+  document.getElementById('coachOverview').innerHTML = `
+    <div class="list-item"><span>Alan / Sıralama:</span> <strong>${selectedStudent.profile.field} / ${selectedStudent.profile.rank || '-'} Top</strong></div>
+    <div class="list-item"><span>Hedef:</span> <strong>${selectedStudent.profile.uni} ${selectedStudent.profile.dept}</strong></div>
+    <div style="margin: 8px 0; font-weight:bold; font-size:12px; color:#818cf8;"> Çalışma Süreleri:</div>
+    <div class="grid-3" style="margin-bottom:8px;">
+      <div style="background:#0f172a; padding:6px; text-align:center; border-radius:6px; font-size:11px;">
+        <span style="color:var(--text-muted);">Günlük</span><br><strong>${selectedStudent.dailyTime}</strong>
+      </div>
+      <div style="background:#0f172a; padding:6px; text-align:center; border-radius:6px; font-size:11px;">
+        <span style="color:var(--text-muted);">Haftalık</span><br><strong>${selectedStudent.weeklyTime}</strong>
+      </div>
+      <div style="background:#0f172a; padding:6px; text-align:center; border-radius:6px; font-size:11px;">
+        <span style="color:var(--text-muted);">Aylık</span><br><strong>${selectedStudent.monthlyTime}</strong>
+      </div>
+    </div>
+    <div class="list-item"><span>Çözülen Soru Sayısı:</span> <strong>${selectedStudent.questionsSolved} Soru</strong></div>
+    <div class="list-item"><span>Girilen Deneme Sayısı:</span> <strong>${selectedStudent.examsCount} Deneme</strong></div>
+  `;
+}
+
 // RENDER ALL
 function renderAll() {
-  // Topbar
   document.getElementById('topbarUsername').innerText = appState.profile.name;
   document.getElementById('topbarTargetInfo').innerText = appState.profile.dept ? `${appState.profile.uni} ${appState.profile.dept}` : "Hedef Belirtilmedi";
 
-  // Profil Ekranı Girişleri
   document.getElementById('profileName').value = appState.profile.name;
   document.getElementById('profileField').value = appState.profile.field;
   document.getElementById('targetUni').value = appState.profile.uni;
@@ -275,14 +341,8 @@ function renderAll() {
     </div>
   `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Deneme kaydı bulunmuyor.</p>';
 
-  // Koç Paneli
-  const totalQuestions = appState.questions.reduce((acc, q) => acc + q.d + q.y + q.b, 0);
-  document.getElementById('coachOverview').innerHTML = `
-    <div class="list-item"><span>Öğrenci:</span> <strong>${appState.profile.name} (${appState.profile.field})</strong></div>
-    <div class="list-item"><span>Hedef Sıralama:</span> <strong>${appState.profile.rank || '-'}</strong></div>
-    <div class="list-item"><span>Çözülen Soru Sayısı:</span> <strong>${totalQuestions} Soru</strong></div>
-    <div class="list-item"><span>Girilen Deneme:</span> <strong>${appState.exams.length} Deneme</strong></div>
-  `;
+  // Koç Paneli Render Et
+  renderCoachPanel();
 
   // Kronometre Güncelle
   const totalMs = getCalculatedTotalMs();
@@ -318,7 +378,7 @@ function renderChart() {
 function uploadWrongQuestion() { alert('Yanlış soru görseli yüklendi!'); }
 function switchExamTab() { renderChart(); }
 
-// LOCAL STORAGE INTEGRATION
+// LOCAL STORAGE
 function saveToLocalStorage() {
   localStorage.setItem('yks_app_state', JSON.stringify(appState));
 }
