@@ -1,7 +1,7 @@
 // ==========================================
 // SUPABASE BAĞLANTI AYARLARI
 // ==========================================
-const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/'; // Supabase Proje URL'niz
+const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/'; // Supabase Proje URL'niz
 const SUPABASE_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';             // Supabase Anon Public Key'iniz
 
 const _supabase = (typeof supabase !== 'undefined' && SUPABASE_URL.includes('supabase.co')) 
@@ -48,7 +48,7 @@ let appState = {
 };
 
 let timerInterval = null;
-letnetChart = null;
+let netChart = null;
 
 // INIT
 document.addEventListener('DOMContentLoaded', async () => {
@@ -56,9 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   updatePlanLessons();
   updateSoruLessons();
   renderExamInputs();
-  
+
   if (_supabase) {
-    // Oturum açık mı kontrol et
     const { data: { session } } = await _supabase.auth.getSession();
     if (session) {
       currentUser = session.user;
@@ -67,6 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       showAuthScreen();
     }
   } else {
+    console.warn("Supabase bağlantısı kurulamadı.");
     showAuthScreen();
   }
 
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// EKRAN GEÇİŞLERİ (Giriş / Uygulama)
+// EKRAN GEÇİŞLERİ
 function showAuthScreen() {
   const authDiv = document.getElementById('auth-container');
   const appDiv = document.getElementById('app-container');
@@ -97,10 +97,9 @@ function showAppScreen() {
 // KİMLİK DOĞRULAMA (AUTH) FONKSİYONLARI
 // ==========================================
 
-// 1. KAYIT OL (Mail Doğrulamalı)
 async function handleSignUp() {
-  const email = document.getElementById('authEmail').value;
-  const password = document.getElementById('authPassword').value;
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value.trim();
   const infoMsg = document.getElementById('authInfoMsg');
 
   if (!email || !password) {
@@ -124,10 +123,9 @@ async function handleSignUp() {
   }
 }
 
-// 2. GİRİŞ YAP
 async function handleSignIn() {
-  const email = document.getElementById('authEmail').value;
-  const password = document.getElementById('authPassword').value;
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value.trim();
 
   if (!email || !password) {
     alert('Lütfen e-posta ve şifre girin.');
@@ -148,9 +146,8 @@ async function handleSignIn() {
   showAppScreen();
 }
 
-// 3. TEKRAR DOĞRULAMA MAİLİ GÖNDER
 async function handleResendVerification() {
-  const email = document.getElementById('authEmail').value;
+  const email = document.getElementById('authEmail').value.trim();
   const infoMsg = document.getElementById('authInfoMsg');
 
   if (!email) {
@@ -169,12 +166,11 @@ async function handleResendVerification() {
   }
 
   if (infoMsg) {
-    infoMsg.innerHTML = `Doğrulama maili <strong>${email}</strong> adresine tekrar gönderildi. Lütfen kontrol edin.`;
+    infoMsg.innerHTML = `Doğrulama maili <strong>${email}</strong> adresine tekrar gönderildi.`;
     infoMsg.style.color = '#818cf8';
   }
 }
 
-// ÇIKIŞ YAP
 async function handleSignOut() {
   if (_supabase) await _supabase.auth.signOut();
   currentUser = null;
@@ -182,7 +178,7 @@ async function handleSignOut() {
 }
 
 // ==========================================
-// SAYFA GEÇİŞİ VE SUPABASE VERİ ÇEKME
+// SAYFA VE VERİ YÖNETİMİ
 // ==========================================
 function switchPage(pageId, btnElement) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
@@ -190,9 +186,6 @@ function switchPage(pageId, btnElement) {
   const targetPage = document.getElementById(`page-${pageId}`);
   if (targetPage) {
     targetPage.classList.remove('hidden');
-  } else {
-    console.error(`Hata: 'page-${pageId}' ID'li sayfa bulunamadı.`);
-    return;
   }
 
   document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
@@ -208,7 +201,6 @@ async function fetchStudentsFromSupabase() {
   try {
     const { data, error } = await _supabase.from('profiles').select('*');
     if (error) {
-      console.error("Supabase Veri Çekme Hatası:", error);
       if (select) select.innerHTML = `<option value="">Veri Çekilemedi</option>`;
       return;
     }
@@ -260,7 +252,6 @@ function renderCoachPanel() {
   `;
 }
 
-// HELPER DERS DOLDURMALARI
 function updatePlanLessons() {
   const type = document.getElementById('planExamType').value;
   const select = document.getElementById('planLessonSelect');
@@ -303,7 +294,6 @@ function renderExamInputs() {
   `).join('');
 }
 
-// PLAN VE SORU EKLEME
 function addPlan() {
   const lesson = document.getElementById('planLessonSelect').value;
   const hours = parseFloat(document.getElementById('planHoursInput').value);
@@ -354,7 +344,6 @@ function addExam() {
   document.getElementById('examTitle').value = '';
 }
 
-// KRONOMETRE
 function startTimer() {
   if (appState.timer.isRunning) return;
   appState.timer.isRunning = true;
@@ -414,7 +403,6 @@ function renderAll() {
   document.getElementById('targetDept').value = appState.profile.dept;
   document.getElementById('targetRank').value = appState.profile.rank;
 
-  // Planlar
   const total = appState.plans.length;
   const completed = appState.plans.filter(p => p.completed).length;
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -435,7 +423,6 @@ function renderAll() {
   if(document.getElementById('planList')) document.getElementById('planList').innerHTML = planHtml;
   if(document.getElementById('homeTaskList')) document.getElementById('homeTaskList').innerHTML = planHtml;
 
-  // Soru Geçmişi
   if(document.getElementById('questionHistoryList')) {
     document.getElementById('questionHistoryList').innerHTML = appState.questions.slice(-5).reverse().map(q => `
       <div class="list-item">
@@ -445,7 +432,6 @@ function renderAll() {
     `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Kayıt yok.</p>';
   }
 
-  // Deneme Geçmişi
   if(document.getElementById('examHistoryList')) {
     document.getElementById('examHistoryList').innerHTML = appState.exams.slice(-5).reverse().map(e => `
       <div class="list-item">
