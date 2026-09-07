@@ -1,7 +1,7 @@
 // SUPABASE BAĞLANTI AYARLARI
 // Buraya kendi Supabase Proje URL ve ANON KEY değerlerini yapıştır kanka:
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/';
+const SUPABASE_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
 // Supabase İstemcisi
 const _supabase = (typeof supabase !== 'undefined' && SUPABASE_URL !== 'YOUR_SUPABASE_URL') 
