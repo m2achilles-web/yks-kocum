@@ -1,7 +1,7 @@
 // 1. SUPABASE BAĞLANTISI
 // (Kendi SUPABASE_URL ve SUPABASE_ANON_KEY bilgilerini yapıştır)
-const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/';
+const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
 let supabase;
 try {
