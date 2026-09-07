@@ -148,7 +148,7 @@ function addQuestionRecord() {
   document.getElementById('soruBos').value = '';
 }
 
-// DENEME DERS DERS DOLDURMA
+// DENEME DERS DOLDURMA
 function renderExamInputs() {
   const cat = document.getElementById('examCategory').value;
   const container = document.getElementById('examLessonInputs');
@@ -242,7 +242,6 @@ function saveProfile() {
   appState.profile.dept = document.getElementById('targetDept').value;
   appState.profile.rank = document.getElementById('targetRank').value;
   
-  // Demo listede kendi ismimizi güncelleyelim
   studentsList[0].profile = { ...appState.profile };
 
   saveAndRender();
@@ -252,8 +251,8 @@ function saveProfile() {
 // KOÇ PANELİ RENDER (ÖĞRENCİ SEÇİM SİSTEMİ)
 function renderCoachPanel() {
   const select = document.getElementById('coachStudentSelect');
-  
-  // Seçenekleri doldur (Eğer boşsa)
+  if (!select) return;
+
   if (select.children.length === 0) {
     select.innerHTML = studentsList.map(s => `<option value="${s.id}">${s.profile.name}</option>`).join('');
   }
@@ -261,7 +260,6 @@ function renderCoachPanel() {
   const selectedId = select.value || "me";
   const selectedStudent = studentsList.find(s => s.id === selectedId) || studentsList[0];
 
-  // Aktif kullanıcının gerçek anlık verilerini "Ben" seçildiğinde güncelle
   if (selectedId === "me") {
     const totalMs = getCalculatedTotalMs();
     const hrs = Math.floor(totalMs / (1000 * 60 * 60));
@@ -275,7 +273,7 @@ function renderCoachPanel() {
   document.getElementById('coachOverview').innerHTML = `
     <div class="list-item"><span>Alan / Sıralama:</span> <strong>${selectedStudent.profile.field} / ${selectedStudent.profile.rank || '-'} Top</strong></div>
     <div class="list-item"><span>Hedef:</span> <strong>${selectedStudent.profile.uni} ${selectedStudent.profile.dept}</strong></div>
-    <div style="margin: 8px 0; font-weight:bold; font-size:12px; color:#818cf8;"> Çalışma Süreleri:</div>
+    <div style="margin: 8px 0; font-weight:bold; font-size:12px; color:#818cf8;">Çalışma Süreleri:</div>
     <div class="grid-3" style="margin-bottom:8px;">
       <div style="background:#0f172a; padding:6px; text-align:center; border-radius:6px; font-size:11px;">
         <span style="color:var(--text-muted);">Günlük</span><br><strong>${selectedStudent.dailyTime}</strong>
@@ -341,7 +339,6 @@ function renderAll() {
     </div>
   `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Deneme kaydı bulunmuyor.</p>';
 
-  // Koç Paneli Render Et
   renderCoachPanel();
 
   // Kronometre Güncelle
@@ -356,6 +353,7 @@ function renderAll() {
   renderChart();
 }
 
+// GRAFİK RENDER (Tıkanmama & Tıklama Düzeltmesi Yapıldı)
 function renderChart() {
   const ctx = document.getElementById('netChart');
   if (!ctx) return;
@@ -369,9 +367,45 @@ function renderChart() {
     type: 'line',
     data: {
       labels: labels.length ? labels : ['Örnek 1', 'Örnek 2'],
-      datasets: [{ label: 'Toplam Net', data: data.length ? data : [0, 0], borderColor: '#4f46e5', tension: 0.3 }]
+      datasets: [{ 
+        label: 'Toplam Net', 
+        data: data.length ? data : [0, 0], 
+        borderColor: '#4f46e5', 
+        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+        borderWidth: 3,
+        pointRadius: 6,
+        pointHoverRadius: 9,
+        pointBackgroundColor: '#818cf8',
+        tension: 0.3 
+      }]
     },
-    options: { responsive: true, maintainAspectRatio: false }
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'nearest',
+        intersect: false
+      },
+      plugins: {
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: function(context) {
+              return ` Net: ${context.raw}`;
+            }
+          }
+        }
+      },
+      onClick: (e, activeElements) => {
+        if (activeElements.length > 0) {
+          const index = activeElements[0].index;
+          const selectedExam = appState.exams[index];
+          if (selectedExam) {
+            alert(`📌 ${selectedExam.title}\nToplam Net: ${selectedExam.totalNet}\nTarih: ${selectedExam.date}`);
+          }
+        }
+      }
+    }
   });
 }
 
