@@ -27,7 +27,7 @@ const LESSON_DATA = {
   }
 };
 
-// DEMO ÖĞRENCİ LİSTESİ (Koç Panelinde Seçilebilecek Öğrenciler)
+// DEMO ÖĞRENCİ LİSTESİ
 let studentsList = [
   {
     id: "me",
@@ -248,7 +248,7 @@ function saveProfile() {
   alert('Profil güncellendi!');
 }
 
-// KOÇ PANELİ RENDER (ÖĞRENCİ SEÇİM SİSTEMİ)
+// KOÇ PANELİ RENDER
 function renderCoachPanel() {
   const select = document.getElementById('coachStudentSelect');
   if (!select) return;
@@ -353,12 +353,14 @@ function renderAll() {
   renderChart();
 }
 
-// GRAFİK RENDER (Tıkanmama & Tıklama Düzeltmesi Yapıldı)
+// GRAFİK RENDER (DOĞRUDAN CANVAS EVENT LISTENER İLE KESİN ÇÖZÜM)
 function renderChart() {
   const ctx = document.getElementById('netChart');
   if (!ctx) return;
   
-  if (netChart) netChart.destroy();
+  if (netChart) {
+    netChart.destroy();
+  }
 
   const labels = appState.exams.map(e => e.title);
   const data = appState.exams.map(e => e.totalNet);
@@ -373,8 +375,9 @@ function renderChart() {
         borderColor: '#4f46e5', 
         backgroundColor: 'rgba(79, 70, 229, 0.2)',
         borderWidth: 3,
-        pointRadius: 6,
-        pointHoverRadius: 9,
+        pointRadius: 8,              // Noktayı belirginleştirdik
+        pointHoverRadius: 12,        // Üstüne gelince kocaman olsun
+        pointHitRadius: 20,         // Tıklama alanını (hitbox) genislettik
         pointBackgroundColor: '#818cf8',
         tension: 0.3 
       }]
@@ -382,31 +385,30 @@ function renderChart() {
     options: { 
       responsive: true, 
       maintainAspectRatio: false,
-      interaction: {
-        mode: 'nearest',
-        intersect: false
-      },
+      events: ['click', 'mousemove'], // Grafik olaylarını zorunlu kılıyoruz
       plugins: {
-        tooltip: {
-          enabled: true,
-          callbacks: {
-            label: function(context) {
-              return ` Net: ${context.raw}`;
-            }
-          }
-        }
-      },
-      onClick: (e, activeElements) => {
-        if (activeElements.length > 0) {
-          const index = activeElements[0].index;
-          const selectedExam = appState.exams[index];
-          if (selectedExam) {
-            alert(`📌 ${selectedExam.title}\nToplam Net: ${selectedExam.totalNet}\nTarih: ${selectedExam.date}`);
-          }
-        }
+        legend: { display: false }
       }
     }
   });
+
+  // Tıklamayı Canvas'ın kendisine bağlayıp Chart.js ile eşleştiriyoruz:
+  ctx.onclick = (e) => {
+    const points = netChart.getElementsAtEventForMode(e, 'nearest', { intersect: false }, true);
+    if (points.length) {
+      const firstPoint = points[0];
+      const index = firstPoint.index;
+      const selectedExam = appState.exams[index];
+
+      if (selectedExam) {
+        let details = Object.entries(selectedExam.lessonNets)
+          .map(([ders, net]) => `• ${ders}: ${net} Net`)
+          .join('\n');
+
+        alert(`📌 ${selectedExam.title}\n🗓 Tarih: ${selectedExam.date}\n💯 Toplam Net: ${selectedExam.totalNet}\n\nDers Detayları:\n${details}`);
+      }
+    }
+  };
 }
 
 function uploadWrongQuestion() { alert('Yanlış soru görseli yüklendi!'); }
