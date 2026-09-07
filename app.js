@@ -1,3 +1,13 @@
+// SUPABASE BAĞLANTI AYARLARI
+// Buraya kendi Supabase Proje URL ve ANON KEY değerlerini yapıştır kanka:
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+// Supabase İstemcisi
+const _supabase = (typeof supabase !== 'undefined' && SUPABASE_URL !== 'YOUR_SUPABASE_URL') 
+  ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
+  : null;
+
 // DERS KÜTÜPHANESİ
 const LESSON_DATA = {
   tyt: {
@@ -27,31 +37,12 @@ const LESSON_DATA = {
   }
 };
 
-// DEMO ÖĞRENCİ LİSTESİ (Koç Paneli Seçenekleri)
-let studentsList = [
-  {
-    id: "me",
-    profile: { name: "Ahmet Yılmaz (Siz)", field: "Sayısal", uni: "İTÜ", dept: "Bilgisayar Müh.", rank: "3500" },
-    dailyTime: "04:15:00", weeklyTime: "28:30:00", monthlyTime: "112:00:00",
-    questionsSolved: 1420, examsCount: 8
-  },
-  {
-    id: "std_1",
-    profile: { name: "Zeynep Kaya", field: "Eşit Ağırlık", uni: "Boğaziçi", dept: "Hukuk", rank: "1200" },
-    dailyTime: "05:40:00", weeklyTime: "34:10:00", monthlyTime: "135:40:00",
-    questionsSolved: 2150, examsCount: 12
-  },
-  {
-    id: "std_2",
-    profile: { name: "Mehmet Demir", field: "Sayısal", uni: "ODTÜ", dept: "Makine Müh.", rank: "5000" },
-    dailyTime: "03:10:00", weeklyTime: "21:00:00", monthlyTime: "88:20:00",
-    questionsSolved: 980, examsCount: 5
-  }
-];
+// DİNAMİK ÖĞRENCİ LİSTESİ (Örnek isimler kaldırıldı, Supabase'den çekilecek)
+let studentsList = [];
 
 // GLOBAL STATE
 let appState = {
-  profile: { name: "Ahmet Yılmaz (Siz)", field: "Sayısal", uni: "İTÜ", dept: "Bilgisayar Müh.", rank: "3500" },
+  profile: { name: "Öğrenci", field: "Sayısal", uni: "", dept: "", rank: "" },
   timer: { startTime: 0, accumulatedTime: 0, isRunning: false },
   plans: [],
   questions: [],
@@ -62,7 +53,7 @@ let timerInterval = null;
 let netChart = null;
 
 // INIT
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   loadFromLocalStorage();
   updatePlanLessons();
   updateSoruLessons();
@@ -70,10 +61,52 @@ document.addEventListener('DOMContentLoaded', () => {
   renderExamInputs();
   renderAll();
   
+  // Supabase'den öğrencileri çek
+  await fetchStudentsFromSupabase();
+
   if (appState.timer.isRunning) {
     runTimerLoop();
   }
 });
+
+// SUPABASE'DEN ÖĞRENCİ ÇEKME
+async function fetchStudentsFromSupabase() {
+  if (!_supabase) {
+    console.warn("Supabase bağlantısı henüz kurulmadı. URL ve Key bilgilerini girin.");
+    return;
+  }
+
+  try {
+    // Supabase üzerindeki 'students' veya 'profiles' tablonuzdan çekebilirsiniz
+    const { data, error } = await _supabase.from('students').select('*');
+    
+    if (error) {
+      console.error("Supabase veri çekme hatası:", error.message);
+      return;
+    }
+
+    if (data) {
+      studentsList = data;
+      populateStudentDropdown();
+    }
+  } catch (err) {
+    console.error("Supabase bağlantı hatası:", err);
+  }
+}
+
+function populateStudentDropdown() {
+  const select = document.getElementById('coachStudentSelect');
+  if (!select) return;
+
+  if (studentsList.length === 0) {
+    select.innerHTML = `<option value="">Kayıtlı öğrenci bulunamadı</option>`;
+    document.getElementById('coachOverview').innerHTML = `<p style="font-size:12px; color:var(--text-muted);">Öğrenci verisi bulunmuyor.</p>`;
+    return;
+  }
+
+  select.innerHTML = studentsList.map(s => `<option value="${s.id}">${s.name || s.email || 'Öğrenci'}</option>`).join('');
+  renderCoachPanel();
+}
 
 // SAYFA GEÇİŞİ
 function switchPage(pageId, btnElement) {
@@ -241,52 +274,41 @@ function saveProfile() {
   appState.profile.uni = document.getElementById('targetUni').value;
   appState.profile.dept = document.getElementById('targetDept').value;
   appState.profile.rank = document.getElementById('targetRank').value;
-  
-  studentsList[0].profile = { ...appState.profile };
 
   saveAndRender();
   alert('Profil güncellendi!');
 }
 
-// KOÇ PANELİ RENDER
+// KOÇ PANELİ RENDER (Dinamik Supabase verisine uyumlu)
 function renderCoachPanel() {
   const select = document.getElementById('coachStudentSelect');
-  if (!select) return;
+  if (!select || !select.value) return;
 
-  if (select.children.length === 0) {
-    select.innerHTML = studentsList.map(s => `<option value="${s.id}">${s.profile.name}</option>`).join('');
-  }
+  const selectedId = select.value;
+  const selectedStudent = studentsList.find(s => String(s.id) === String(selectedId));
 
-  const selectedId = select.value || "me";
-  const selectedStudent = studentsList.find(s => s.id === selectedId) || studentsList[0];
-
-  if (selectedId === "me") {
-    const totalMs = getCalculatedTotalMs();
-    const hrs = Math.floor(totalMs / (1000 * 60 * 60));
-    const mins = Math.floor((totalMs / (1000 * 60)) % 60);
-    
-    selectedStudent.dailyTime = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:00`;
-    selectedStudent.questionsSolved = appState.questions.reduce((acc, q) => acc + q.d + q.y + q.b, 0);
-    selectedStudent.examsCount = appState.exams.length;
+  if (!selectedStudent) {
+    document.getElementById('coachOverview').innerHTML = `<p style="font-size:12px; color:var(--text-muted);">Öğrenci bilgisi bulunamadı.</p>`;
+    return;
   }
 
   document.getElementById('coachOverview').innerHTML = `
-    <div class="list-item"><span>Alan / Sıralama:</span> <strong>${selectedStudent.profile.field} / ${selectedStudent.profile.rank || '-'} Top</strong></div>
-    <div class="list-item"><span>Hedef:</span> <strong>${selectedStudent.profile.uni} ${selectedStudent.profile.dept}</strong></div>
+    <div class="list-item"><span>Alan / Sıralama:</span> <strong>${selectedStudent.field || '-'} / ${selectedStudent.target_rank || '-'} Top</strong></div>
+    <div class="list-item"><span>Hedef:</span> <strong>${selectedStudent.target_uni || ''} ${selectedStudent.target_dept || ''}</strong></div>
     <div style="margin: 8px 0; font-weight:bold; font-size:12px; color:#818cf8;">Çalışma Süreleri:</div>
     <div class="grid-3" style="margin-bottom:8px;">
       <div style="background:#0f172a; padding:6px; text-align:center; border-radius:6px; font-size:11px;">
-        <span style="color:var(--text-muted);">Günlük</span><br><strong>${selectedStudent.dailyTime}</strong>
+        <span style="color:var(--text-muted);">Günlük</span><br><strong>${selectedStudent.daily_time || '00:00'}</strong>
       </div>
       <div style="background:#0f172a; padding:6px; text-align:center; border-radius:6px; font-size:11px;">
-        <span style="color:var(--text-muted);">Haftalık</span><br><strong>${selectedStudent.weeklyTime}</strong>
+        <span style="color:var(--text-muted);">Haftalık</span><br><strong>${selectedStudent.weekly_time || '00:00'}</strong>
       </div>
       <div style="background:#0f172a; padding:6px; text-align:center; border-radius:6px; font-size:11px;">
-        <span style="color:var(--text-muted);">Aylık</span><br><strong>${selectedStudent.monthlyTime}</strong>
+        <span style="color:var(--text-muted);">Aylık</span><br><strong>${selectedStudent.monthly_time || '00:00'}</strong>
       </div>
     </div>
-    <div class="list-item"><span>Çözülen Soru Sayısı:</span> <strong>${selectedStudent.questionsSolved} Soru</strong></div>
-    <div class="list-item"><span>Girilen Deneme Sayısı:</span> <strong>${selectedStudent.examsCount} Deneme</strong></div>
+    <div class="list-item"><span>Çözülen Soru Sayısı:</span> <strong>${selectedStudent.questions_solved || 0} Soru</strong></div>
+    <div class="list-item"><span>Girilen Deneme Sayısı:</span> <strong>${selectedStudent.exams_count || 0} Deneme</strong></div>
   `;
 }
 
@@ -339,8 +361,6 @@ function renderAll() {
     </div>
   `).join('') || '<p style="font-size:12px; color:var(--text-muted);">Deneme kaydı bulunmuyor.</p>';
 
-  renderCoachPanel();
-
   // Kronometre Güncelle
   const totalMs = getCalculatedTotalMs();
   const secs = Math.floor((totalMs / 1000) % 60);
@@ -353,7 +373,7 @@ function renderAll() {
   renderChart();
 }
 
-// GRAFİK RENDER (Canvas Event Listener ve Klonlama Mantığı Entegre Edildi)
+// GRAFİK RENDER
 function renderChart() {
   const canvas = document.getElementById('netChart');
   if (!canvas) return;
@@ -363,7 +383,6 @@ function renderChart() {
     netChart = null;
   }
 
-  // Event listener birikmesini önlemek için canvas'ı klonlayıp tazeliyoruz
   const newCanvas = canvas.cloneNode(true);
   canvas.parentNode.replaceChild(newCanvas, canvas);
 
@@ -373,16 +392,16 @@ function renderChart() {
   netChart = new Chart(newCanvas, {
     type: 'line',
     data: {
-      labels: labels.length ? labels : ['Örnek 1', 'Örnek 2'],
+      labels: labels.length ? labels : ['Henüz Deneme Yok'],
       datasets: [{ 
         label: 'Toplam Net', 
-        data: data.length ? data : [0, 0], 
+        data: data.length ? data : [0], 
         borderColor: '#4f46e5', 
         backgroundColor: 'rgba(79, 70, 229, 0.2)',
         borderWidth: 3,
         pointRadius: 8,
         pointHoverRadius: 12,
-        pointHitRadius: 25, // Tıklama hitbox'ı geniş
+        pointHitRadius: 25,
         pointBackgroundColor: '#818cf8',
         tension: 0.3 
       }]
@@ -393,24 +412,6 @@ function renderChart() {
       plugins: {
         legend: { display: false },
         tooltip: { enabled: true }
-      }
-    }
-  });
-
-  // Doğrudan tıklama olayı ekleme
-  newCanvas.addEventListener('click', (evt) => {
-    const points = netChart.getElementsAtEventForMode(evt, 'nearest', { intersect: false }, true);
-    
-    if (points.length > 0) {
-      const index = points[0].index;
-      const selectedExam = appState.exams[index];
-
-      if (selectedExam) {
-        let details = Object.entries(selectedExam.lessonNets)
-          .map(([ders, net]) => `• ${ders}: ${net} Net`)
-          .join('\n');
-
-        alert(`📌 ${selectedExam.title}\n🗓 Tarih: ${selectedExam.date}\n💯 Toplam Net: ${selectedExam.totalNet}\n\nDers Detayları:\n${details}`);
       }
     }
   });
