@@ -1,6 +1,6 @@
 // 1. SUPABASE BAĞLANTISI (Gerekli veritabanı işlemleri için kalıyor)
-const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co'; // Kendi URL'in
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // Kendi Anon Key'in
+const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/'; // Kendi URL'in
+const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi'; // Kendi Anon Key'in
 
 let supabase;
 if (window.supabase) {
