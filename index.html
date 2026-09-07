@@ -12,37 +12,8 @@
 </head>
 <body>
 
-  <!-- AUTH EKRANI -->
-  <div id="authOverlay" class="auth-modal">
-    <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
-      
-      <!-- Tab Butonları -->
-      <div class="tab-group" style="margin-bottom: 20px;">
-        <button type="button" id="tabLoginBtn" class="tab-btn active" onclick="switchAuthTab('login')">Giriş Yap</button>
-        <button type="button" id="tabRegisterBtn" class="tab-btn" onclick="switchAuthTab('register')">Kayıt Ol</button>
-      </div>
-
-      <!-- Form -->
-      <div id="authForm">
-        <input type="email" id="authEmail" placeholder="E-posta Adresi" required>
-        <input type="password" id="authPassword" placeholder="Şifre" required>
-        
-        <div id="registerExtraFields" class="hidden">
-          <input type="text" id="authName" placeholder="Adınız Soyadınız">
-          <select id="authRole">
-            <option value="student">Öğrenci</option>
-            <option value="coach">Koç / Admin</option>
-          </select>
-        </div>
-
-        <button type="button" id="authPrimaryBtn" class="btn-primary" onclick="handleAuth()">Giriş Yap</button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ANA UYGULAMA -->
-  <div id="appContainer" class="app-container hidden">
+  <!-- ANA UYGULAMA (Giriş yapmadan direkt açık) -->
+  <div id="appContainer" class="app-container">
     <div class="topbar">
       <div class="topbar-left">
         <h1>YKS Koçum</h1>
@@ -50,7 +21,6 @@
       </div>
       <div>
         <button class="icon-btn" onclick="toggleTheme()">🌙 / ☀️</button>
-        <button class="icon-btn" onclick="logout()" style="color: var(--danger); margin-left: 4px;">Çıkış</button>
       </div>
     </div>
 
@@ -126,21 +96,6 @@
         <div class="card-title">Gelen Ödevler</div>
         <div id="assignmentList"></div>
       </div>
-
-      <div id="adminPanelCard" class="card hidden">
-        <div class="card-title">Öğrenciye Ödev At (Koç Paneli)</div>
-        <select id="selectStudentForAssignment">
-          <option value="">Öğrenci Seçin...</option>
-        </select>
-        <select id="assignmentTypeSelect">
-          <option value="tyt">TYT</option>
-          <option value="ayt">AYT</option>
-          <option value="ydt">YDT</option>
-        </select>
-        <input type="text" id="assignmentTitleInput" placeholder="Ödev Başlığı / Konusu">
-        <textarea id="assignmentDescInput" placeholder="Ödev Detayları..."></textarea>
-        <button class="btn-primary" onclick="createAssignment()">Ödevi Gönder</button>
-      </div>
     </div>
 
     <!-- 5. DAHA FAZLA -->
@@ -161,24 +116,12 @@
         <input type="number" id="targetRankInput" placeholder="Hedef Sıralama (Örn: 5000)">
         <button class="btn-primary" onclick="saveTarget()">Hedefleri Kaydet</button>
       </div>
-
-      <div id="coachAnalyticsCard" class="card hidden">
-        <div class="card-title">Öğrenci İlerleme Takibi (Sadece Koç)</div>
-        <select id="coachStudentSelect" onchange="loadStudentProgress(this.value)">
-          <option value="">İlerlemesini Görmek İçin Öğrenci Seçin...</option>
-        </select>
-        <div id="progressResults" style="margin-top: 15px;">
-          <div class="item-row"><span>Günlük Çalışma:</span> <strong id="dailyTime">0 sa 0 dk</strong></div>
-          <div class="item-row"><span>Haftalık Çalışma:</span> <strong id="weeklyTime">0 sa 0 dk</strong></div>
-          <div class="item-row"><span>Aylık Çalışma:</span> <strong id="monthlyTime">0 sa 0 dk</strong></div>
-        </div>
-      </div>
     </div>
 
   </div>
 
-  <!-- Bottom Nav -->
-  <div id="bottomNav" class="bottom-nav hidden">
+  <!-- Bottom Nav (Doğrudan Görünür) -->
+  <div id="bottomNav" class="bottom-nav">
     <button class="nav-item active" onclick="switchPage('home', this)"><span>🏠</span> Ana Sayfa</button>
     <button class="nav-item" onclick="switchPage('deneme', this)"><span>📊</span> Denemeler</button>
     <button class="nav-item" onclick="switchPage('yanlis', this)"><span>📷</span> Yanlışlar</button>
