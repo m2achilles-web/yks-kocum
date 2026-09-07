@@ -41,7 +41,7 @@ body {
   display: none !important;
 }
 
-/* Modal / Auth Ekranı */
+/* Auth Modal */
 .auth-modal {
   position: fixed;
   inset: 0;
@@ -91,7 +91,7 @@ body {
   cursor: pointer;
 }
 
-/* Cards & Controls */
+/* Cards & Forms */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -131,19 +131,19 @@ input, select, textarea {
   cursor: pointer;
 }
 
+/* Tabs */
 .tab-group {
   display: flex;
   background: var(--bg);
   padding: 4px;
   border-radius: 12px;
   gap: 4px;
-  margin-bottom: 16px;
 }
 
 .tab-btn {
   flex: 1;
   border: 0;
-  padding: 8px;
+  padding: 10px;
   border-radius: 8px;
   background: transparent;
   color: var(--muted);
@@ -154,18 +154,16 @@ input, select, textarea {
 .tab-btn.active {
   background: var(--card);
   color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* Lists & Gallery */
 .item-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
-}
-
-.item-row:last-child {
-  border-bottom: 0;
 }
 
 .gallery-grid {
@@ -182,6 +180,7 @@ input, select, textarea {
   border-radius: 8px;
 }
 
+/* Bottom Nav */
 .bottom-nav {
   position: fixed;
   bottom: 12px;
