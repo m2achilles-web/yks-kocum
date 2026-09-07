@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YKS Kocum </title>
+  <title>YKS Koçluk Uygulaması</title>
   <link rel="stylesheet" href="./style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -25,7 +25,6 @@
         <div style="font-size: 12px; opacity: 0.8;">Hedefine Ulaşmak İçin Çalışmaya Devam Et!</div>
       </div>
 
-      <!-- İlerleme & Süre Kartı -->
       <div class="card grid-2">
         <div>
           <div class="card-title">Bugün İlerleme</div>
@@ -178,10 +177,14 @@
         <button class="btn-primary" onclick="saveProfile()">Bilgileri Kaydet</button>
       </div>
 
-      <!-- Koç Paneli -->
+      <!-- KOÇ PANELİ (GÜNCELLENDİ) -->
       <div class="card" style="border: 1px solid #818cf8;">
-        <div class="card-title" style="color: #818cf8;">👨‍🏫 Koç Paneli (Genel Bakış)</div>
-        <div id="coachOverview"></div>
+        <div class="card-title" style="color: #818cf8;">👨‍🏫 Koç Paneli (Öğrenci İnceleme)</div>
+        <label style="font-size: 11px; color: var(--text-muted);">İncelenecek Öğrenciyi Seçin:</label>
+        <select id="coachStudentSelect" onchange="renderCoachPanel()">
+          <!-- Dinamik öğrenci listesi eklenecek -->
+        </select>
+        <div id="coachOverview" style="margin-top: 10px;"></div>
       </div>
     </div>
 
