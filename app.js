@@ -27,7 +27,7 @@ const LESSON_DATA = {
   }
 };
 
-// DEMO ÖĞRENCİ LİSTESİ
+// DEMO ÖĞRENCİ LİSTESİ (Koç Paneli Seçenekleri)
 let studentsList = [
   {
     id: "me",
@@ -49,7 +49,7 @@ let studentsList = [
   }
 ];
 
-// GLOBAL DATA STRUCTURES
+// GLOBAL STATE
 let appState = {
   profile: { name: "Ahmet Yılmaz (Siz)", field: "Sayısal", uni: "İTÜ", dept: "Bilgisayar Müh.", rank: "3500" },
   timer: { startTime: 0, accumulatedTime: 0, isRunning: false },
@@ -353,19 +353,24 @@ function renderAll() {
   renderChart();
 }
 
-// GRAFİK RENDER (DOĞRUDAN CANVAS EVENT LISTENER İLE KESİN ÇÖZÜM)
+// GRAFİK RENDER (Canvas Event Listener ve Klonlama Mantığı Entegre Edildi)
 function renderChart() {
-  const ctx = document.getElementById('netChart');
-  if (!ctx) return;
+  const canvas = document.getElementById('netChart');
+  if (!canvas) return;
   
   if (netChart) {
     netChart.destroy();
+    netChart = null;
   }
+
+  // Event listener birikmesini önlemek için canvas'ı klonlayıp tazeliyoruz
+  const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
 
   const labels = appState.exams.map(e => e.title);
   const data = appState.exams.map(e => e.totalNet);
 
-  netChart = new Chart(ctx, {
+  netChart = new Chart(newCanvas, {
     type: 'line',
     data: {
       labels: labels.length ? labels : ['Örnek 1', 'Örnek 2'],
@@ -375,9 +380,9 @@ function renderChart() {
         borderColor: '#4f46e5', 
         backgroundColor: 'rgba(79, 70, 229, 0.2)',
         borderWidth: 3,
-        pointRadius: 8,              // Noktayı belirginleştirdik
-        pointHoverRadius: 12,        // Üstüne gelince kocaman olsun
-        pointHitRadius: 20,         // Tıklama alanını (hitbox) genislettik
+        pointRadius: 8,
+        pointHoverRadius: 12,
+        pointHitRadius: 25, // Tıklama hitbox'ı geniş
         pointBackgroundColor: '#818cf8',
         tension: 0.3 
       }]
@@ -385,19 +390,19 @@ function renderChart() {
     options: { 
       responsive: true, 
       maintainAspectRatio: false,
-      events: ['click', 'mousemove'], // Grafik olaylarını zorunlu kılıyoruz
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: { enabled: true }
       }
     }
   });
 
-  // Tıklamayı Canvas'ın kendisine bağlayıp Chart.js ile eşleştiriyoruz:
-  ctx.onclick = (e) => {
-    const points = netChart.getElementsAtEventForMode(e, 'nearest', { intersect: false }, true);
-    if (points.length) {
-      const firstPoint = points[0];
-      const index = firstPoint.index;
+  // Doğrudan tıklama olayı ekleme
+  newCanvas.addEventListener('click', (evt) => {
+    const points = netChart.getElementsAtEventForMode(evt, 'nearest', { intersect: false }, true);
+    
+    if (points.length > 0) {
+      const index = points[0].index;
       const selectedExam = appState.exams[index];
 
       if (selectedExam) {
@@ -408,7 +413,7 @@ function renderChart() {
         alert(`📌 ${selectedExam.title}\n🗓 Tarih: ${selectedExam.date}\n💯 Toplam Net: ${selectedExam.totalNet}\n\nDers Detayları:\n${details}`);
       }
     }
-  };
+  });
 }
 
 function uploadWrongQuestion() { alert('Yanlış soru görseli yüklendi!'); }
