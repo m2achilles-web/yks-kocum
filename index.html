@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YKS Koçluk ve Takip</title>
-  <!-- Chart.js & Supabase JS SDK -->
+  
+  <!-- Kütüphaneler -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -20,26 +21,44 @@
       --success: #22c55e;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+    /* Arka plan garantisi */
+    html, body {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    body { display: flex; }
 
     /* MASAÜSTÜ SIDEBAR */
-    .sidebar { width: 240px; background: #020617; padding: 20px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid var(--border); flex-shrink: 0; }
+    .sidebar { 
+      width: 240px; 
+      background: #020617; 
+      padding: 20px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+      border-right: 1px solid var(--border); 
+      flex-shrink: 0; 
+    }
     .sidebar h2 { font-size: 18px; color: var(--accent-hover); margin-bottom: 20px; text-align: center; }
-    .nav-item { padding: 12px 16px; border-radius: 8px; color: var(--text-muted); cursor: pointer; transition: 0.2s; text-decoration: none; display: block; font-size: 14px; }
+    .nav-item { padding: 12px 16px; border-radius: 8px; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 14px; }
     .nav-item:hover, .nav-item.active { background: var(--accent); color: white; font-weight: bold; }
 
-    /* MOBİL ALT MENÜ (Masaüstünde Gizli) */
+    /* MOBİL NAV */
     .bottom-nav { display: none; }
 
     /* MAIN AREA */
-    .main-content { flex: 1; padding: 25px; overflow-y: auto; }
+    .main-content { flex: 1; padding: 25px; overflow-y: auto; background-color: var(--bg-dark); }
     .topbar { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
     
     .page { display: block; }
     .page.hidden { display: none !important; }
 
-    /* GRID & CARDS */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
@@ -53,14 +72,10 @@
     .progress-bg { background: #0f172a; border-radius: 8px; height: 18px; width: 100%; overflow: hidden; margin: 10px 0; border: 1px solid var(--border); }
     .progress-fill { background: var(--success); height: 100%; width: 0%; text-align: center; font-size: 11px; line-height: 18px; transition: width 0.3s; }
 
-    /* ================= MOBİL UYUM (RESPONSIVE) ================= */
+    /* MOBİL UYUM */
     @media (max-width: 768px) {
       body { flex-direction: column; }
-      
-      /* Sol menüyü kaldır */
       .sidebar { display: none; }
-
-      /* Alt menüyü göster (App Tarzı) */
       .bottom-nav { 
         display: flex; 
         position: fixed; 
@@ -71,29 +86,17 @@
         border-top: 1px solid var(--border); 
         z-index: 1000;
         overflow-x: auto;
-        white-space: nowrap;
       }
-      .bottom-nav .nav-item { 
-        flex: 1; 
-        text-align: center; 
-        padding: 12px 8px; 
-        font-size: 11px; 
-        border-radius: 0;
-      }
-
-      /* İçerik alanını düzenle (Alt menünün altında kalmasın) */
+      .bottom-nav .nav-item { flex: 1; text-align: center; padding: 12px 6px; font-size: 11px; white-space: nowrap; }
       .main-content { padding: 15px; padding-bottom: 70px; }
-
-      /* Grid yapılarını teke düşür */
       .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 10px; }
-
-      .topbar { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 13px; }
+      .topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- MASAÜSTÜ SIDEBAR -->
+  <!-- SIDEBAR -->
   <div class="sidebar">
     <h2>YKS KOÇLUK</h2>
     <div class="nav-item active" onclick="switchPage('home', this)">Ana Sayfa</div>
@@ -105,15 +108,14 @@
     <div class="nav-item" onclick="switchPage('profile', this)">Profilim</div>
   </div>
 
-  <!-- ANA İÇERİK -->
+  <!-- MAIN CONTENT -->
   <div class="main-content">
-    
     <div class="topbar">
       <div><strong>Öğrenci:</strong> <span id="topbarUsername">Yükleniyor...</span></div>
       <div><strong>Hedef:</strong> <span id="topbarTargetInfo">-</span></div>
     </div>
 
-    <!-- SAYFA: ANA SAYFA -->
+    <!-- HOME -->
     <section id="page-home" class="page">
       <div class="grid-2">
         <div class="card">
@@ -128,7 +130,7 @@
       </div>
     </section>
 
-    <!-- SAYFA: PLANLAR -->
+    <!-- PLANS -->
     <section id="page-plans" class="page hidden">
       <div class="card">
         <h3>Yeni Plan Ekle</h3>
@@ -145,7 +147,7 @@
       </div>
     </section>
 
-    <!-- SAYFA: SORU TAKİBİ -->
+    <!-- QUESTIONS -->
     <section id="page-questions" class="page hidden">
       <div class="card">
         <h3>Soru Kaydı Ekle</h3>
@@ -167,12 +169,12 @@
       </div>
     </section>
 
-    <!-- SAYFA: DENEME ANALİZİ -->
+    <!-- EXAMS -->
     <section id="page-exams" class="page hidden">
       <div class="card">
         <h3>Yeni Deneme Kaydı</h3>
         <select id="examCategory" onchange="renderExamInputs()"><option value="tyt">TYT</option><option value="ayt">AYT</option><option value="ydt">YDT</option></select>
-        <input type="text" id="examTitle" placeholder="Deneme Adı (Örn: Özdebir 1)">
+        <input type="text" id="examTitle" placeholder="Deneme Adı">
         <div id="examLessonInputs" class="grid-3" style="margin-top: 10px;"></div>
         <button onclick="addExam()" style="margin-top: 15px;">Denemeyi Kaydet</button>
       </div>
@@ -186,7 +188,7 @@
       </div>
     </section>
 
-    <!-- SAYFA: KRONOMETRE -->
+    <!-- TIMER -->
     <section id="page-timer" class="page hidden">
       <div class="card" style="text-align: center;">
         <h3>Ders Çalışma Kronometresi</h3>
@@ -199,7 +201,7 @@
       </div>
     </section>
 
-    <!-- SAYFA: ÖĞRENCİLER (KOÇ PANELİ) -->
+    <!-- COACH / ÖĞRENCİLER -->
     <section id="page-coach" class="page hidden">
       <div class="card">
         <h3>Koçluk Paneli - Öğrenci Seçimi</h3>
@@ -215,7 +217,7 @@
       </div>
     </section>
 
-    <!-- SAYFA: PROFİLİM -->
+    <!-- PROFILE -->
     <section id="page-profile" class="page hidden">
       <div class="card">
         <h3>Profil Bilgileri</h3>
@@ -232,10 +234,9 @@
         <button onclick="saveProfile()">Profili Güncelle</button>
       </div>
     </section>
-
   </div>
 
-  <!-- MOBİL ALT MENÜ (MOBİLDE GÖZÜKÜR) -->
+  <!-- MOBİL NAV -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchPage('home', this)">Ana Sayfa</div>
     <div class="nav-item" onclick="switchPage('plans', this)">Planlar</div>
