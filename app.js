@@ -1,6 +1,6 @@
 // SUPABASE BAĞLANTI AYARLARI (Kendi anahtarlarını yapıştır)
-const SUPABASE_URL = 'https://xxxx.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOi...';
+const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/';
+const SUPABASE_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
 // Supabase İstemcisi
 const _supabase = (typeof supabase !== 'undefined' && SUPABASE_URL !== 'https://xxxx.supabase.co') 
