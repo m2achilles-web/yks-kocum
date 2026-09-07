@@ -1,91 +1,144 @@
-const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/';
+// 1. SUPABASE BAĞLANTISI
+// (Kendi SUPABASE_URL ve SUPABASE_ANON_KEY değerlerini tırnakların içine yaz)
+const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let supabase;
+try {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+  console.error("Supabase başlatılamadı:", e);
+}
 
 let currentUser = null;
-let userRole = 'student'; // 'student' veya 'coach'
+let userRole = 'student';
 let isSignUpMode = false;
 
 let chartInstance = null;
 let timerInterval = null;
 let seconds = 0;
 
-// SAYFA YÜKLENİRKEN AUTH KONTROLÜ
+// SAYFA YÜKLENDİĞİNDE
 document.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    await fetchUserProfile();
+  if (!supabase) return;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      await fetchUserProfile();
+    }
+  } catch (err) {
+    console.error("Session alınırken hata:", err);
   }
 });
 
-// AUTH İŞLEMLERİ (Giriş / Kayıt Modu Değişimi)
+// GİRİŞ / KAYIT MODU GEÇİŞİ
 function toggleAuthMode() {
   isSignUpMode = !isSignUpMode;
   document.getElementById('authTitle').innerText = isSignUpMode ? 'Kayıt Ol' : 'Giriş Yap';
   document.getElementById('authPrimaryBtn').innerText = isSignUpMode ? 'Kayıt Ol' : 'Giriş Yap';
-  document.getElementById('authToggleText').innerHTML = isSignUpMode ? 'Zaten hesabın var mı? **Giriş Yap**' : 'Hesabın yok mu? **Kayıt Ol**';
+  document.getElementById('authToggleText').innerHTML = isSignUpMode ? 'Zaten hesabın var mı? <b>Giriş Yap</b>' : 'Hesabın yok mu? <b>Kayıt Ol</b>';
   document.getElementById('roleSelectGroup').classList.toggle('hidden', !isSignUpMode);
 }
 
+// BUTONA BASILDIĞINDA ÇALIŞAN ANA FONKSİYON
 async function handleAuth() {
-  const email = document.getElementById('authEmail').value;
-  const password = document.getElementById('authPassword').value;
+  const emailInput = document.getElementById('authEmail');
+  const passwordInput = document.getElementById('authPassword');
+  
+  const email = emailInput ? emailInput.value.trim() : '';
+  const password = passwordInput ? passwordInput.value.trim() : '';
 
-  if (!email || !password) return alert('E-posta ve şifre giriniz.');
+  if (!email || !password) {
+    alert('Lütfen e-posta ve şifre alanlarını doldurun.');
+    return;
+  }
 
-  if (isSignUpMode) {
-    const role = document.getElementById('authRole').value;
-    const fullName = document.getElementById('authName').value;
+  const btn = document.getElementById('authPrimaryBtn');
+  btn.disabled = true;
+  btn.innerText = 'Lütfen bekleyin...';
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName, role: role } }
-    });
+  try {
+    if (isSignUpMode) {
+      // KAYIT OL
+      const role = document.getElementById('authRole').value;
+      const fullName = document.getElementById('authName').value;
 
-    if (error) return alert('Kayıt Hatası: ' + error.message);
-    
-    // Profiles tablosuna kullanıcı bilgisi yaz
-    if (data.user) {
-      await supabase.from('profiles').insert([{ id: data.user.id, full_name: fullName, role: role }]);
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            full_name: fullName,
+            role: role
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        // Profiles tablosuna kayıt
+        await supabase.from('profiles').insert([
+          { id: data.user.id, full_name: fullName, role: role }
+        ]);
+      }
+
+      alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+      toggleAuthMode();
+
+    } else {
+      // GİRİŞ YAP
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) throw error;
+
+      currentUser = data.user;
+      await fetchUserProfile();
     }
-    alert('Kayıt başarılı! Giriş yapabilirsiniz.');
-    toggleAuthMode();
 
-  } else {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return alert('Giriş Hatası: ' + error.message);
-    currentUser = data.user;
-    await fetchUserProfile();
+  } catch (err) {
+    alert('İşlem Başarısız: ' + (err.message || err));
+    console.error('Auth Hatası:', err);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = isSignUpMode ? 'Kayıt Ol' : 'Giriş Yap';
   }
 }
 
 async function fetchUserProfile() {
-  const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-  
-  userRole = data ? data.role : (currentUser.user_metadata.role || 'student');
-  
-  // UI Düzenlemeleri
-  document.getElementById('authOverlay').classList.add('hidden');
-  document.getElementById('appContainer').classList.remove('hidden');
-  document.getElementById('bottomNav').classList.remove('hidden');
+  try {
+    const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+    
+    userRole = data ? data.role : (currentUser.user_metadata?.role || 'student');
+    
+    document.getElementById('authOverlay').classList.add('hidden');
+    document.getElementById('appContainer').classList.remove('hidden');
+    document.getElementById('bottomNav').classList.remove('hidden');
 
-  const roleBadge = document.getElementById('roleBadge');
-  roleBadge.innerText = userRole === 'coach' ? 'KOÇ' : 'ÖĞRENCİ';
+    const roleBadge = document.getElementById('roleBadge');
+    if (roleBadge) {
+      roleBadge.innerText = userRole === 'coach' ? 'KOÇ' : 'ÖĞRENCİ';
+    }
 
-  if (userRole === 'coach') {
-    document.getElementById('adminPanelCard').classList.remove('hidden');
-    document.getElementById('coachAnalyticsCard').classList.remove('hidden');
-    document.getElementById('studentTargetCard').classList.add('hidden');
-    loadStudentsList();
-  } else {
-    document.getElementById('adminPanelCard').classList.add('hidden');
-    document.getElementById('coachAnalyticsCard').classList.add('hidden');
-    document.getElementById('studentTargetCard').classList.remove('hidden');
+    if (userRole === 'coach') {
+      document.getElementById('adminPanelCard')?.classList.remove('hidden');
+      document.getElementById('coachAnalyticsCard')?.classList.remove('hidden');
+      document.getElementById('studentTargetCard')?.classList.add('hidden');
+      loadStudentsList();
+    } else {
+      document.getElementById('adminPanelCard')?.classList.add('hidden');
+      document.getElementById('coachAnalyticsCard')?.classList.add('hidden');
+      document.getElementById('studentTargetCard')?.classList.remove('hidden');
+    }
+
+    fetchAssignments();
+  } catch (e) {
+    console.error("Profil çekme hatası:", e);
   }
-
-  fetchAssignments();
 }
 
 async function logout() {
@@ -111,6 +164,7 @@ function switchPage(pageId, btn) {
 
 // DENEME NETLERİ
 async function loadExamData(examType = 'tyt') {
+  if (!currentUser) return;
   const { data } = await supabase.from('exams').select('*').eq('user_id', currentUser.id).eq('type', examType).order('created_at', { ascending: true });
   const labels = data ? data.map(item => item.name) : [];
   const scores = data ? data.map(item => item.net_score) : [];
@@ -157,14 +211,14 @@ async function loadStudentsList() {
   const coachSelect = document.getElementById('coachStudentSelect');
   const assignSelect = document.getElementById('selectStudentForAssignment');
 
-  coachSelect.innerHTML = '<option value="">Öğrenci Seçin...</option>';
-  assignSelect.innerHTML = '<option value="">Öğrenci Seçin...</option>';
+  if (coachSelect) coachSelect.innerHTML = '<option value="">Öğrenci Seçin...</option>';
+  if (assignSelect) assignSelect.innerHTML = '<option value="">Öğrenci Seçin...</option>';
 
   if (data) {
     data.forEach(s => {
       const opt = `<option value="${s.id}">${s.full_name || s.id}</option>`;
-      coachSelect.innerHTML += opt;
-      assignSelect.innerHTML += opt;
+      if (coachSelect) coachSelect.innerHTML += opt;
+      if (assignSelect) assignSelect.innerHTML += opt;
     });
   }
 }
@@ -184,17 +238,18 @@ async function createAssignment() {
 }
 
 async function fetchAssignments() {
+  if (!currentUser) return;
   let query = supabase.from('assignments').select('*');
   if (userRole === 'student') query = query.eq('student_id', currentUser.id);
 
   const { data } = await query;
   const list = document.getElementById('assignmentList');
   const homeList = document.getElementById('homeTaskList');
-  list.innerHTML = '';
+  if (list) list.innerHTML = '';
   if (homeList) homeList.innerHTML = '';
 
   if (!data || data.length === 0) {
-    list.innerHTML = '<p style="font-size:12px; color:var(--muted);">Atanmış ödev bulunmuyor.</p>';
+    if (list) list.innerHTML = '<p style="font-size:12px; color:var(--muted);">Atanmış ödev bulunmuyor.</p>';
     if (homeList) homeList.innerHTML = '<p style="font-size:12px; color:var(--muted);">Henüz bir göreviniz yok.</p>';
     return;
   }
@@ -209,7 +264,7 @@ async function fetchAssignments() {
         ${userRole === 'student' ? `<button class="icon-btn" onclick="completeAssignment(${item.id})">${item.is_completed ? '✅ Tamamlandı' : 'Tamamla'}</button>` : ''}
       </div>
     `;
-    list.innerHTML += html;
+    if (list) list.innerHTML += html;
     if (homeList && !item.is_completed) homeList.innerHTML += html;
   });
 }
@@ -219,7 +274,7 @@ async function completeAssignment(id) {
   fetchAssignments();
 }
 
-// ÖĞRENCİ İLERLEME TAKİBİ (Sadece Koç)
+// ÖĞRENCİ İLERLEME TAKİBİ
 async function loadStudentProgress(studentId) {
   if (!studentId) return;
   const { data } = await supabase.from('study_sessions').select('*').eq('user_id', studentId);
@@ -243,7 +298,7 @@ async function loadStudentProgress(studentId) {
   document.getElementById('monthlyTime').innerText = `${Math.floor(monthly/3600)} sa ${Math.floor((monthly%3600)/60)} dk`;
 }
 
-// KRONOMETRE & SÜRE KAYDI
+// KRONOMETRE
 function startTimer() {
   if (timerInterval) return;
   timerInterval = setInterval(() => { seconds++; updateTimerDisplay(); }, 1000);
@@ -273,7 +328,7 @@ function updateTimerDisplay() {
   document.getElementById('timerDisplay').innerText = `${hrs}:${mins}:${secs}`;
 }
 
-// ÖĞRENCİ HEDEF KAYDETME
+// HEDEF KAYDETME
 async function saveTarget() {
   const department = document.getElementById('targetDepartmentInput').value;
   const rank = document.getElementById('targetRankInput').value;
@@ -299,10 +354,11 @@ async function uploadWrongQuestion() {
 }
 
 async function fetchWrongQuestions() {
+  if (!currentUser) return;
   const { data } = await supabase.from('wrong_questions').select('*').eq('user_id', currentUser.id);
   const gallery = document.getElementById('wrongQuestionsGallery');
-  gallery.innerHTML = '';
-  if (data) {
+  if (gallery) gallery.innerHTML = '';
+  if (data && gallery) {
     data.forEach(item => {
       gallery.innerHTML += `<div class="gallery-item"><img src="${item.image_url}"></div>`;
     });
