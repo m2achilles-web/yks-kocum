@@ -95,3 +95,8 @@ input, select, button, textarea {
 
 .nav-item span { font-size: 14px; }
 .nav-item.active { color: #818cf8; font-weight: bold; }
+/* Grafiğin tıklamaları ve üzerine gelme (hover) olaylarını algılamasını sağlıyoruz */
+#netChart {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
