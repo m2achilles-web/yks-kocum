@@ -3,13 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YKS Koçluk Uygulaması</title>
-
-  <!-- CSS Dosyası Bağlantısı -->
+  <title>YKS Kocum </title>
   <link rel="stylesheet" href="./style.css">
-
-  <!-- Kütüphaneler -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -17,8 +12,8 @@
   <div class="app-container">
     <div class="topbar">
       <div>
-        <h1>YKS Koçum</h1>
-        <span class="admin-badge">ÖĞRENCİ</span>
+        <h1 id="topbarUsername">YKS Koçum</h1>
+        <span class="admin-badge" id="topbarTargetInfo">Hedef Belirtilmedi</span>
       </div>
     </div>
 
@@ -30,13 +25,73 @@
         <div style="font-size: 12px; opacity: 0.8;">Hedefine Ulaşmak İçin Çalışmaya Devam Et!</div>
       </div>
 
+      <!-- İlerleme & Süre Kartı -->
+      <div class="card grid-2">
+        <div>
+          <div class="card-title">Bugün İlerleme</div>
+          <div class="progress-bar-container">
+            <div id="dailyProgressBar" class="progress-bar" style="width: 0%;">0%</div>
+          </div>
+        </div>
+        <div>
+          <div class="card-title">Toplam Çalışma</div>
+          <div id="homeTotalStudyTime" style="font-size: 20px; font-weight: bold; color: #818cf8;">00:00:00</div>
+        </div>
+      </div>
+
       <div class="card">
-        <div class="card-title">Yapılacak Görevler</div>
-        <div id="homeTaskList" style="color: var(--text-muted); font-size: 13px;">Bugün için planlanan görev bulunmuyor.</div>
+        <div class="card-title">Bugünkü Görevler</div>
+        <div id="homeTaskList"></div>
       </div>
     </div>
 
-    <!-- 2. DENEME & NET ANALİZİ -->
+    <!-- 2. PLAN SAYFASI -->
+    <div id="page-plan" class="page hidden">
+      <div class="card">
+        <div class="card-title">Yeni Çalışma Planı Oluştur</div>
+        <select id="planExamType" onchange="updatePlanLessons()">
+          <option value="tyt">TYT</option>
+          <option value="ayt">AYT</option>
+          <option value="ydt">YDT</option>
+        </select>
+        <select id="planLessonSelect"></select>
+        <input type="number" id="planHoursInput" placeholder="Hedef Süre (Saat)">
+        <button class="btn-primary" onclick="addPlan()">Plana Ekle</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Planlanan Çalışmalar</div>
+        <div id="planList"></div>
+      </div>
+    </div>
+
+    <!-- 3. SORU TAKİP SAYFASI -->
+    <div id="page-soru" class="page hidden">
+      <div class="card">
+        <div class="card-title">Soru Sayısı Gir</div>
+        <select id="soruExamType" onchange="updateSoruLessons()">
+          <option value="tyt">TYT</option>
+          <option value="ayt">AYT</option>
+          <option value="ydt">YDT</option>
+        </select>
+        <select id="soruLessonSelect" onchange="updateSoruTopics()"></select>
+        <select id="soruTopicSelect"></select>
+        
+        <div class="grid-3">
+          <input type="number" id="soruDogru" placeholder="Doğru">
+          <input type="number" id="soruYanlis" placeholder="Yanlış">
+          <input type="number" id="soruBos" placeholder="Boş">
+        </div>
+        <button class="btn-primary" onclick="addQuestionRecord()">Kaydet</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Son Çözülen Sorular</div>
+        <div id="questionHistoryList"></div>
+      </div>
+    </div>
+
+    <!-- 4. DENEME & NET ANALİZİ -->
     <div id="page-deneme" class="page hidden">
       <div class="card">
         <div class="card-title">Net Analizi & Grafikler</div>
@@ -45,74 +100,104 @@
           <button class="tab-btn" onclick="switchExamTab('ayt', this)">AYT</button>
           <button class="tab-btn" onclick="switchExamTab('ydt', this)">YDT</button>
         </div>
-        <div style="height: 200px;"><canvas id="netChart"></canvas></div>
+        <div style="height: 180px;"><canvas id="netChart"></canvas></div>
       </div>
 
       <div class="card">
-        <div class="card-title">Yeni Deneme Neti Gir</div>
-        <select id="examType">
+        <div class="card-title">Yeni Deneme Gir (Ders Ders Net)</div>
+        <select id="examCategory" onchange="renderExamInputs()">
           <option value="tyt">TYT Denemesi</option>
           <option value="ayt">AYT Denemesi</option>
           <option value="ydt">YDT Denemesi</option>
         </select>
-        <input type="text" id="examNameInput" placeholder="Deneme Adı (Örn: Yayın Denemesi #3)">
-        <input type="number" id="examNetInput" placeholder="Toplam Net Sayısı">
-        <button class="btn-primary" onclick="addExamNet()">Kaydet</button>
+        <input type="text" id="examTitle" placeholder="Deneme Adı (Örn: Özdebir #1)">
+        <div id="examLessonInputs" class="grid-2"></div>
+        <button class="btn-primary" onclick="addExam()">Denemeyi Kaydet</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Deneme Geçmişi</div>
+        <div id="examHistoryList"></div>
       </div>
     </div>
 
-    <!-- 3. YANLIŞ KUTUSU -->
+    <!-- 5. YANLIŞ KUTUSU -->
     <div id="page-yanlis" class="page hidden">
       <div class="card">
         <div class="card-title">Yanlış Soru Ekle</div>
-        <select id="wrongQuestionLesson">
-          <option value="matematik">Matematik</option>
-          <option value="fen">Fen Bilimleri</option>
-          <option value="turkce">Türkçe</option>
-          <option value="ydt">YDT (İngilizce)</option>
+        <select id="wrongExamType" onchange="updateWrongLessons()">
+          <option value="tyt">TYT</option>
+          <option value="ayt">AYT</option>
+          <option value="ydt">YDT</option>
         </select>
+        <select id="wrongLessonSelect"></select>
         <input type="file" id="questionImageInput" accept="image/*">
         <button class="btn-primary" onclick="uploadWrongQuestion()">Soru Fotoğrafı Yükle</button>
       </div>
 
       <div class="card">
         <div class="card-title">Yanlış Soru Galerisi</div>
-        <p style="color: var(--text-muted); font-size: 13px;">Henüz kayıtlı yanlış soru yok.</p>
+        <div id="wrongQuestionsGallery"></div>
       </div>
     </div>
 
-    <!-- 4. KOÇUM -->
+    <!-- 6. KOÇUM -->
     <div id="page-koc" class="page hidden">
       <div class="card">
         <div class="card-title">Gelen Ödevler</div>
-        <p style="color: var(--text-muted); font-size: 13px;">Atanmış bir ödev bulunmuyor.</p>
+        <div id="assignmentList"></div>
       </div>
     </div>
 
-    <!-- 5. DAHA FAZLA -->
+    <!-- 7. DAHA FAZLA (Profil & Kronometre & Koç Paneli) -->
     <div id="page-more" class="page hidden">
+      <!-- Kronometre -->
       <div class="card" style="text-align: center;">
         <div class="card-title">Çalışma Kronometresi</div>
-        <div id="timerDisplay" style="font-size: 40px; font-weight: 900; margin: 12px 0; font-family: monospace;">00:00:00</div>
+        <div id="timerDisplay" style="font-size: 36px; font-weight: 900; margin: 8px 0; font-family: monospace;">00:00:00</div>
         <div style="display: flex; gap: 8px;">
           <button class="btn-primary" onclick="startTimer()">Başlat</button>
-          <button class="btn-primary" style="background: var(--danger);" onclick="stopTimer()">Durdur</button>
+          <button class="btn-primary" style="background: var(--danger);" onclick="stopTimer()">Durdur & Kaydet</button>
           <button class="icon-btn" onclick="resetTimer()">🔄</button>
         </div>
       </div>
+
+      <!-- Öğrenci Profil & Hedef -->
+      <div class="card">
+        <div class="card-title">Öğrenci Bilgileri & Hedefler</div>
+        <input type="text" id="profileName" placeholder="Adınız Soyadınız">
+        <select id="profileField">
+          <option value="Sayısal">Sayısal</option>
+          <option value="Eşit Ağırlık">Eşit Ağırlık</option>
+          <option value="Sözel">Sözel</option>
+          <option value="Dil">Dil</option>
+        </select>
+        <input type="text" id="targetUni" placeholder="Hedef Üniversite (Örn: İTÜ)">
+        <input type="text" id="targetDept" placeholder="Hedef Bölüm (Örn: Bilgisayar Müh.)">
+        <input type="number" id="targetRank" placeholder="Hedef Sıralama (Örn: 5000)">
+        <button class="btn-primary" onclick="saveProfile()">Bilgileri Kaydet</button>
+      </div>
+
+      <!-- Koç Paneli -->
+      <div class="card" style="border: 1px solid #818cf8;">
+        <div class="card-title" style="color: #818cf8;">👨‍🏫 Koç Paneli (Genel Bakış)</div>
+        <div id="coachOverview"></div>
+      </div>
     </div>
+
   </div>
 
   <!-- Bottom Nav -->
   <div class="bottom-nav">
-    <button class="nav-item active" onclick="switchPage('home', this)"><span>🏠</span> Ana Sayfa</button>
-    <button class="nav-item" onclick="switchPage('deneme', this)"><span>📊</span> Denemeler</button>
-    <button class="nav-item" onclick="switchPage('yanlis', this)"><span>📷</span> Yanlışlar</button>
-    <button class="nav-item" onclick="switchPage('koc', this)"><span>👨‍🏫</span> Koçum</button>
-    <button class="nav-item" onclick="switchPage('more', this)"><span>⚙️</span> Daha Fazla</button>
+    <button class="nav-item active" onclick="switchPage('home', this)"><span>🏠</span>Ana Sayfa</button>
+    <button class="nav-item" onclick="switchPage('plan', this)"><span>📅</span>Plan</button>
+    <button class="nav-item" onclick="switchPage('soru', this)"><span>📝</span>Soru</button>
+    <button class="nav-item" onclick="switchPage('deneme', this)"><span>📊</span>Deneme</button>
+    <button class="nav-item" onclick="switchPage('yanlis', this)"><span>📷</span>Yanlışlar</button>
+    <button class="nav-item" onclick="switchPage('koc', this)"><span>👨‍🏫</span>Koçum</button>
+    <button class="nav-item" onclick="switchPage('more', this)"><span>⚙️</span>Daha Fazla</button>
   </div>
 
-  <!-- JS Dosyası Bağlantısı -->
   <script src="./app.js"></script>
 </body>
 </html>
