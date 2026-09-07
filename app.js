@@ -1,8 +1,8 @@
 // ==========================================
 // SUPABASE BAĞLANTI AYARLARI
 // ==========================================
-const SUPABASE_URL = 'https://xxxx.supabase.co'; // Buraya kendi Supabase URL'ini yapıştır
-const SUPABASE_KEY = 'eyJhbGciOi...';          // Buraya kendi Supabase Anon Key'ini yapıştır
+const SUPABASE_URL = 'https://m2achilles-web.github.io/yks-kocum/'; // Buraya kendi Supabase URL'ini yapıştır
+const SUPABASE_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';          // Buraya kendi Supabase Anon Key'ini yapıştır
 
 const _supabase = (typeof supabase !== 'undefined' && SUPABASE_URL.includes('supabase.co')) 
   ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
