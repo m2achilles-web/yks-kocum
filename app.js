@@ -1,69 +1,48 @@
-// Supabase İstemci Yapılandırması (Kendi URL ve Anon Key bilgilerini eklediğinden emin ol)
-const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/';
+// Supabase İstemci Yapılandırması
+const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/';
 const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
 
-// Supabase kütüphanesinin yüklenip yüklenmediğini kontrol edelim
-if (!window.supabase) {
-    console.error('Supabase kütüphanesi yüklenemedi! HTML dosyanda Supabase CDN script linkinin olduğundan emin ol.');
-}
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const supabase = window.supabase.createClient(https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/, sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi);
-
-// DOM tamamen yüklendiğinde çalıştır
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-} else {
-    initApp();
-}
-
-function initApp() {
-    console.log('Uygulama başlatılıyor...');
+// Sayfa tamamen yüklendiğinde çalıştır
+window.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM yüklendi, script çalışıyor!");
     checkUserSession();
 
-    // Giriş Formu Dinleyicisi
+    // Giriş İşlemi
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const emailField = document.getElementById('login-email');
-            const passwordField = document.getElementById('login-password');
-            
-            if (!emailField || !passwordField) return;
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
 
-            const email = emailField.value;
-            const password = passwordField.value;
-
+            console.log("Giriş yapılıyor:", email);
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             
             if (error) {
                 alert('Giriş Hatası: ' + error.message);
             } else {
-                checkUserSession();
+                window.location.reload();
             }
         });
     } else {
-        console.warn('login-form ID li element bulunamadı!');
+        console.error("HATA: 'login-form' id'li form HTML'de bulunamadı!");
     }
 
-    // Kayıt Formu Dinleyicisi
+    // Kayıt İşlemi
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const emailField = document.getElementById('signup-email');
-            const passwordField = document.getElementById('signup-password');
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
 
-            if (!emailField || !passwordField) return;
-
-            const email = emailField.value;
-            const password = passwordField.value;
-
+            console.log("Kayıt olunuyor:", email);
             const { data, error } = await supabase.auth.signUp({ 
                 email, 
                 password,
-                options: {
-                    data: { role: 'student' }
-                }
+                options: { data: { role: 'student' } }
             });
             
             if (error) {
@@ -73,7 +52,7 @@ function initApp() {
             }
         });
     } else {
-        console.warn('signup-form ID li element bulunamadı!');
+        console.error("HATA: 'signup-form' id'li form HTML'de bulunamadı!");
     }
 
     // Çıkış Butonu
@@ -84,9 +63,9 @@ function initApp() {
             window.location.reload();
         });
     }
-}
+});
 
-// Oturum ve Rol Kontrolü Fonksiyonu
+// Oturum ve Rol Kontrolü
 async function checkUserSession() {
     const { data: { session } } = await supabase.auth.getSession();
 
@@ -109,12 +88,11 @@ async function checkUserSession() {
         .single();
 
     if (error) {
-        console.error('Profil bilgisi çekilemedi:', error.message);
+        console.error('Profil çekilemedi:', error.message);
         return;
     }
 
     const userRole = profile ? profile.role : 'student';
-
     const coachPanel = document.getElementById('coach-panel');
     const studentPanel = document.getElementById('student-panel');
 
@@ -129,7 +107,6 @@ async function checkUserSession() {
     }
 }
 
-// Koç Paneli Verilerini Yükleme
 async function loadCoachDashboard() {
     const studentListEl = document.getElementById('student-list');
     if (!studentListEl) return;
@@ -155,15 +132,14 @@ async function loadCoachDashboard() {
     studentListEl.innerHTML = '';
     studentList.forEach(student => {
         const li = document.createElement('li');
-        li.textContent = `Öğrenci ID: ${student.id} (Rol: ${student.role})`;
+        li.textContent = `Öğrenci ID: ${student.id}`;
         studentListEl.appendChild(li);
     });
 }
 
-// Öğrenci Paneli Verilerini Yükleme
 async function loadStudentDashboard(userId) {
     const studentInfoEl = document.getElementById('student-info');
     if (studentInfoEl) {
-        studentInfoEl.textContent = `Hoş geldin! Kullanıcı ID: ${userId}`;
+        studentInfoEl.textContent = `Hoş geldin! ID: ${userId}`;
     }
 }
