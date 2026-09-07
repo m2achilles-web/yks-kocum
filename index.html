@@ -4,114 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YKS Koçluk Uygulaması</title>
-  <!-- Chart.js Grafikler İçin -->
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --primary: #4f46e5;
-      --primary-light: rgba(79, 70, 229, 0.08);
-      --success: #10b981;
-      --danger: #ef4444;
-      --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
-    }
-    body.dark {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --border: #334155;
-      --primary-light: rgba(99, 102, 241, 0.15);
-      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-    }
-    body {
-      margin: 0; padding: 0; background: var(--bg); color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    .app-container { max-width: 600px; margin: 0 auto; padding: 16px 16px 100px; }
-    .hidden { display: none !important; }
-    
-    /* Header & Topbar */
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .topbar h1 { font-size: 20px; margin: 0; font-weight: 800; }
-    .icon-btn { border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
-
-    /* Cards */
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
-    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-    
-    /* Tabs */
-    .tab-group { display: flex; background: var(--bg); padding: 4px; border-radius: 12px; gap: 4px; margin-bottom: 16px; }
-    .tab-btn { flex: 1; border: 0; padding: 8px; border-radius: 8px; background: transparent; color: var(--muted); font-weight: 700; cursor: pointer; }
-    .tab-btn.active { background: var(--card); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-
-    /* Checklist & Lists */
-    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
-    .item-row:last-child { border-bottom: 0; }
-    .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-    .badge-tyt { background: #e0e7ff; color: #3730a3; }
-    .badge-ayt { background: #fef3c7; color: #92400e; }
-    .badge-ydt { background: #dcfce7; color: #166534; }
-
-    /* Form Controls */
-    input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
-    .btn-primary { width: 100%; background: var(--primary); color: white; border: 0; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-
-    /* Bottom Nav */
-    .bottom-nav { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: min(calc(100% - 24px), 580px); background: var(--card); border: 1px solid var(--border); border-radius: 20px; display: flex; justify-content: space-around; padding: 8px; box-shadow: var(--shadow); }
-    .nav-item { border: 0; background: transparent; color: var(--muted); font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; flex: 1; }
-    .nav-item.active { color: var(--primary); }
-  </style>
 </head>
 <body>
 
-  <div class="app-container">
+  <!-- AUTH EKRANI (Giriş / Kayıt) -->
+  <div id="authOverlay" class="auth-modal">
+    <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+      <h2 id="authTitle" style="margin-top:0;">Giriş Yap</h2>
+      <input type="email" id="authEmail" placeholder="E-posta Adresi">
+      <input type="password" id="authPassword" placeholder="Şifre">
+      
+      <div id="roleSelectGroup" class="hidden">
+        <select id="authRole">
+          <option value="student">Öğrenci</option>
+          <option value="coach">Koç / Admin</option>
+        </select>
+        <input type="text" id="authName" placeholder="Adınız Soyadınız">
+      </div>
+
+      <button id="authPrimaryBtn" class="btn-primary" onclick="handleAuth()">Giriş Yap</button>
+      <p style="font-size: 13px; color: var(--muted); margin-top: 15px; cursor: pointer;" onclick="toggleAuthMode()" id="authToggleText">
+        Hesabın yok mu? **Kayıt Ol**
+      </p>
+    </div>
+  </div>
+
+  <!-- ANA UYGULAMA CONTAINER -->
+  <div id="appContainer" class="app-container hidden">
     <div class="topbar">
-      <h1>YKS Koçum</h1>
-      <button class="icon-btn" onclick="toggleTheme()">🌙 / ☀️</button>
+      <div class="topbar-left">
+        <h1>YKS Koçum</h1>
+        <span id="roleBadge" class="admin-badge">ÖĞRENCİ</span>
+      </div>
+      <div>
+        <button class="icon-btn" onclick="toggleTheme()">🌙 / ☀️</button>
+        <button class="icon-btn" onclick="logout()" style="color: var(--danger); margin-left: 4px;">Çıkış</button>
+      </div>
     </div>
 
     <!-- 1. ANA SAYFA -->
     <div id="page-home" class="page">
       <div class="card" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white;">
-        <div style="font-size: 13px; opacity: 0.9;">YKS 2027 Kalan Süre</div>
+        <div style="font-size: 13px; opacity: 0.9;">YKS Kalan Süre</div>
         <div style="font-size: 32px; font-weight: 900; margin: 8px 0;">284 Gün</div>
         <div style="font-size: 12px; opacity: 0.8;">Hedefine Ulaşmak İçin Çalışmaya Devam Et!</div>
       </div>
 
       <div class="card">
-        <div class="card-title">Bugünün Ödevleri (Karma)</div>
-        <div class="item-row">
-          <div>
-            <span class="badge badge-tyt">TYT</span>
-            <span style="font-weight: 600; font-size: 14px; margin-left: 6px;">Matematik - Problem Çözümü</span>
-          </div>
-          <input type="checkbox" style="width: auto; margin:0;">
-        </div>
-        <div class="item-row">
-          <div>
-            <span class="badge badge-ydt">YDT</span>
-            <span style="font-weight: 600; font-size: 14px; margin-left: 6px;">English Grammar - Tenses Testi</span>
-          </div>
-          <input type="checkbox" style="width: auto; margin:0;">
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Hızlı Hedef Checklist</div>
-        <div class="item-row">
-          <span style="font-size: 14px;">100 Paragraf Sorusunu Tamamla</span>
-          <input type="checkbox" style="width: auto; margin:0;">
-        </div>
-        <div class="item-row">
-          <span style="font-size: 14px;">40 YDT Kelime Ezberi Yap</span>
-          <input type="checkbox" style="width: auto; margin:0;">
-        </div>
+        <div class="card-title">Yapılacak Görevler</div>
+        <div id="homeTaskList"></div>
       </div>
     </div>
 
@@ -120,9 +64,9 @@
       <div class="card">
         <div class="card-title">Net Analizi & Grafikler</div>
         <div class="tab-group">
-          <button class="tab-btn active" onclick="switchExamTab('tyt')">TYT</button>
-          <button class="tab-btn" onclick="switchExamTab('ayt')">AYT</button>
-          <button class="tab-btn" onclick="switchExamTab('ydt')">YDT</button>
+          <button class="tab-btn active" onclick="switchExamTab('tyt', this)">TYT</button>
+          <button class="tab-btn" onclick="switchExamTab('ayt', this)">AYT</button>
+          <button class="tab-btn" onclick="switchExamTab('ydt', this)">YDT</button>
         </div>
         <canvas id="netChart" style="max-height: 220px;"></canvas>
       </div>
@@ -134,167 +78,109 @@
           <option value="ayt">AYT Denemesi</option>
           <option value="ydt">YDT Denemesi</option>
         </select>
-        <input type="text" placeholder="Deneme Adı (Örn: Yayın Denemesi #3)">
-        <input type="number" placeholder="Toplam Net Sayısı">
-        <button class="btn-primary">Kaydet</button>
+        <input type="text" id="examNameInput" placeholder="Deneme Adı (Örn: Yayın Denemesi #3)">
+        <input type="number" id="examNetInput" placeholder="Toplam Net Sayısı">
+        <button class="btn-primary" onclick="addExamNet()">Kaydet</button>
       </div>
     </div>
 
     <!-- 3. YANLIŞ KUTUSU -->
     <div id="page-yanlis" class="page hidden">
       <div class="card">
+        <div class="card-title">Yanlış Soru Ekle</div>
+        <select id="wrongQuestionLesson">
+          <option value="matematik">Matematik</option>
+          <option value="fen">Fen Bilimleri</option>
+          <option value="turkce">Türkçe</option>
+          <option value="ydt">YDT (İngilizce)</option>
+        </select>
+        <input type="file" id="questionImageInput" accept="image/*">
+        <button class="btn-primary" onclick="uploadWrongQuestion()">Soru Fotoğrafı Yükle</button>
+      </div>
+
+      <div class="card">
         <div class="card-title">Yanlış Soru Galerisi</div>
-        <select>
+        <select id="filterLessonSelect" onchange="fetchWrongQuestions()">
           <option value="tum">Tüm Dersler</option>
           <option value="matematik">Matematik</option>
           <option value="fen">Fen Bilimleri</option>
           <option value="turkce">Türkçe</option>
           <option value="ydt">YDT (İngilizce)</option>
         </select>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
-          <div style="border: 1px solid var(--border); padding: 10px; border-radius: 12px; text-align: center; background: var(--bg);">
-            <div style="height: 80px; background: #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 12px;">Soru Fotoğrafı</div>
-            <span class="badge badge-ydt" style="margin-top: 8px; display: inline-block;">YDT</span>
-          </div>
-          <div style="border: 1px solid var(--border); padding: 10px; border-radius: 12px; text-align: center; background: var(--bg);">
-            <div style="height: 80px; background: #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 12px;">Soru Fotoğrafı</div>
-            <span class="badge badge-tyt" style="margin-top: 8px; display: inline-block;">TYT Mat</span>
-          </div>
-        </div>
+        <div id="wrongQuestionsGallery" class="gallery-grid"></div>
       </div>
     </div>
 
-    <!-- 4. KOÇUM (ÖDEV ATAMA & MESAJ) -->
+    <!-- 4. KOÇUM (ÖDEVLER) -->
     <div id="page-koc" class="page hidden">
-      <!-- Öğrenci Modu: Ödev Listesi -->
       <div class="card">
-        <div class="card-title">Koçumdan Gelen Ödevler</div>
-        <div class="item-row">
-          <div>
-            <span class="badge badge-ydt">YDT</span>
-            <div style="font-weight: 700; font-size: 14px; margin-top: 4px;">Reading Part 3 Metin Analizi</div>
-            <small style="color: var(--muted)">Son Tarih: Yarın 18:00</small>
-          </div>
-          <button class="icon-btn" style="font-size: 12px;">Tamamla</button>
-        </div>
+        <div class="card-title">Gelen Ödevler</div>
+        <div id="assignmentList"></div>
       </div>
 
-      <!-- Koç Modu: Ödev Atama Paneli -->
-      <div class="card">
+      <!-- Sadece Koç Görebilir -->
+      <div id="adminPanelCard" class="card hidden">
         <div class="card-title">Öğrenciye Ödev At (Koç Paneli)</div>
-        <select>
-          <option>Ders Türü Seçin</option>
+        <select id="selectStudentForAssignment">
+          <option value="">Öğrenci Seçin...</option>
+        </select>
+        <select id="assignmentTypeSelect">
           <option value="tyt">TYT</option>
           <option value="ayt">AYT</option>
           <option value="ydt">YDT</option>
         </select>
-        <input type="text" placeholder="Ödev Başlığı / Konusu">
-        <textarea placeholder="Ödev Detayları ve Açıklama..."></textarea>
-        <button class="btn-primary">Ödevi Gönder</button>
+        <input type="text" id="assignmentTitleInput" placeholder="Ödev Başlığı / Konusu">
+        <textarea id="assignmentDescInput" placeholder="Ödev Detayları..."></textarea>
+        <button class="btn-primary" onclick="createAssignment()">Ödevi Gönder</button>
       </div>
     </div>
 
     <!-- 5. DAHA FAZLA -->
     <div id="page-more" class="page hidden">
-      <div class="card">
-        <div class="card-title">Profil & Hedef Ayarları</div>
-        <p style="font-size: 13px; color: var(--muted); margin: 0;">Sınav türünü (Sayısal, Sözel, Eşit Ağırlık, YDT) ve hedef sıralamanı buradan düzenleyebilirsin.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">Kronometre Geçmişi</div>
-        <div class="item-row">
-          <span style="font-size: 13px;">Dün Toplam Çalışma</span>
-          <strong style="font-size: 13px;">5 Sa 20 Dk</strong>
+      <!-- Kronometre -->
+      <div class="card" style="text-align: center;">
+        <div class="card-title" style="justify-content: center;">Çalışma Kronometresi</div>
+        <div id="timerDisplay" style="font-size: 44px; font-weight: 900; margin: 12px 0; font-family: monospace;">00:00:00</div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-primary" onclick="startTimer()">Başlat</button>
+          <button class="btn-primary" style="background: var(--danger);" onclick="stopTimer()">Durdur ve Kaydet</button>
+          <button class="icon-btn" onclick="resetTimer()">🔄</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">Detaylı İstatistikler</div>
-        <p style="font-size: 13px; color: var(--muted); margin: 0;">Haftalık ve aylık soru çözümü dökümleri.</p>
+
+      <!-- Öğrenci Hedef Girme -->
+      <div id="studentTargetCard" class="card">
+        <div class="card-title">Hedeflerimi Belirle</div>
+        <input type="text" id="targetDepartmentInput" placeholder="Hedef Bölüm (Örn: İTÜ Bilgisayar Müh.)">
+        <input type="number" id="targetRankInput" placeholder="Hedef Sıralama (Örn: 5000)">
+        <button class="btn-primary" onclick="saveTarget()">Hedefleri Kaydet</button>
+      </div>
+
+      <!-- SADECE KOÇUN GÖREBİLECEĞİ İLERLEME PANELİ -->
+      <div id="coachAnalyticsCard" class="card hidden">
+        <div class="card-title">Öğrenci İlerleme Takibi (Sadece Koç)</div>
+        <select id="coachStudentSelect" onchange="loadStudentProgress(this.value)">
+          <option value="">İlerlemesini Görmek İçin Öğrenci Seçin...</option>
+        </select>
+        <div id="progressResults" style="margin-top: 15px;">
+          <div class="item-row"><span>Günlük Çalışma:</span> <strong id="dailyTime">0 sa 0 dk</strong></div>
+          <div class="item-row"><span>Haftalık Çalışma:</span> <strong id="weeklyTime">0 sa 0 dk</strong></div>
+          <div class="item-row"><span>Aylık Çalışma:</span> <strong id="monthlyTime">0 sa 0 dk</strong></div>
+        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Bottom Nav Bar -->
-  <div class="bottom-nav">
-    <button class="nav-item active" onclick="switchPage('home', this)">
-      <span>🏠</span> Ana Sayfa
-    </button>
-    <button class="nav-item" onclick="switchPage('deneme', this)">
-      <span>📊</span> Denemeler
-    </button>
-    <button class="nav-item" onclick="switchPage('yanlis', this)">
-      <span>📷</span> Yanlışlar
-    </button>
-    <button class="nav-item" onclick="switchPage('koc', this)">
-      <span>👨‍🏫</span> Koçum
-    </button>
-    <button class="nav-item" onclick="switchPage('more', this)">
-      <span>⚙️</span> Daha Fazla
-    </button>
+  <!-- Bottom Nav -->
+  <div id="bottomNav" class="bottom-nav hidden">
+    <button class="nav-item active" onclick="switchPage('home', this)"><span>🏠</span> Ana Sayfa</button>
+    <button class="nav-item" onclick="switchPage('deneme', this)"><span>📊</span> Denemeler</button>
+    <button class="nav-item" onclick="switchPage('yanlis', this)"><span>📷</span> Yanlışlar</button>
+    <button class="nav-item" onclick="switchPage('koc', this)"><span>👨‍🏫</span> Koçum</button>
+    <button class="nav-item" onclick="switchPage('more', this)"><span>⚙️</span> Daha Fazla</button>
   </div>
 
-  <script>
-    // Tema Geçişi
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-    }
-
-    // Sayfa Navigasyonu
-    function switchPage(pageId, btn) {
-      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      document.getElementById('page-' + pageId).classList.remove('hidden');
-      
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      if(pageId === 'deneme') {
-        initChart();
-      }
-    }
-
-    // Chart.js Deneme Net Grafiği Entegrasyonu
-    let chartInstance = null;
-    function initChart() {
-      const ctx = document.getElementById('netChart').getContext('2d');
-      if(chartInstance) chartInstance.destroy();
-      
-      chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Deneme 1', 'Deneme 2', 'Deneme 3', 'Deneme 4'],
-          datasets: [{
-            label: 'Net İlerlemesi',
-            data: [45, 52, 48, 61],
-            borderColor: '#4f46e5',
-            backgroundColor: 'rgba(79, 70, 229, 0.1)',
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } }
-        }
-      });
-    }
-
-    // Deneme Sekmeleri Geçişi
-    function switchExamTab(type) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      // Örnek Veri Güncelleme
-      if(type === 'ydt') {
-        chartInstance.data.datasets[0].data = [60, 65, 68, 74];
-      } else if(type === 'ayt') {
-        chartInstance.data.datasets[0].data = [30, 35, 38, 42];
-      } else {
-        chartInstance.data.datasets[0].data = [45, 52, 48, 61];
-      }
-      chartInstance.update();
-    }
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
