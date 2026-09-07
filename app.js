@@ -1,7 +1,7 @@
 // 1. SUPABASE BAĞLANTISI
-// (Kendi SUPABASE_URL ve SUPABASE_ANON_KEY değerlerini tırnakların içine yaz)
-const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';
+// (Kendi SUPABASE_URL ve SUPABASE_ANON_KEY bilgilerini yapıştır)
+const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
 
 let supabase;
 try {
@@ -12,7 +12,7 @@ try {
 
 let currentUser = null;
 let userRole = 'student';
-let isSignUpMode = false;
+let currentAuthTab = 'login'; // 'login' veya 'register'
 
 let chartInstance = null;
 let timerInterval = null;
@@ -28,29 +28,42 @@ document.addEventListener('DOMContentLoaded', async () => {
       await fetchUserProfile();
     }
   } catch (err) {
-    console.error("Session alınırken hata:", err);
+    console.error("Session hatası:", err);
   }
 });
 
-// GİRİŞ / KAYIT MODU GEÇİŞİ
-function toggleAuthMode() {
-  isSignUpMode = !isSignUpMode;
-  document.getElementById('authTitle').innerText = isSignUpMode ? 'Kayıt Ol' : 'Giriş Yap';
-  document.getElementById('authPrimaryBtn').innerText = isSignUpMode ? 'Kayıt Ol' : 'Giriş Yap';
-  document.getElementById('authToggleText').innerHTML = isSignUpMode ? 'Zaten hesabın var mı? <b>Giriş Yap</b>' : 'Hesabın yok mu? <b>Kayıt Ol</b>';
-  document.getElementById('roleSelectGroup').classList.toggle('hidden', !isSignUpMode);
+// GİRİŞ / KAYIT TAB GEÇİŞİ (Kesin Çözüm)
+function switchAuthTab(mode) {
+  currentAuthTab = mode;
+  
+  const loginBtn = document.getElementById('tabLoginBtn');
+  const registerBtn = document.getElementById('tabRegisterBtn');
+  const extraFields = document.getElementById('registerExtraFields');
+  const primaryBtn = document.getElementById('authPrimaryBtn');
+
+  if (mode === 'register') {
+    loginBtn.classList.remove('active');
+    registerBtn.classList.add('active');
+    extraFields.classList.remove('hidden');
+    primaryBtn.innerText = 'Kayıt Ol';
+  } else {
+    registerBtn.classList.remove('active');
+    loginBtn.classList.add('active');
+    extraFields.classList.add('hidden');
+    primaryBtn.innerText = 'Giriş Yap';
+  }
 }
 
-// BUTONA BASILDIĞINDA ÇALIŞAN ANA FONKSİYON
+// ANA AUTH İŞLEMİ (Giriş Yap / Kayıt Ol)
 async function handleAuth() {
   const emailInput = document.getElementById('authEmail');
   const passwordInput = document.getElementById('authPassword');
-  
+
   const email = emailInput ? emailInput.value.trim() : '';
   const password = passwordInput ? passwordInput.value.trim() : '';
 
   if (!email || !password) {
-    alert('Lütfen e-posta ve şifre alanlarını doldurun.');
+    alert('Lütfen e-posta ve şifrenizi girin.');
     return;
   }
 
@@ -59,33 +72,36 @@ async function handleAuth() {
   btn.innerText = 'Lütfen bekleyin...';
 
   try {
-    if (isSignUpMode) {
+    if (currentAuthTab === 'register') {
       // KAYIT OL
       const role = document.getElementById('authRole').value;
       const fullName = document.getElementById('authName').value;
+
+      if (!fullName) {
+        alert('Lütfen adınızı ve soyadınızı girin.');
+        btn.disabled = false;
+        btn.innerText = 'Kayıt Ol';
+        return;
+      }
 
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
         options: {
-          data: {
-            full_name: fullName,
-            role: role
-          }
+          data: { full_name: fullName, role: role }
         }
       });
 
       if (error) throw error;
 
       if (data.user) {
-        // Profiles tablosuna kayıt
         await supabase.from('profiles').insert([
           { id: data.user.id, full_name: fullName, role: role }
         ]);
       }
 
       alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
-      toggleAuthMode();
+      switchAuthTab('login');
 
     } else {
       // GİRİŞ YAP
@@ -101,11 +117,11 @@ async function handleAuth() {
     }
 
   } catch (err) {
-    alert('İşlem Başarısız: ' + (err.message || err));
+    alert('Hata: ' + (err.message || err));
     console.error('Auth Hatası:', err);
   } finally {
     btn.disabled = false;
-    btn.innerText = isSignUpMode ? 'Kayıt Ol' : 'Giriş Yap';
+    btn.innerText = currentAuthTab === 'register' ? 'Kayıt Ol' : 'Giriş Yap';
   }
 }
 
