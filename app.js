@@ -1,8 +1,8 @@
 // ==========================================
 // SUPABASE BAĞLANTI AYARLARI
 // ==========================================
-const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/'; // Buraya kendi Supabase URL'ini yapıştır
-const SUPABASE_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';          // Buraya kendi Supabase Anon Key'ini yapıştır
+const SUPABASE_URL = 'https://wcjusyzrlnnbtwyjypnm.supabase.co/rest/v1/'; // Supabase Proje URL'niz
+const SUPABASE_KEY = 'sb_publishable_K2AIrHSs765CUXlGzqlCdg_ntTpKVXi';             // Supabase Anon Public Key'iniz
 
 const _supabase = (typeof supabase !== 'undefined' && SUPABASE_URL.includes('supabase.co')) 
   ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
@@ -34,6 +34,7 @@ const LESSON_DATA = {
 };
 
 let studentsList = [];
+let currentUser = null;
 
 let appState = {
   profile: { name: "Öğrenci (Sen)", field: "Sayısal", uni: "İTÜ", dept: "Yazılım Mühendisliği", rank: 5000 },
@@ -47,7 +48,7 @@ let appState = {
 };
 
 let timerInterval = null;
-let netChart = null;
+letnetChart = null;
 
 // INIT
 document.addEventListener('DOMContentLoaded', async () => {
@@ -55,17 +56,134 @@ document.addEventListener('DOMContentLoaded', async () => {
   updatePlanLessons();
   updateSoruLessons();
   renderExamInputs();
-  renderAll();
-
-  // Supabase'den gerçek öğrencileri çek
-  await fetchStudentsFromSupabase();
+  
+  if (_supabase) {
+    // Oturum açık mı kontrol et
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      showAppScreen();
+    } else {
+      showAuthScreen();
+    }
+  } else {
+    showAuthScreen();
+  }
 
   if (appState.timer.isRunning) {
     runTimerLoop();
   }
 });
 
-// SAYFA GEÇİŞİ
+// EKRAN GEÇİŞLERİ (Giriş / Uygulama)
+function showAuthScreen() {
+  const authDiv = document.getElementById('auth-container');
+  const appDiv = document.getElementById('app-container');
+  if (authDiv) authDiv.classList.remove('hidden');
+  if (appDiv) appDiv.classList.add('hidden');
+}
+
+function showAppScreen() {
+  const authDiv = document.getElementById('auth-container');
+  const appDiv = document.getElementById('app-container');
+  if (authDiv) authDiv.classList.add('hidden');
+  if (appDiv) appDiv.classList.remove('hidden');
+
+  renderAll();
+  fetchStudentsFromSupabase();
+}
+
+// ==========================================
+// KİMLİK DOĞRULAMA (AUTH) FONKSİYONLARI
+// ==========================================
+
+// 1. KAYIT OL (Mail Doğrulamalı)
+async function handleSignUp() {
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+  const infoMsg = document.getElementById('authInfoMsg');
+
+  if (!email || !password) {
+    alert('Lütfen e-posta ve şifre girin.');
+    return;
+  }
+
+  const { data, error } = await _supabase.auth.signUp({
+    email: email,
+    password: password,
+  });
+
+  if (error) {
+    alert('Kayıt Hatası: ' + error.message);
+    return;
+  }
+
+  if (infoMsg) {
+    infoMsg.innerHTML = `Kayıt başarılı! Lütfen <strong>${email}</strong> adresine gelen doğrulama bağlantısına tıklayın.`;
+    infoMsg.style.color = 'var(--success)';
+  }
+}
+
+// 2. GİRİŞ YAP
+async function handleSignIn() {
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+
+  if (!email || !password) {
+    alert('Lütfen e-posta ve şifre girin.');
+    return;
+  }
+
+  const { data, error } = await _supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
+
+  if (error) {
+    alert('Giriş Hatası: ' + error.message);
+    return;
+  }
+
+  currentUser = data.user;
+  showAppScreen();
+}
+
+// 3. TEKRAR DOĞRULAMA MAİLİ GÖNDER
+async function handleResendVerification() {
+  const email = document.getElementById('authEmail').value;
+  const infoMsg = document.getElementById('authInfoMsg');
+
+  if (!email) {
+    alert('Lütfen önce yukarıdaki alana e-posta adresinizi yazın.');
+    return;
+  }
+
+  const { error } = await _supabase.auth.resend({
+    type: 'signup',
+    email: email,
+  });
+
+  if (error) {
+    alert('Mail Gönderilemedi: ' + error.message);
+    return;
+  }
+
+  if (infoMsg) {
+    infoMsg.innerHTML = `Doğrulama maili <strong>${email}</strong> adresine tekrar gönderildi. Lütfen kontrol edin.`;
+    infoMsg.style.color = '#818cf8';
+  }
+}
+
+// ÇIKIŞ YAP
+async function handleSignOut() {
+  if (_supabase) await _supabase.auth.signOut();
+  currentUser = null;
+  showAuthScreen();
+}
+
+// ==========================================
+// SAYFA GEÇİŞİ VE SUPABASE VERİ ÇEKME
+// ==========================================
 function switchPage(pageId, btnElement) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   
@@ -83,19 +201,12 @@ function switchPage(pageId, btnElement) {
   if (pageId === 'exams') renderChart();
 }
 
-// SUPABASE'DEN GERÇEK ÖĞRENCİLERİ ÇEK
 async function fetchStudentsFromSupabase() {
   const select = document.getElementById('coachStudentSelect');
-
-  if (!_supabase) {
-    console.warn("Supabase bilgileri girilmedi.");
-    if (select) select.innerHTML = `<option value="">Supabase Bağlantısı Yok</option>`;
-    return;
-  }
+  if (!_supabase) return;
 
   try {
     const { data, error } = await _supabase.from('profiles').select('*');
-    
     if (error) {
       console.error("Supabase Veri Çekme Hatası:", error);
       if (select) select.innerHTML = `<option value="">Veri Çekilemedi</option>`;
@@ -111,7 +222,6 @@ async function fetchStudentsFromSupabase() {
     }
   } catch (err) {
     console.error("Bağlantı Hatası:", err);
-    if (select) select.innerHTML = `<option value="">Bağlantı Kurulamadı</option>`;
   }
 }
 
