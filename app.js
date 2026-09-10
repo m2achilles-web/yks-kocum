@@ -142,10 +142,36 @@
     ];
 
     let activePlanGroup = "TYT";
+    let activeQuestionGroup = "TYT";
     let planDraftSettings = {};
 
     function planGroupOf(subject){
       return String(subject || "").split(" ")[0].toUpperCase();
+    }
+
+    function switchQuestionGroup(group){
+      activeQuestionGroup = group;
+      document.querySelectorAll(".question-type-tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.questionGroup === group);
+      });
+      const select = document.getElementById("qSubject");
+      if(select){
+        const groups = Array.from(select.querySelectorAll("optgroup"));
+        groups.forEach(g => {
+          const isActive = String(g.label || "").trim().toUpperCase() === group;
+          g.hidden = !isActive;
+          g.querySelectorAll("option").forEach(o => o.hidden = !isActive);
+        });
+        const activeGroup = groups.find(g => String(g.label || "").trim().toUpperCase() === group);
+        if(activeGroup && activeGroup.querySelector("option")){
+          const first = activeGroup.querySelector("option");
+          if(!select.value || !select.value.toUpperCase().startsWith(group + " ")) select.value = first.value;
+        }
+      }
+    }
+
+    function initQuestionGroup(){
+      switchQuestionGroup(activeQuestionGroup);
     }
 
     function savePlanDraftLocal(){
@@ -1072,6 +1098,9 @@
           "hidden"
         );
 
+        const coachMoreCard = document.getElementById("coachPanelMoreCard");
+        if(coachMoreCard) coachMoreCard.classList.remove("hidden");
+
       }else{
 
         badge.classList.add(
@@ -1081,6 +1110,9 @@
         section.classList.add(
           "hidden"
         );
+
+        const coachMoreCard = document.getElementById("coachPanelMoreCard");
+        if(coachMoreCard) coachMoreCard.classList.add("hidden");
 
       }
 
@@ -1408,36 +1440,55 @@
 
       currentRole = "user";
 
+      // Önce mevcut my_role RPC'sini dene. Eski projelerde RPC olmayabilir
+      // veya farklı bir veri tipi dönebilir; bu durumda profil/metadata
+      // üzerinden güvenli bir fallback kullanıyoruz.
       try{
 
-        const {
-          data,
-          error
-        } =
-          await supabaseClient
-            .rpc("my_role");
+        const { data, error } = await supabaseClient.rpc("my_role");
 
-        if(
-          !error &&
-          data
-        ){
+        if(!error && data){
+          const raw = Array.isArray(data) ? data[0] : data;
+          const roleValue = typeof raw === "object"
+            ? (raw?.role || raw?.my_role || raw?.current_role)
+            : raw;
 
-          currentRole =
-            String(data)
-              .toLowerCase()
-              .trim();
-
+          if(roleValue){
+            currentRole = String(roleValue).toLowerCase().trim();
+          }
         }
 
       }catch(e){
+        console.warn("my_role RPC kullanılamadı, fallback deneniyor:", e);
+      }
 
-        console.error(
-          "Rol alınamadı:",
-          e
-        );
+      // RPC user döndürdüyse bile profil rolünü kontrol et. Böylece
+      // profiles.role = coach/admin olan eski kurulumlar da çalışır.
+      if(!isStaff()){
+        try{
+          const { data: roleProfile, error: roleProfileError } = await supabaseClient
+            .from("profiles")
+            .select("role")
+            .eq("id", currentUser.id)
+            .maybeSingle();
 
-        currentRole = "user";
+          if(!roleProfileError && roleProfile?.role){
+            currentRole = String(roleProfile.role).toLowerCase().trim();
+          }
+        }catch(e){
+          console.warn("Profil rolü okunamadı:", e);
+        }
+      }
 
+      // Son fallback: auth metadata içinde role varsa onu kullan.
+      if(!isStaff()){
+        const metadataRole =
+          currentUser?.app_metadata?.role ||
+          currentUser?.user_metadata?.role;
+
+        if(metadataRole){
+          currentRole = String(metadataRole).toLowerCase().trim();
+        }
       }
 
       updateAdminBadge();
@@ -1575,8 +1626,10 @@
       if(page === "questions")
         renderQuestions();
 
-      if(page === "exams")
+      if(page === "exams") {
+        if(!document.querySelector("#examScoreFields .exam-net-input")) renderExamScoreFields();
         renderExams();
+      }
 
       if(page === "badges")
         renderBadges();
@@ -3108,6 +3161,8 @@
 
     function renderQuestions(){
 
+      initQuestionGroup();
+
       const container =
         document.getElementById(
           "questionList"
@@ -3224,259 +3279,123 @@
        EXAMS
     ===================================================== */
 
+    let activeExamType = "TYT";
+
+    function examFieldsFor(type){
+      if(type === "AYT") return [
+        ["AYT Matematik","math"],["AYT Fizik","physics"],["AYT Kimya","chemistry"],["AYT Biyoloji","biology"],
+        ["AYT Edebiyat","literature"],["AYT Tarih","history"],["AYT Coğrafya","geography"]
+      ];
+      if(type === "YDT") return [["YDT Neti","ydt"]];
+      return [["Türkçe","turkish"],["Matematik","math"],["Fen","science"],["Sosyal","social"]];
+    }
+
+    function switchExamType(type){
+      activeExamType = type || "TYT";
+      document.querySelectorAll(".exam-type-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.exam === activeExamType));
+      const select = document.getElementById("examType");
+      if(select) select.value = activeExamType;
+      renderExamScoreFields();
+      renderExams();
+    }
+
+    function renderExamScoreFields(){
+      const box = document.getElementById("examScoreFields");
+      if(!box) return;
+      box.innerHTML = examFieldsFor(activeExamType).map(([label,key]) => `
+        <div class="field exam-score-field">
+          <label>${escapeHtml(label)} Neti</label>
+          <input class="input exam-net-input" data-exam-key="${escapeAttr(key)}" type="number" min="0" step="0.25" value="0" oninput="updateExamTotal()">
+        </div>`).join("");
+      updateExamTotal();
+    }
+
+    function updateExamTotal(){
+      const inputs = document.querySelectorAll("#examScoreFields .exam-net-input");
+      let total = 0;
+      inputs.forEach(input => total += Number(input.value) || 0);
+      const max = activeExamType === "YDT" ? 80 : null;
+      const info = document.getElementById("examTotalInfo");
+      if(info) info.innerHTML = `Toplam net: <strong>${total.toFixed(2)}${max ? " / 80" : ""}</strong>`;
+      return total;
+    }
+
     async function addExam(){
+      if(!currentUser) return;
+      const name = document.getElementById("examName")?.value.trim();
+      const date = document.getElementById("examDate")?.value || today();
+      const type = document.getElementById("examType")?.value || activeExamType;
+      activeExamType = type;
+      if(!name){ toast("Deneme adı gir."); return; }
 
-      const name =
-        document.getElementById(
-          "examName"
-        ).value.trim();
+      const values = {};
+      document.querySelectorAll("#examScoreFields .exam-net-input").forEach(input => {
+        values[input.dataset.examKey] = Number(input.value) || 0;
+      });
+      if(type === "YDT" && (values.ydt || 0) > 80){ toast("YDT neti 80'i geçemez."); return; }
 
-
-      const date =
-        document.getElementById(
-          "examDate"
-        ).value ||
-        today();
-
-
-      const type =
-        document.getElementById(
-          "examType"
-        ).value;
-
-
-      const turkish =
-        Number(
-          document.getElementById(
-            "examTurkish"
-          ).value
-        ) || 0;
-
-
-      const math =
-        Number(
-          document.getElementById(
-            "examMath"
-          ).value
-        ) || 0;
-
-
-      const science =
-        Number(
-          document.getElementById(
-            "examScience"
-          ).value
-        ) || 0;
-
-
-      const social =
-        Number(
-          document.getElementById(
-            "examSocial"
-          ).value
-        ) || 0;
-
-
-      if(!name){
-
-        toast(
-          "Deneme adı gir."
-        );
-
-        return;
-
-      }
-
-
-      const net =
-        turkish +
-        math +
-        science +
-        social;
-
-
+      const net = Object.values(values).reduce((sum,v) => sum + Number(v || 0), 0);
       const row = {
-
-        user_id:
-          currentUser.id,
-
-        name,
-
-        date,
-
-        type,
-
-        turkish,
-
-        math,
-
-        science,
-
-        social,
-
-        net:
-          Number(
-            net.toFixed(2)
-          )
-
+        user_id: currentUser.id, name, date, type,
+        turkish: Number(values.turkish || 0),
+        math: Number(values.math || 0),
+        science: Number(values.science || 0),
+        social: Number(values.social || 0),
+        net: Number(net.toFixed(2)),
+        details: JSON.stringify(values)
       };
 
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient
-          .from("exams")
-          .insert(row)
-          .select()
-          .single();
-
-
-      if(error){
-
-        console.error(error);
-
-        toast(
-          error.message
-        );
-
-        return;
-
+      let result = await supabaseClient.from("exams").insert(row).select().single();
+      if(result.error && /details/i.test(result.error.message || "")){
+        const {details, ...legacyRow} = row;
+        result = await supabaseClient.from("exams").insert(legacyRow).select().single();
       }
+      if(result.error){ console.error(result.error); toast(result.error.message); return; }
 
-
-      exams.unshift(
-        data
-      );
-
-
+      exams.unshift(result.data);
       saveLocal();
-
-
-      document.getElementById(
-        "examName"
-      ).value = "";
-
-
+      document.getElementById("examName").value = "";
+      renderExamScoreFields();
       checkBadges();
-
       renderExams();
-
       renderHome();
-
-
-      toast(
-        "Deneme kaydedildi 📊"
-      );
-
+      toast("Deneme kaydedildi 📊");
     }
 
+    function examDetailValues(e){
+      try{
+        if(e.details && typeof e.details === "string") return JSON.parse(e.details) || {};
+        if(e.details && typeof e.details === "object") return e.details;
+      }catch(err){}
+      return {turkish:e.turkish, math:e.math, science:e.science, social:e.social};
+    }
+
+    function renderExamChart(){
+      const box = document.getElementById("examChart");
+      if(!box) return;
+      const rows = exams.filter(e => (e.type || "TYT") === activeExamType).slice(0,10).reverse();
+      if(!rows.length){ box.innerHTML = `<div class="exam-chart-empty">${activeExamType} için henüz deneme yok.</div>`; return; }
+      const max = Math.max(1, ...rows.map(e => Number(e.net) || 0));
+      box.innerHTML = rows.map(e => {
+        const pct = Math.max(4, Math.min(100, (Number(e.net)||0) / max * 100));
+        return `<div class="exam-chart-row"><div class="exam-chart-label">${escapeHtml(e.name || "Deneme")}<span>${Number(e.net||0).toFixed(2)}</span></div><div class="exam-chart-track"><div class="exam-chart-bar" style="width:${pct}%"></div></div></div>`;
+      }).join("");
+    }
 
     function renderExams(){
-
-      const container =
-        document.getElementById(
-          "examList"
-        );
-
-
-      if(!exams.length){
-
-        container.innerHTML =
-          `<div style="color:var(--muted)">
-            Henüz deneme yok.
-          </div>`;
-
-        return;
-
-      }
-
-
-      container.innerHTML =
-        exams
-          .map(
-            e => `
-
-          <div class="list-item">
-
-            <div class="list-top">
-
-              <div>
-
-                <div class="list-title">
-
-                  ${
-                    escapeHtml(
-                      e.name
-                    )
-                  }
-
-                </div>
-
-                <div class="list-meta">
-
-                  ${
-                    e.type ||
-                    ""
-                  }
-
-                  ·
-
-                  ${
-                    e.date ||
-                    ""
-                  }
-
-                </div>
-
-              </div>
-
-              <div class="net">
-
-                ${
-                  Number(
-                    e.net ||
-                    0
-                  ).toFixed(2)
-                }
-
-              </div>
-
-            </div>
-
-            <div class="list-meta">
-
-              Türkçe ${
-                e.turkish ||
-                0
-              }
-
-              · Mat ${
-                e.math ||
-                0
-              }
-
-              · Fen ${
-                e.science ||
-                0
-              }
-
-              · Sosyal ${
-                e.social ||
-                0
-              }
-
-            </div>
-
-          </div>
-
-        `
-          )
-          .join("");
-
+      const container = document.getElementById("examList");
+      if(!container) return;
+      const filtered = exams.filter(e => (e.type || "TYT") === activeExamType);
+      const count = document.getElementById("examHistoryCount");
+      if(count) count.textContent = `${filtered.length} kayıt`;
+      if(!filtered.length) container.innerHTML = `<div style="color:var(--muted)">${activeExamType} için henüz deneme yok.</div>`;
+      else container.innerHTML = filtered.slice(0,20).map(e => {
+        const values = examDetailValues(e);
+        const detail = examFieldsFor(activeExamType).map(([label,key]) => `${label}: ${Number(values[key] || 0).toFixed(2)}`).join(" · ");
+        return `<div class="list-item"><div class="list-top"><div><div class="list-title">${escapeHtml(e.name || "Deneme")}</div><div class="list-meta">${escapeHtml(e.date || "")} · ${escapeHtml(e.type || activeExamType)}</div></div><div class="net">${Number(e.net || 0).toFixed(2)}</div></div><div class="list-meta">${escapeHtml(detail)}</div></div>`;
+      }).join("");
+      renderExamChart();
     }
-
 
     /* =====================================================
        FOCUS
