@@ -344,6 +344,12 @@
           <h2>Soru Takibi</h2>
         </div>
 
+        <div class="question-type-tabs">
+          <button type="button" class="question-type-tab active" data-question-group="TYT" onclick="switchQuestionGroup('TYT')">TYT</button>
+          <button type="button" class="question-type-tab" data-question-group="AYT" onclick="switchQuestionGroup('AYT')">AYT</button>
+          <button type="button" class="question-type-tab" data-question-group="YDT" onclick="switchQuestionGroup('YDT')">YDT</button>
+        </div>
+
         <div class="card">
 
           <div class="form-grid">
@@ -462,7 +468,7 @@
           <div class="field"><label>Deneme adı</label><input id="examName" class="input" placeholder="Örn. TYT Genel Deneme 1"></div>
           <div class="form-grid">
             <div class="field"><label>Tarih</label><input id="examDate" class="input" type="date"></div>
-            <div class="field"><label>Tür</label><select id="examType"><option>TYT</option><option>AYT</option><option>YDT</option></select></div>
+            <div class="field"><label>Tür</label><select id="examType" onchange="switchExamType(this.value)"><option>TYT</option><option>AYT</option><option>YDT</option></select></div>
           </div>
           <div id="examScoreFields" class="exam-score-grid"></div>
           <div id="examTotalInfo" class="exam-total-info">Toplam net: <strong>0.00</strong></div>
@@ -549,6 +555,7 @@
           <button class="more-card" onclick="showPage('focus')"><span>⏱️</span><strong>Odak</strong><small>Kronometre ve çalışma süresi</small></button>
           <button class="more-card" onclick="showPage('profile')"><span>👤</span><strong>Profil</strong><small>Hedeflerini ve hesabını düzenle</small></button>
           <button class="more-card" onclick="showPage('badges')"><span>🏆</span><strong>Rozetler</strong><small>Başarılarını görüntüle</small></button>
+          <button id="coachPanelMoreCard" class="more-card staff-only hidden" onclick="openCoachPanel()"><span>🎓</span><strong>Koç Paneli</strong><small>Öğrencileri ve hedeflerini takip et</small></button>
           <button class="more-card" onclick="showPage('home')"><span>⌂</span><strong>Ana Sayfa</strong><small>Özet ekranına dön</small></button>
         </div>
       </section>
