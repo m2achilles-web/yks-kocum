@@ -932,139 +932,51 @@
       const {
         data,
         error
-      } =
-        await supabaseClient
-          .from("profiles")
-          .select("*")
-          .eq(
-            "id",
-            currentUser.id
-          )
-          .maybeSingle();
+      } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
 
       if(error)
         console.error(error);
 
       if(data){
-
         profile = data;
-
       }else{
-
-        profile = {
-
-          id:
-            currentUser.id,
-
-          ...DEFAULT_PROFILE
-
+        // Create a minimal profile first. This keeps first-login/profile
+        // creation working even when optional goal columns are missing.
+        const baseProfile = {
+          id: currentUser.id,
+          username: DEFAULT_PROFILE.username || "Öğrenci",
+          field: DEFAULT_PROFILE.field || "Sayısal",
+          target_rank: DEFAULT_PROFILE.target_rank ?? null,
+          university: DEFAULT_PROFILE.university || "",
+          department: DEFAULT_PROFILE.department || "",
+          exam_date: DEFAULT_PROFILE.exam_date || null
         };
 
-        const {
-          error:insertError
-        } =
-          await supabaseClient
+        const { error:insertError } = await supabaseClient
+          .from("profiles")
+          .upsert(baseProfile);
+
+        if(insertError){
+          console.error(insertError);
+          // Retry once with only the id if an older schema has another
+          // optional column mismatch.
+          const retry = await supabaseClient
             .from("profiles")
-            .upsert(profile);
+            .upsert({ id: currentUser.id });
+          if(retry.error) console.error(retry.error);
+        }
 
-        if(insertError)
-          console.error(
-            insertError
-          );
-
+        profile = {
+          id: currentUser.id,
+          ...DEFAULT_PROFILE
+        };
       }
 
       fillProfileUI();
-
-    }
-
-
-    function fillProfileUI(){
-
-      profile =
-        Object.assign(
-          {},
-          DEFAULT_PROFILE,
-          profile || {}
-        );
-
-      document.getElementById(
-        "helloName"
-      ).textContent =
-        "Merhaba, " +
-        (
-          profile.username ||
-          "Öğrenci"
-        ) +
-        " 👋";
-
-      updateAdminBadge();
-
-      document.getElementById(
-        "profileUsername"
-      ).value =
-        profile.username || "";
-
-      document.getElementById(
-        "profileField"
-      ).value =
-        profile.field ||
-        "Sayısal";
-
-      document.getElementById(
-        "profileRank"
-      ).value =
-        profile.target_rank ||
-        "";
-
-      document.getElementById(
-        "profileHours"
-      ).value =
-        profile.daily_hours ??
-        4;
-
-      document.getElementById(
-        "profileQuestions"
-      ).value =
-        profile.daily_questions ??
-        100;
-
-      document.getElementById(
-        "profileUniversity"
-      ).value =
-        profile.university ||
-        "";
-
-      document.getElementById(
-        "profileDepartment"
-      ).value =
-        profile.department ||
-        "";
-
-      document.getElementById(
-        "profileExamDate"
-      ).value =
-        profile.exam_date ||
-        "";
-
-      document.getElementById(
-        "heroQuestions"
-      ).textContent =
-        (
-          profile.daily_questions ||
-          0
-        ) +
-        " soru";
-
-      document.getElementById(
-        "heroHours"
-      ).textContent =
-        "Günlük hedef: " +
-        (
-          profile.daily_hours ||
-          0
-        ) +
-        " saat";
 
     }
 
@@ -1121,102 +1033,30 @@
 
     async function saveProfile(){
 
-      const updated = {
+      if(!currentUser){
+        toast("Önce giriş yapmalısın.");
+        return;
+      }
 
-        id:
-          currentUser.id,
-
-        username:
-          document
-            .getElementById(
-              "profileUsername"
-            )
-            .value
-            .trim() ||
-          "Öğrenci",
-
-        field:
-          document
-            .getElementById(
-              "profileField"
-            )
-            .value,
-
-        target_rank:
-          Number(
-            document
-              .getElementById(
-                "profileRank"
-              )
-              .value
-          ) || null,
-
-        daily_hours:
-          Number(
-            document
-              .getElementById(
-                "profileHours"
-              )
-              .value
-          ) || 0,
-
-        daily_questions:
-          Number(
-            document
-              .getElementById(
-                "profileQuestions"
-              )
-              .value
-          ) || 0,
-
-        university:
-          document
-            .getElementById(
-              "profileUniversity"
-            )
-            .value
-            .trim(),
-
-        department:
-          document
-            .getElementById(
-              "profileDepartment"
-            )
-            .value
-            .trim(),
-
-        exam_date:
-          document
-            .getElementById(
-              "profileExamDate"
-            )
-            .value ||
-          null
-
+      const baseProfile = {
+        id: currentUser.id,
+        username: document.getElementById("profileUsername").value.trim() || "Öğrenci",
+        field: document.getElementById("profileField").value,
+        target_rank: Number(document.getElementById("profileRank").value) || null,
+        university: document.getElementById("profileUniversity").value.trim(),
+        department: document.getElementById("profileDepartment").value.trim(),
+        exam_date: document.getElementById("profileExamDate").value || null
       };
 
-      // Some older Supabase projects do not yet have the optional
-      // daily_hours / daily_questions columns. Save the main profile first,
-      // then retry without those optional fields if the schema is missing them.
+      const dailyHours = Number(document.getElementById("profileHours").value) || 0;
+      const dailyQuestions = Number(document.getElementById("profileQuestions").value) || 0;
+
+      // IMPORTANT: save the core profile separately from the optional daily
+      // goal columns. That way an old profiles schema can never block saving
+      // username, field, rank, university, department and exam date.
       let { error } = await supabaseClient
         .from("profiles")
-        .upsert(updated);
-
-      if(error && /daily_hours|daily_questions|schema cache|column/i.test(error.message || "")){
-        console.warn("Profilde günlük hedef sütunları eksik; temel profil bilgileri kaydediliyor.", error);
-        const fallback = { ...updated };
-        delete fallback.daily_hours;
-        delete fallback.daily_questions;
-
-        const retry = await supabaseClient
-          .from("profiles")
-          .upsert(fallback);
-        error = retry.error || null;
-
-        if(!error){
-          toast("Profil kaydedildi. Günlük hedefler için Supabase migration'ını çalıştırman gerekiyor.");
-        }
-      }
+        .upsert(baseProfile);
 
       if(error){
         console.error(error);
@@ -1224,441 +1064,45 @@
         return;
       }
 
+      // Save daily goals only when the columns exist. If the project has not
+      // run the migration yet, the rest of the profile still saves correctly.
+      let goalsSaved = true;
+      const goalsResult = await supabaseClient
+        .from("profiles")
+        .update({
+          daily_hours: dailyHours,
+          daily_questions: dailyQuestions
+        })
+        .eq("id", currentUser.id);
+
+      if(goalsResult.error){
+        goalsSaved = false;
+        const msg = goalsResult.error.message || "";
+        if(!/daily_hours|daily_questions|schema cache|column/i.test(msg)){
+          console.error(goalsResult.error);
+        }else{
+          console.warn("Günlük hedef sütunları henüz Supabase şemasında yok:", goalsResult.error);
+        }
+      }
+
       profile = {
-
-        ...profile,
-
-        ...updated
-
+        ...(profile || {}),
+        ...baseProfile,
+        daily_hours: dailyHours,
+        daily_questions: dailyQuestions
       };
 
       saveLocal();
-
       fillProfileUI();
 
-      toast(
-        "Profil kaydedildi ✅"
-      );
+      if(goalsSaved){
+        toast("Profil kaydedildi ✅");
+      }else{
+        toast("Profil kaydedildi ✅ Günlük hedeflerin buluta aktarılması için V9.2 migration SQL'ini bir kez çalıştır.");
+      }
 
       renderHome();
 
-    }
-
-
-    /* =====================================================
-       CLOUD LOAD
-    ===================================================== */
-
-    async function loadCloudData(){
-
-      if(!currentUser)
-        return;
-
-      try{
-
-        const [
-          q,
-          e,
-          w,
-          t,
-          s,
-          p,
-          b
-        ] =
-          await Promise.all([
-
-            supabaseClient
-              .from("questions")
-              .select("*")
-              .eq(
-                "user_id",
-                currentUser.id
-              )
-              .order(
-                "date",
-                {
-                  ascending:false
-                }
-              ),
-
-            supabaseClient
-              .from("exams")
-              .select("*")
-              .eq(
-                "user_id",
-                currentUser.id
-              )
-              .order(
-                "date",
-                {
-                  ascending:false
-                }
-              ),
-
-            supabaseClient
-              .from("wrongs")
-              .select("*")
-              .eq(
-                "user_id",
-                currentUser.id
-              )
-              .order(
-                "date",
-                {
-                  ascending:false
-                }
-              ),
-
-            supabaseClient
-              .from("topics")
-              .select("*")
-              .eq(
-                "user_id",
-                currentUser.id
-              ),
-
-            supabaseClient
-              .from("study_sessions")
-              .select("*")
-              .eq(
-                "user_id",
-                currentUser.id
-              )
-              .order(
-                "date",
-                {
-                  ascending:false
-                }
-              ),
-
-            supabaseClient
-              .from("daily_plans")
-              .select("*")
-              .eq(
-                "user_id",
-                currentUser.id
-              )
-              .eq(
-                "plan_date",
-                today()
-              )
-              .maybeSingle(),
-
-            supabaseClient
-              .from("badges")
-              .select("*")
-              .eq(
-                "user_id",
-                currentUser.id
-              )
-
-          ]);
-
-        if(q.data)
-          questions = q.data;
-
-        if(e.data)
-          exams = e.data;
-
-        if(w.data)
-          wrongs = w.data;
-
-        if(t.data){
-
-          topics = {};
-
-          t.data.forEach(
-            row => {
-
-              topics[
-                row.subject +
-                "::" +
-                row.topic
-              ] =
-                row.state;
-
-            }
-          );
-
-        }
-
-        if(s.data)
-          studySessions = s.data;
-
-        if(p.data)
-          dailyPlan = p.data;
-
-        if(b.data)
-          badges = b.data;
-
-        loadPlanDraftLocal();
-
-        /*
-          Buluttan günlük plan geldiyse
-          ders seçimlerini de al.
-        */
-
-        if(
-          dailyPlan &&
-          Array.isArray(
-            dailyPlan.subjects
-          ) &&
-          dailyPlan.subjects.length
-        ){
-
-          selectedPlanSubjects =
-            dailyPlan.subjects;
-
-          savePlanSubjectsLocal();
-
-        }else{
-
-          loadPlanSubjects();
-
-        }
-
-        saveLocal();
-
-      }catch(error){
-
-        console.error(error);
-
-        toast(
-          "Bulut verileri yüklenirken sorun oldu."
-        );
-
-      }
-
-    }
-
-
-    /* =====================================================
-       ROLE
-    ===================================================== */
-
-    async function getRole(){
-
-      currentRole = "user";
-
-      // Önce mevcut my_role RPC'sini dene. Eski projelerde RPC olmayabilir
-      // veya farklı bir veri tipi dönebilir; bu durumda profil/metadata
-      // üzerinden güvenli bir fallback kullanıyoruz.
-      try{
-
-        const { data, error } = await supabaseClient.rpc("my_role");
-
-        if(!error && data){
-          const raw = Array.isArray(data) ? data[0] : data;
-          const roleValue = typeof raw === "object"
-            ? (raw?.role || raw?.my_role || raw?.current_role)
-            : raw;
-
-          if(roleValue){
-            currentRole = String(roleValue).toLowerCase().trim();
-          }
-        }
-
-      }catch(e){
-        console.warn("my_role RPC kullanılamadı, fallback deneniyor:", e);
-      }
-
-      // RPC user döndürdüyse bile profil rolünü kontrol et. Böylece
-      // profiles.role = coach/admin olan eski kurulumlar da çalışır.
-      if(!isStaff()){
-        try{
-          const { data: roleProfile, error: roleProfileError } = await supabaseClient
-            .from("profiles")
-            .select("role")
-            .eq("id", currentUser.id)
-            .maybeSingle();
-
-          if(!roleProfileError && roleProfile?.role){
-            currentRole = String(roleProfile.role).toLowerCase().trim();
-          }
-        }catch(e){
-          console.warn("Profil rolü okunamadı:", e);
-        }
-      }
-
-      // Son fallback: auth metadata içinde role varsa onu kullan.
-      if(!isStaff()){
-        const metadataRole =
-          currentUser?.app_metadata?.role ||
-          currentUser?.user_metadata?.role;
-
-        if(metadataRole){
-          currentRole = String(metadataRole).toLowerCase().trim();
-        }
-      }
-
-      updateAdminBadge();
-
-    }
-
-
-    /* =====================================================
-       BOOT
-    ===================================================== */
-
-    async function bootApp(){
-
-      document
-        .getElementById("authScreen")
-        .classList
-        .add("hidden");
-
-      document
-        .getElementById("appScreen")
-        .classList
-        .remove("hidden");
-
-      try{
-
-        loadLocal();
-
-        await getRole();
-
-        await loadProfile();
-
-        await loadCloudData();
-
-        await createTodayPlanIfNeeded();
-
-        renderAll();
-
-        if(
-          currentRole === "admin" ||
-          currentRole === "coach"
-        ){
-
-          await loadAdminStats(false);
-
-        }
-
-      }catch(error){
-
-        console.error(error);
-
-        toast(
-          "Uygulama yüklenirken hata oluştu."
-        );
-
-      }finally{
-
-        document
-          .getElementById("loading")
-          .classList
-          .add("hidden");
-
-      }
-
-    }
-
-
-    /* =====================================================
-       NAVIGATION
-    ===================================================== */
-
-    function showPage(page){
-
-      const pages = [
-
-        "home",
-        "plan",
-        "questions",
-        "exams",
-        "focus",
-        "badges",
-        "profile",
-        "more"
-
-      ];
-
-      pages.forEach(
-        p => {
-
-          const element =
-            document.getElementById(
-              "page-" + p
-            );
-
-          if(element){
-
-            element.classList.toggle(
-              "hidden",
-              p !== page
-            );
-
-          }
-
-        }
-      );
-
-      document
-        .querySelectorAll(
-          ".nav-btn"
-        )
-        .forEach(
-          btn => {
-
-            btn.classList.toggle(
-              "active",
-              btn.dataset.page === page
-            );
-
-          }
-        );
-
-      window.scrollTo({
-
-        top:0,
-
-        behavior:"smooth"
-
-      });
-
-      if(page === "home")
-        renderHome();
-
-      if(page === "plan")
-        renderPlan();
-
-      if(page === "questions")
-        renderQuestions();
-
-      if(page === "exams") {
-        if(!document.querySelector("#examScoreFields .exam-net-input")) renderExamScoreFields();
-        renderExams();
-      }
-
-      if(page === "badges")
-        renderBadges();
-
-
-      if(
-        page === "profile" &&
-        (
-          currentRole === "admin" ||
-          currentRole === "coach"
-        )
-      ){
-
-        loadAdminStats(false);
-
-      }
-
-    }
-
-
-    function openCoachPanel(){
-      if(!isStaff()){ toast("Koç paneline erişim yetkin yok."); return; }
-      showPage("profile");
-      const admin = document.getElementById("adminSection");
-      if(admin){
-        admin.classList.remove("hidden");
-        setTimeout(() => admin.scrollIntoView({behavior:"smooth", block:"start"}), 80);
-      }
-      loadAdminStats(false);
     }
 
 
