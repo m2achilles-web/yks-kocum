@@ -56,7 +56,6 @@
     */
 
     let selectedPlanSubjects = [];
-    let planDraftSettings = {};
 
 
     const today = () => {
@@ -123,6 +122,7 @@
       "AYT Edebiyat",
       "AYT Tarih",
       "AYT Coğrafya",
+
       "YDT İngilizce",
       "YDT Almanca",
       "YDT Arapça"
@@ -140,6 +140,47 @@
       "TYT Türkçe"
 
     ];
+
+    let activePlanGroup = "TYT";
+    let planDraftSettings = {};
+
+    function planGroupOf(subject){
+      return String(subject || "").split(" ")[0].toUpperCase();
+    }
+
+    function savePlanDraftLocal(){
+      if(!currentUser) return;
+      try{ localStorage.setItem("yksKocumV9_plan_draft_" + currentUser.id, JSON.stringify(planDraftSettings)); }catch(e){}
+    }
+
+    function loadPlanDraftLocal(){
+      if(!currentUser) return;
+      try{
+        const raw = localStorage.getItem("yksKocumV9_plan_draft_" + currentUser.id);
+        const parsed = raw ? JSON.parse(raw) : {};
+        if(parsed && typeof parsed === "object") planDraftSettings = parsed;
+      }catch(e){ planDraftSettings = {}; }
+    }
+
+    function filterPlanGroup(group){
+      activePlanGroup = group;
+      document.querySelectorAll(".plan-group-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.group === group));
+      renderPlanSubjectEditor();
+    }
+
+    function setPlanDraft(subject, key, value){
+      if(!planDraftSettings[subject]) planDraftSettings[subject] = {minutes:60, start:"18:00"};
+      planDraftSettings[subject][key] = key === "minutes" ? Number(value) : value;
+      savePlanDraftLocal();
+      updatePlanDraft();
+    }
+
+    function updatePlanDraft(){
+      const total = selectedPlanSubjects.reduce((sum, subject) => sum + Number(planDraftSettings[subject]?.minutes || 60), 0);
+      const el = document.getElementById("planTotalHours");
+      if(el) el.textContent = `${Math.floor(total/60)} saat ${total%60 ? total%60 + " dk" : ""}`.trim();
+      updateSelectedPlanCount();
+    }
 
 
     /* =====================================================
@@ -1122,19 +1163,32 @@
 
       };
 
-      const {
-        error
-      } =
-        await supabaseClient
+      // Some older Supabase projects do not yet have the optional
+      // daily_hours / daily_questions columns. Save the main profile first,
+      // then retry without those optional fields if the schema is missing them.
+      let { error } = await supabaseClient
+        .from("profiles")
+        .upsert(updated);
+
+      if(error && /daily_hours|daily_questions|schema cache|column/i.test(error.message || "")){
+        console.warn("Profilde günlük hedef sütunları eksik; temel profil bilgileri kaydediliyor.", error);
+        const fallback = { ...updated };
+        delete fallback.daily_hours;
+        delete fallback.daily_questions;
+
+        const retry = await supabaseClient
           .from("profiles")
-          .upsert(updated);
+          .upsert(fallback);
+        error = retry.error || null;
+
+        if(!error){
+          toast("Profil kaydedildi. Günlük hedefler için Supabase migration'ını çalıştırman gerekiyor.");
+        }
+      }
 
       if(error){
-
         console.error(error);
-
         toast(error.message);
-
         return;
       }
 
@@ -1304,6 +1358,8 @@
 
         if(b.data)
           badges = b.data;
+
+        loadPlanDraftLocal();
 
         /*
           Buluttan günlük plan geldiyse
@@ -1525,6 +1581,7 @@
       if(page === "badges")
         renderBadges();
 
+
       if(
         page === "profile" &&
         (
@@ -1540,124 +1597,102 @@
     }
 
 
+    function openCoachPanel(){
+      if(!isStaff()){ toast("Koç paneline erişim yetkin yok."); return; }
+      showPage("profile");
+      const admin = document.getElementById("adminSection");
+      if(admin){
+        admin.classList.remove("hidden");
+        setTimeout(() => admin.scrollIntoView({behavior:"smooth", block:"start"}), 80);
+      }
+      loadAdminStats(false);
+    }
+
+
     /* =====================================================
        HOME
     ===================================================== */
 
-    function getCoachAnalysis(){
-
-      const todayKey = today();
-
-      const todayQuestions = questions.reduce(
-        (sum, q) => sum + (q.date === todayKey ? Number(q.total || 0) : 0),
-        0
-      );
-
-      const questionGoal = Number(profile?.daily_questions || 0);
-
-      const sortedExams = [...exams]
-        .filter(e => e && e.date)
-        .sort((a, b) => String(b.date).localeCompare(String(a.date)));
-
-      const latestExam = sortedExams[0] || null;
-      const previousExam = sortedExams[1] || null;
-
-      const subjectStats = {};
-      questions.forEach(q => {
-        const subject = String(q.subject || "").trim();
-        if(!subject) return;
-        if(!subjectStats[subject]) subjectStats[subject] = { total: 0, net: 0 };
-        subjectStats[subject].total += Number(q.total || 0);
-        subjectStats[subject].net += Number(q.net || 0);
-      });
-
-      const candidates = Object.entries(subjectStats)
-        .filter(([, stat]) => stat.total >= 10)
-        .map(([subject, stat]) => ({
-          subject,
-          total: stat.total,
-          efficiency: stat.net / Math.max(1, stat.total)
-        }))
-        .sort((a, b) => a.efficiency - b.efficiency);
-
-      const weak = candidates[0] || null;
-
-      let status = "Hazır";
-      let message = "Bugünkü verilerini takip etmeye devam et; düzenli kayıt yaptıkça önerilerim daha isabetli olacak.";
-
-      if(!questions.length && !exams.length && !studySessions.length){
-        status = "Başlangıç";
-        message = "İlk adım: bugün küçük bir hedef belirle, birkaç soru çöz ve ilk denemeni kaydet. Koçun zamanla seni tanıyacak.";
-      }else if(latestExam && previousExam && Number(latestExam.net || 0) < Number(previousExam.net || 0) - 0.5){
-        status = "Dikkat";
-        message = `Son denemede netin ${Number(latestExam.net || 0).toFixed(2)}. Önceki denemeye göre düşüş var; özellikle ${weak?.subject || "zorlandığın derse"} kısa bir tekrar + soru seti ayır.`;
-      }else if(weak){
-        status = "Öncelik";
-        message = `${weak.subject} şu an en düşük performans gösteren dersin. Bugün bu derse ekstra ${Math.max(20, Math.round((Number(profile?.daily_hours || 4) * 60) / 6))} dakika ayırman iyi bir hamle olur.`;
-      }else if(questionGoal > 0 && todayQuestions < questionGoal){
-        status = "Hedef";
-        message = `Bugünkü hedefinin ${Math.max(0, questionGoal - todayQuestions)} sorusu kaldı. Hedefi tek seferde bitirmek yerine küçük setlere bölerek ilerle.`;
-      }else if(latestExam){
-        status = "İyi gidiyor";
-        message = `Son denemen ${Number(latestExam.net || 0).toFixed(2)} net. İstikrarı koru ve yeni denemede küçük bir artışı hedefle.`;
-      }
-
-      return { todayQuestions, questionGoal, latestExam, previousExam, weak, status, message };
-    }
-
-
-    function renderCoach(){
-
-      const statusEl = document.getElementById("coachStatus");
-      const messageEl = document.getElementById("coachMessage");
-      if(!statusEl || !messageEl) return;
-
-      const analysis = getCoachAnalysis();
-
-      statusEl.textContent = analysis.status;
-      messageEl.textContent = analysis.message;
-
-      document.getElementById("coachLastNet").textContent =
-        analysis.latestExam ? Number(analysis.latestExam.net || 0).toFixed(2) : "—";
-
-      let trend = "Henüz yeterli veri yok";
-      if(analysis.latestExam && analysis.previousExam){
-        const diff = Number(analysis.latestExam.net || 0) - Number(analysis.previousExam.net || 0);
-        trend = `${diff > 0 ? "+" : ""}${diff.toFixed(2)} net · önceki deneme`;
-      }else if(analysis.latestExam){
-        trend = "İlk kayıt · sonraki denemeyle karşılaştırılacak";
-      }
-      document.getElementById("coachNetTrend").textContent = trend;
-
-      document.getElementById("coachTodayQuestions").textContent =
-        `${analysis.todayQuestions} / ${analysis.questionGoal || "—"}`;
-
-      const progress = analysis.questionGoal
-        ? Math.min(100, Math.round(analysis.todayQuestions / analysis.questionGoal * 100))
-        : 0;
-      document.getElementById("coachQuestionProgress").textContent =
-        analysis.questionGoal ? `%${progress} tamamlandı` : "Profilinden günlük hedef belirle";
-
-      document.getElementById("coachWeakSubject").textContent =
-        analysis.weak?.subject || "—";
-      document.getElementById("coachWeakDetail").textContent =
-        analysis.weak
-          ? `${analysis.weak.total} soru üzerinden öncelik`
-          : "En az 10 soruluk veri gerekli";
-    }
-
-
-    function formatMinutes(total){const m=Math.max(0,Math.round(total));return `${Math.floor(m/60)}s ${String(m%60).padStart(2,'0')}dk`;}
-    function periodMinutes(days){const now=new Date();const cutoff=new Date(now.getFullYear(),now.getMonth(),now.getDate()-days+1);return studySessions.reduce((sum,x)=>{const d=x.date?new Date(x.date+'T00:00:00'):(x.created_at?new Date(x.created_at):null);return d&&d>=cutoff?sum+Number(x.minutes||0)+Number(x.seconds||0)/60:sum;},0);}
     function renderHome(){
-      const totalQuestions=questions.reduce((sum,q)=>sum+Number(q.total||0),0), totalNet=questions.reduce((sum,q)=>sum+Number(q.net||0),0), totalMinutes=studySessions.reduce((sum,s)=>sum+Number(s.minutes||0)+Number(s.seconds||0)/60,0);
-      document.getElementById('totalQuestions').textContent=totalQuestions;document.getElementById('totalNet').textContent=totalNet.toFixed(2);document.getElementById('totalExams').textContent=exams.length;document.getElementById('totalMinutes').textContent=formatMinutes(totalMinutes);
-      const d=periodMinutes(1),w=periodMinutes(7),now=new Date();const monthStart=new Date(now.getFullYear(),now.getMonth(),1);const mo=studySessions.reduce((sum,x)=>{const dt=x.date?new Date(x.date+'T00:00:00'):(x.created_at?new Date(x.created_at):null);return dt&&dt>=monthStart?sum+Number(x.minutes||0)+Number(x.seconds||0)/60:sum;},0);
-      document.getElementById('studyDaily').textContent=formatMinutes(d);document.getElementById('studyWeekly').textContent=formatMinutes(w);document.getElementById('studyMonthly').textContent=formatMinutes(mo);
-      const tasks=Array.isArray(dailyPlan?.tasks)?dailyPlan.tasks:[],planned=tasks.reduce((a,t)=>a+Number(t.minutes||0),0),done=tasks.filter(t=>t.done).reduce((a,t)=>a+Number(t.minutes||0),0),pct=planned?Math.min(100,Math.round(done/planned*100)):0;
-      const bar=document.getElementById('todayProgressBar');if(bar)bar.style.width=pct+'%';const pctEl=document.getElementById('todayPlanProgress');if(pctEl)pctEl.textContent=pct+'%';const minEl=document.getElementById('todayPlanMinutes');if(minEl)minEl.textContent=`${Math.round(done)} / ${Math.round(planned)} dk`;
-      document.getElementById('streakText').textContent=calculateStreak()+' gün seri';renderTodayTasks();renderCoach();
+
+      const totalQuestions =
+        questions.reduce(
+
+          (sum,q) =>
+            sum +
+            Number(
+              q.total || 0
+            ),
+
+          0
+
+        );
+
+      const totalNet =
+        questions.reduce(
+
+          (sum,q) =>
+            sum +
+            Number(
+              q.net || 0
+            ),
+
+          0
+
+        );
+
+      const totalMinutes =
+        studySessions.reduce(
+
+          (sum,s) =>
+            sum +
+            Number(
+              s.minutes || 0
+            ) +
+            Number(
+              s.seconds || 0
+            ) / 60,
+
+          0
+
+        );
+
+      document.getElementById(
+        "totalQuestions"
+      ).textContent =
+        totalQuestions;
+
+      document.getElementById(
+        "totalNet"
+      ).textContent =
+        totalNet.toFixed(2);
+
+      document.getElementById(
+        "totalExams"
+      ).textContent =
+        exams.length;
+
+      document.getElementById(
+        "totalMinutes"
+      ).textContent =
+        Math.round(
+          totalMinutes
+        ) +
+        " dk";
+
+      const streak =
+        calculateStreak();
+
+      document.getElementById(
+        "streakText"
+      ).textContent =
+        streak +
+        " gün seri";
+
+      renderTodayTasks();
+
     }
+
 
     function calculateStreak(){
 
@@ -1916,32 +1951,371 @@
     ===================================================== */
 
     function renderPlanSubjectEditor(){
-      const container=document.getElementById("planSubjectEditor"); if(!container)return;
-      loadPlanSubjects();
-      const activeGroup=document.querySelector(".plan-group-tab.active")?.dataset.group || "TYT";
-      const currentTasks=Array.isArray(dailyPlan?.tasks)?dailyPlan.tasks:[];
-      selectedPlanSubjects.forEach(subject=>{if(!planDraftSettings[subject]){const old=currentTasks.find(t=>t.subject===subject);planDraftSettings[subject]={minutes:Number(old?.minutes||60),time:old?.time||"09:00"};}});
-      const selected=new Set(selectedPlanSubjects);
-      container.innerHTML=SUBJECTS.filter(s=>s.startsWith(activeGroup+" ")).map(subject=>{
-        const draft=planDraftSettings[subject]||{minutes:60,time:"09:00"}; const checked=selected.has(subject);
-        return `<div class="plan-subject-row ${checked?"selected":""}">
-          <label class="plan-subject-check"><input type="checkbox" data-plan-subject="${escapeAttr(subject)}" ${checked?"checked":""} onchange="togglePlanSubject('${escapeAttr(subject)}',this.checked)"><span>${escapeHtml(subject)}</span></label>
-          <div class="plan-subject-controls"><label><small>Süre</small><select data-plan-minutes="${escapeAttr(subject)}" value="${draft.minutes}" onchange="setPlanDraft('${escapeAttr(subject)}','minutes',this.value)"><option value="30" ${draft.minutes===30?'selected':''}>30 dk</option><option value="45" ${draft.minutes===45?'selected':''}>45 dk</option><option value="60" ${draft.minutes===60?'selected':''}>1 saat</option><option value="90" ${draft.minutes===90?'selected':''}>1.5 saat</option><option value="120" ${draft.minutes===120?'selected':''}>2 saat</option><option value="150" ${draft.minutes===150?'selected':''}>2.5 saat</option><option value="180" ${draft.minutes===180?'selected':''}>3 saat</option><option value="240" ${draft.minutes===240?'selected':''}>4 saat</option></select></label><label><small>Başlangıç</small><input type="time" data-plan-time="${escapeAttr(subject)}" value="${escapeAttr(draft.time)}" onchange="setPlanDraft('${escapeAttr(subject)}','time',this.value)"></label></div>
-        </div>`;
-      }).join("") || `<div class="coach-empty">Bu bölüm için ders bulunamadı.</div>`;
-      const count=document.getElementById("selectedPlanCount");if(count)count.textContent=selectedPlanSubjects.length; updatePlanDraft();
+      const box = document.getElementById("planSubjectEditor");
+      if(!box) return;
+      if(!Object.keys(planDraftSettings).length) loadPlanDraftLocal();
+      const visible = SUBJECTS.filter(subject => planGroupOf(subject) === activePlanGroup);
+      box.innerHTML = visible.map(subject => {
+        const checked = selectedPlanSubjects.includes(subject);
+        const draft = planDraftSettings[subject] || {minutes:60, start:"18:00"};
+        return `
+          <div class="plan-subject-row ${checked ? "selected" : ""}">
+            <label class="subject-check">
+              <input type="checkbox" value="${escapeAttr(subject)}" ${checked ? "checked" : ""} onchange="togglePlanSubject(this)">
+              <span>${escapeHtml(subject)}</span>
+            </label>
+            <select class="plan-duration" ${checked ? "" : "disabled"} onchange="setPlanDraft('${escapeAttr(subject)}','minutes',this.value)">
+              ${[30,45,60,90,120,150,180,240].map(m => `<option value="${m}" ${Number(draft.minutes||60)===m?'selected':''}>${m} dk</option>`).join("")}
+            </select>
+            <input class="plan-start" type="time" value="${escapeAttr(draft.start || "18:00")}" ${checked ? "" : "disabled"} onchange="setPlanDraft('${escapeAttr(subject)}','start',this.value)">
+          </div>`;
+      }).join("");
+      updatePlanDraft();
     }
-    function filterPlanGroup(group){document.querySelectorAll('.plan-group-tab').forEach(b=>b.classList.toggle('active',b.dataset.group===group));renderPlanSubjectEditor();}
-    function togglePlanSubject(subject,checked){if(checked){if(!selectedPlanSubjects.includes(subject))selectedPlanSubjects.push(subject);if(!planDraftSettings[subject])planDraftSettings[subject]={minutes:60,time:'09:00'};}else selectedPlanSubjects=selectedPlanSubjects.filter(s=>s!==subject);renderPlanSubjectEditor();}
-    function setPlanDraft(subject,key,value){planDraftSettings[subject]=planDraftSettings[subject]||{minutes:60,time:'09:00'};planDraftSettings[subject][key]=key==='minutes'?Number(value):value;updatePlanDraft();}
-    function updatePlanDraft(){let total=selectedPlanSubjects.reduce((sum,s)=>sum+Number(planDraftSettings[s]?.minutes||60),0);const el=document.getElementById('planTotalHours');if(el)el.textContent=`${(total/60).toFixed(1)} saat`;}
+
+
+    function updateSelectedPlanCount(){
+
+      const counter =
+        document.getElementById(
+          "selectedPlanCount"
+        );
+
+      if(counter){
+
+        counter.textContent =
+          selectedPlanSubjects.length;
+
+      }
+
+    }
+
+
+    function togglePlanSubject(input){
+      const subject = input.value;
+      if(input.checked){
+        if(!selectedPlanSubjects.includes(subject)) selectedPlanSubjects.push(subject);
+        if(!planDraftSettings[subject]) planDraftSettings[subject] = {minutes:60, start:"18:00"};
+      }else{
+        selectedPlanSubjects = selectedPlanSubjects.filter(item => item !== subject);
+      }
+      savePlanSubjectsLocal();
+      savePlanDraftLocal();
+      renderPlanSubjectEditor();
+    }
+
+
+    /* =====================================================
+       PLAN - SAVE SUBJECTS
+    ===================================================== */
 
     async function saveSelectedPlanSubjects(){
-      if(!currentUser||!selectedPlanSubjects.length){toast('En az bir ders seçmelisin.');return;}
+
+      if(!currentUser)
+        return;
+
+
+      if(
+        !selectedPlanSubjects.length
+      ){
+
+        toast(
+          "En az bir ders seçmelisin."
+        );
+
+        return;
+
+      }
+
+
       savePlanSubjectsLocal();
-      if(dailyPlan){dailyPlan.subjects=[...selectedPlanSubjects];await supabaseClient.from('daily_plans').upsert({...dailyPlan,subjects:[...selectedPlanSubjects],updated_at:new Date().toISOString()},{onConflict:'user_id,plan_date'});}
-      const status=document.getElementById('planSaveStatus');if(status)status.textContent='Ders seçimlerin kaydedildi.';renderPlanSubjectEditor();
+
+
+      /*
+        Mevcut plan varsa subjects alanını
+        güncelle fakat görevleri bozma.
+      */
+
+      if(dailyPlan){
+
+        dailyPlan.subjects =
+          [...selectedPlanSubjects];
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from("daily_plans")
+            .upsert(
+
+              {
+
+                ...dailyPlan,
+
+                subjects:
+                  [...selectedPlanSubjects],
+
+                updated_at:
+                  new Date()
+                    .toISOString()
+
+              },
+
+              {
+                onConflict:
+                  "user_id,plan_date"
+              }
+
+            )
+            .select()
+            .single();
+
+
+        if(error){
+
+          console.error(error);
+
+          toast(
+            "Dersler kaydedilemedi: " +
+            error.message
+          );
+
+          return;
+
+        }
+
+
+        if(data){
+
+          dailyPlan =
+            data;
+
+        }
+
+      }
+
+
+      saveLocal();
+
+
+      const status =
+        document.getElementById(
+          "planSaveStatus"
+        );
+
+      if(status){
+
+        status.textContent =
+          "✓ Ders tercihlerin kaydedildi.";
+
+        setTimeout(
+          () => {
+
+            status.textContent = "";
+
+          },
+          3000
+        );
+
+      }
+
+
+      renderPlan();
+
+      toast(
+        "Dersler kaydedildi 📚"
+      );
+
     }
+
+
+    /* =====================================================
+       PLAN - REFRESH
+    ===================================================== */
+
+    async function refreshTodayPlan(){
+
+      if(!currentUser)
+        return;
+
+
+      if(
+        !selectedPlanSubjects.length
+      ){
+
+        toast(
+          "Önce en az bir ders seç."
+        );
+
+        return;
+
+      }
+
+
+      const hours =
+        Number(
+          document.getElementById(
+            "planHours"
+          ).value
+        ) ||
+        Number(
+          profile?.daily_hours ||
+          4
+        );
+
+
+      const start =
+        document.getElementById(
+          "planStart"
+        ).value ||
+        dailyPlan?.start_time ||
+        "18:00";
+
+
+      const totalMinutes =
+        Math.max(
+          15,
+          Math.round(
+            hours * 60
+          )
+        );
+
+
+      const minutesPerSubject =
+        Math.max(
+          15,
+          Math.floor(
+            totalMinutes /
+            selectedPlanSubjects.length
+          )
+        );
+
+
+      const tasks =
+        selectedPlanSubjects.map(
+          (
+            subject,
+            index
+          ) => {
+
+            const startMinutes =
+              timeToMinutes(start) +
+              index *
+              minutesPerSubject;
+
+            return {
+
+              id:
+                "task_" +
+                Date.now() +
+                "_" +
+                index,
+
+              date:
+                today(),
+
+              time:
+                minutesToTime(
+                  startMinutes
+                ),
+
+              subject,
+
+              topic:"",
+
+              minutes:
+                minutesPerSubject,
+
+              done:false
+
+            };
+
+          }
+        );
+
+
+      const newPlan = {
+
+        user_id:
+          currentUser.id,
+
+        plan_date:
+          today(),
+
+        hours,
+
+        start_time:
+          start,
+
+        subjects:
+          [...selectedPlanSubjects],
+
+        tasks,
+
+        updated_at:
+          new Date()
+            .toISOString()
+
+      };
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("daily_plans")
+          .upsert(
+
+            newPlan,
+
+            {
+              onConflict:
+                "user_id,plan_date"
+            }
+
+          )
+          .select()
+          .single();
+
+
+      if(error){
+
+        console.error(error);
+
+        toast(
+          "Plan yenilenemedi: " +
+          error.message
+        );
+
+        return;
+
+      }
+
+
+      dailyPlan =
+        data || newPlan;
+
+
+      savePlanSubjectsLocal();
+
+      saveLocal();
+
+      renderPlan();
+
+      renderHome();
+
+      toast(
+        "Plan seçtiğin derslere göre yenilendi 🔄"
+      );
+
+    }
+
+
+    /* =====================================================
+       PLAN
+    ===================================================== */
 
     function renderPlan(){
 
@@ -1958,12 +2332,8 @@
         Dersleri yükle
       */
 
-      loadPlanSubjects();
-
-
-      /*
-        Editor
-      */
+      if(!selectedPlanSubjects.length) loadPlanSubjects();
+      if(!Object.keys(planDraftSettings).length) loadPlanDraftLocal();
 
       renderPlanSubjectEditor();
 
@@ -2299,25 +2669,214 @@
     ===================================================== */
 
     async function savePlan(){
-      const rows=[...document.querySelectorAll('.plan-subject-row')];
-      const selected=selectedPlanSubjects.filter(s=>SUBJECTS.includes(s));
-      if(!selected.length){toast('En az bir ders seç.');return;}
-      const oldTasks=Array.isArray(dailyPlan?.tasks)?dailyPlan.tasks:[];
-      const tasks=[]; let cursor=0;
-      selected.forEach((subject,index)=>{
-        const old=oldTasks.find(t=>t.subject===subject);
-        const minutes=Number(document.querySelector(`[data-plan-minutes="${CSS.escape(subject)}"]`)?.value || old?.minutes || 60);
-        const time=document.querySelector(`[data-plan-time="${CSS.escape(subject)}"]`)?.value || old?.time || minutesToTime(timeToMinutes('09:00')+cursor);
-        tasks.push({id:old?.id||('task_'+Date.now()+'_'+index),date:today(),time,subject,topic:old?.topic||'',minutes,done:old?.done||false});
-        cursor+=minutes;
-      });
-      const hours=tasks.reduce((a,t)=>a+Number(t.minutes||0),0)/60;
-      const start=tasks[0]?.time||'09:00';
-      const newPlan={user_id:currentUser.id,plan_date:today(),hours:Number(hours.toFixed(2)),start_time:start,subjects:selected,tasks,updated_at:new Date().toISOString()};
-      const {data,error}=await supabaseClient.from('daily_plans').upsert(newPlan,{onConflict:'user_id,plan_date'}).select().single();
-      if(error){console.error(error);toast(error.message);return;}
-      dailyPlan=data||newPlan; selectedPlanSubjects=[...selected]; savePlanSubjectsLocal(); saveLocal(); renderPlan(); renderHome(); toast('Kişisel planın kaydedildi 📅');
+
+      const select =
+        document.getElementById(
+          "planSubjects"
+        );
+
+
+      const subjects =
+        Array.from(
+          select.selectedOptions
+        )
+        .map(
+          option =>
+            option.value
+        );
+
+
+      if(!subjects.length){
+
+        toast(
+          "En az bir ders seç."
+        );
+
+        return;
+
+      }
+
+
+      const hours =
+        Number(
+          document.getElementById(
+            "planHours"
+          ).value
+        ) || 0;
+
+
+      const start =
+        document.getElementById(
+          "planStart"
+        ).value ||
+        "18:00";
+
+
+      /*
+        Yeni ders seçimlerini ana sisteme aktar.
+      */
+
+      selectedPlanSubjects =
+        [...subjects];
+
+
+      savePlanSubjectsLocal();
+
+
+      const minutesPerSubject =
+        Math.max(
+          15,
+          Math.floor(
+            hours *
+            60 /
+            subjects.length
+          )
+        );
+
+
+      /*
+        Mevcut görevlerin tamamlanma durumunu koru.
+      */
+
+      const oldTasks =
+        dailyPlan?.tasks ||
+        [];
+
+
+      const tasks =
+        subjects.map(
+          (
+            subject,
+            index
+          ) => {
+
+            const previous =
+              oldTasks.find(
+                task =>
+                  task.subject ===
+                  subject
+              );
+
+
+            const startMinutes =
+              timeToMinutes(
+                start
+              ) +
+              index *
+              minutesPerSubject;
+
+
+            return {
+
+              id:
+                previous?.id ||
+                (
+                  "task_" +
+                  Date.now() +
+                  "_" +
+                  index
+                ),
+
+              date:
+                today(),
+
+              time:
+                minutesToTime(
+                  startMinutes
+                ),
+
+              subject,
+
+              topic:
+                previous?.topic ||
+                "",
+
+              minutes:
+                minutesPerSubject,
+
+              done:
+                previous?.done ||
+                false
+
+            };
+
+          }
+        );
+
+
+      const newPlan = {
+
+        user_id:
+          currentUser.id,
+
+        plan_date:
+          today(),
+
+        hours,
+
+        start_time:
+          start,
+
+        subjects,
+
+        tasks,
+
+        updated_at:
+          new Date()
+            .toISOString()
+
+      };
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("daily_plans")
+          .upsert(
+
+            newPlan,
+
+            {
+              onConflict:
+                "user_id,plan_date"
+            }
+
+          )
+          .select()
+          .single();
+
+
+      if(error){
+
+        console.error(error);
+
+        toast(
+          error.message
+        );
+
+        return;
+
+      }
+
+
+      dailyPlan =
+        data || newPlan;
+
+
+      saveLocal();
+
+      renderPlan();
+
+      renderHome();
+
+      toast(
+        "Plan kaydedildi 📅"
+      );
+
     }
+
 
     async function toggleTask(id){
 
@@ -2665,31 +3224,259 @@
        EXAMS
     ===================================================== */
 
-    let activeExamType='TYT';
-    function examFieldsFor(type){
-      if(type==='YDT') return [{id:'ydtNet',label:'YDT Neti',max:80}];
-      if(type==='AYT') return [{id:'aytMath',label:'Matematik'},{id:'aytPhysics',label:'Fizik'},{id:'aytChemistry',label:'Kimya'},{id:'aytBiology',label:'Biyoloji'},{id:'aytLiterature',label:'Edebiyat'},{id:'aytHistory',label:'Tarih'},{id:'aytGeography',label:'Coğrafya'}];
-      return [{id:'tytTurkish',label:'Türkçe'},{id:'tytMath',label:'Matematik'},{id:'tytScience',label:'Fen'},{id:'tytSocial',label:'Sosyal'}];
-    }
-    function switchExamType(type){activeExamType=type;const sel=document.getElementById('examType');if(sel)sel.value=type;document.querySelectorAll('.exam-type-tab').forEach(b=>b.classList.toggle('active',b.dataset.exam===type));renderExamScoreFields();}
-    function renderExamScoreFields(){
-      const box=document.getElementById('examScoreFields'); if(!box)return; const fields=examFieldsFor(activeExamType); box.innerHTML=fields.map(f=>`<div class="exam-score-field"><label>${f.label}</label><input id="${f.id}" class="input" type="number" min="0" max="${f.max||200}" step=".01" value="0" oninput="updateExamTotal()"></div>`).join(''); updateExamTotal();
-    }
-    function updateExamTotal(){const fields=examFieldsFor(activeExamType);let total=fields.reduce((s,f)=>s+Number(document.getElementById(f.id)?.value||0),0);const info=document.getElementById('examTotalInfo');if(info)info.innerHTML=`Toplam net: <strong>${total.toFixed(2)}</strong>`;}
     async function addExam(){
-      const name=document.getElementById('examName').value.trim(),date=document.getElementById('examDate').value||today(),type=activeExamType;
-      if(!name){toast('Deneme adı gir.');return;}
-      const values={}; let net=0; examFieldsFor(type).forEach(f=>{values[f.id]=Number(document.getElementById(f.id)?.value||0);net+=values[f.id];});
-      const row={user_id:currentUser.id,name,date,type,net:Number(net.toFixed(2)),turkish:type==='TYT'?values.tytTurkish:0,math:type==='TYT'?values.tytMath:0,science:type==='TYT'?values.tytScience:0,social:type==='TYT'?values.tytSocial:0,details:JSON.stringify(values)};
-      let result=await supabaseClient.from('exams').insert(row).select().single();
-      if(result.error && String(result.error.message||'').toLowerCase().includes('details')){delete row.details;result=await supabaseClient.from('exams').insert(row).select().single();}
-      if(result.error){toast(result.error.message);return;}
-      exams.unshift(result.data);saveLocal();document.getElementById('examName').value='';checkBadges();renderExams();renderHome();toast('Deneme kaydedildi 📊');
+
+      const name =
+        document.getElementById(
+          "examName"
+        ).value.trim();
+
+
+      const date =
+        document.getElementById(
+          "examDate"
+        ).value ||
+        today();
+
+
+      const type =
+        document.getElementById(
+          "examType"
+        ).value;
+
+
+      const turkish =
+        Number(
+          document.getElementById(
+            "examTurkish"
+          ).value
+        ) || 0;
+
+
+      const math =
+        Number(
+          document.getElementById(
+            "examMath"
+          ).value
+        ) || 0;
+
+
+      const science =
+        Number(
+          document.getElementById(
+            "examScience"
+          ).value
+        ) || 0;
+
+
+      const social =
+        Number(
+          document.getElementById(
+            "examSocial"
+          ).value
+        ) || 0;
+
+
+      if(!name){
+
+        toast(
+          "Deneme adı gir."
+        );
+
+        return;
+
+      }
+
+
+      const net =
+        turkish +
+        math +
+        science +
+        social;
+
+
+      const row = {
+
+        user_id:
+          currentUser.id,
+
+        name,
+
+        date,
+
+        type,
+
+        turkish,
+
+        math,
+
+        science,
+
+        social,
+
+        net:
+          Number(
+            net.toFixed(2)
+          )
+
+      };
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("exams")
+          .insert(row)
+          .select()
+          .single();
+
+
+      if(error){
+
+        console.error(error);
+
+        toast(
+          error.message
+        );
+
+        return;
+
+      }
+
+
+      exams.unshift(
+        data
+      );
+
+
+      saveLocal();
+
+
+      document.getElementById(
+        "examName"
+      ).value = "";
+
+
+      checkBadges();
+
+      renderExams();
+
+      renderHome();
+
+
+      toast(
+        "Deneme kaydedildi 📊"
+      );
+
     }
-    function examDetailValues(e){if(e?.details){try{return JSON.parse(e.details)}catch{}}return e||{};}
-    function renderExamChart(){const box=document.getElementById('examChart');if(!box)return;const data=[...exams].filter(e=>e.type===activeExamType).sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-8);if(!data.length){box.innerHTML='<div class="coach-empty">Bu türde henüz deneme yok.</div>';return;}const max=Math.max(1,...data.map(e=>Number(e.net||0)));box.innerHTML=data.map(e=>`<div class="chart-col"><div class="chart-value">${Number(e.net||0).toFixed(1)}</div><div class="chart-bar" style="height:${Math.max(8,Math.round(Number(e.net||0)/max*150))}px"></div><small>${escapeHtml(String(e.date||'').slice(5))}</small></div>`).join('');}
-    function renderExams(){const container=document.getElementById('examList');if(!container)return;document.getElementById('examHistoryCount').textContent=`${exams.length} kayıt`;if(!exams.length){container.innerHTML='<div class="coach-empty">Henüz deneme yok.</div>';renderExamChart();return;}container.innerHTML=exams.map(e=>{const d=examDetailValues(e);let summary=e.type==='YDT'?`YDT ${Number(d.ydtNet??e.net??0).toFixed(2)} / 80`:e.type==='AYT'?`Mat ${d.aytMath??0} · Fiz ${d.aytPhysics??0} · Kim ${d.aytChemistry??0} · Biy ${d.aytBiology??0} · Edb ${d.aytLiterature??0} · Tar ${d.aytHistory??0} · Coğ ${d.aytGeography??0}`:`Tür ${d.tytTurkish??e.turkish??0} · Mat ${d.tytMath??e.math??0} · Fen ${d.tytScience??e.science??0} · Sos ${d.tytSocial??e.social??0}`;return `<div class="list-item"><div class="list-top"><div><div class="list-title">${escapeHtml(e.name||'Deneme')}</div><div class="list-meta">${escapeHtml(e.type||'')} · ${escapeHtml(e.date||'')}</div></div><div class="net">${Number(e.net||0).toFixed(2)}</div></div><div class="list-meta">${escapeHtml(summary)}</div></div>`}).join('');renderExamChart();}
-    renderExamScoreFields();
+
+
+    function renderExams(){
+
+      const container =
+        document.getElementById(
+          "examList"
+        );
+
+
+      if(!exams.length){
+
+        container.innerHTML =
+          `<div style="color:var(--muted)">
+            Henüz deneme yok.
+          </div>`;
+
+        return;
+
+      }
+
+
+      container.innerHTML =
+        exams
+          .map(
+            e => `
+
+          <div class="list-item">
+
+            <div class="list-top">
+
+              <div>
+
+                <div class="list-title">
+
+                  ${
+                    escapeHtml(
+                      e.name
+                    )
+                  }
+
+                </div>
+
+                <div class="list-meta">
+
+                  ${
+                    e.type ||
+                    ""
+                  }
+
+                  ·
+
+                  ${
+                    e.date ||
+                    ""
+                  }
+
+                </div>
+
+              </div>
+
+              <div class="net">
+
+                ${
+                  Number(
+                    e.net ||
+                    0
+                  ).toFixed(2)
+                }
+
+              </div>
+
+            </div>
+
+            <div class="list-meta">
+
+              Türkçe ${
+                e.turkish ||
+                0
+              }
+
+              · Mat ${
+                e.math ||
+                0
+              }
+
+              · Fen ${
+                e.science ||
+                0
+              }
+
+              · Sosyal ${
+                e.social ||
+                0
+              }
+
+            </div>
+
+          </div>
+
+        `
+          )
+          .join("");
+
+    }
+
 
     /* =====================================================
        FOCUS
@@ -2902,11 +3689,21 @@
 
         qs.forEach(q => { if(byUser[q.user_id]) byUser[q.user_id].questionCount++; });
         examsData.forEach(e => { if(byUser[e.user_id]) byUser[e.user_id].examCount++; });
+        const now = new Date();
+        const dayKey = now.toLocaleDateString("en-CA", {timeZone:"Europe/Istanbul"});
+        const weekStart = new Date(now); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate() - ((weekStart.getDay()+6)%7));
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         sessions.forEach(s => {
-          if(byUser[s.user_id]){
-            const mins=Number(s.minutes||0)+Number(s.seconds||0)/60; byUser[s.user_id].studyMinutes += mins;
-            const d=s.date?new Date(s.date+'T00:00:00'):(s.created_at?new Date(s.created_at):null); const now=new Date();
-            if(d){const diff=(now-d)/86400000;if(diff<1.5)byUser[s.user_id].studyDaily+=mins;if(diff<7)byUser[s.user_id].studyWeekly+=mins;if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())byUser[s.user_id].studyMonthly+=mins;}
+          if(!byUser[s.user_id]) return;
+          const mins = Number(s.minutes || 0) + Number(s.seconds || 0) / 60;
+          byUser[s.user_id].studyMinutes += mins;
+          const rawDate = s.date || s.created_at;
+          const d = rawDate ? new Date(String(rawDate).length===10 ? rawDate+"T00:00:00" : rawDate) : null;
+          if(d && !Number.isNaN(d.getTime())){
+            const localDay = d.toLocaleDateString("en-CA", {timeZone:"Europe/Istanbul"});
+            if(localDay === dayKey) byUser[s.user_id].studyDaily += mins;
+            if(d >= weekStart) byUser[s.user_id].studyWeekly += mins;
+            if(d >= monthStart) byUser[s.user_id].studyMonthly += mins;
           }
         });
         plans.forEach(plan => {
@@ -2932,8 +3729,6 @@
       adminStudentFilter = String(value || "").trim().toLocaleLowerCase("tr-TR");
       renderAdminStudents();
     }
-
-function periodStudyMinutes(sessions,days){const now=new Date();const cutoff=new Date(now.getTime()-days*86400000);return sessions.reduce((sum,s)=>{const d=s.created_at?new Date(s.created_at):(s.date?new Date(s.date+'T23:59:59'):null);return d&&d>=cutoff?sum+Number(s.minutes||0)+Number(s.seconds||0)/60:sum;},0);}
 
     function renderAdminStudents(){
       const container = document.getElementById("adminStudentList");
@@ -2979,8 +3774,7 @@ function periodStudyMinutes(sessions,days){const now=new Date();const cutoff=new
                 <span>•</span>
                 <span>${student.questionCount} soru</span>
                 <span>•</span>
-                <span>${Math.round(student.studyMinutes)} dk toplam</span>
-                <span>•</span><span>G ${Math.round(student.studyDaily)} dk</span><span>•</span><span>H ${Math.round(student.studyWeekly)} dk</span><span>•</span><span>A ${Math.round(student.studyMonthly)} dk</span>
+                <span>G ${Math.round(student.studyDaily)} dk</span><span>H ${Math.round(student.studyWeekly)} dk</span><span>A ${Math.round(student.studyMonthly)} dk</span>
               </div>
               <div class="progress admin-student-progress"><div style="width:${progress}%"></div></div>
             </div>
@@ -3076,6 +3870,12 @@ function periodStudyMinutes(sessions,days){const now=new Date();const cutoff=new
             <div class="stat"><div class="stat-label">Deneme</div><div class="stat-value">${studentExams.length}</div></div>
             <div class="stat"><div class="stat-label">Çalışma</div><div class="stat-value">${Math.round(studyMinutes)} dk</div></div>
             <div class="stat"><div class="stat-label">Görev</div><div class="stat-value">${taskProgress}%</div></div>
+          </div>
+
+          <div class="coach-period-grid">
+            <div><span>Günlük</span><strong>${Math.round(student.studyDaily || 0)} dk</strong></div>
+            <div><span>Haftalık</span><strong>${Math.round(student.studyWeekly || 0)} dk</strong></div>
+            <div><span>Aylık</span><strong>${Math.round(student.studyMonthly || 0)} dk</strong></div>
           </div>
 
           <div class="admin-detail-grid">
