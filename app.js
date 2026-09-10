@@ -920,6 +920,191 @@
     }
 
 
+    async function loadCloudData(){
+
+      if(!currentUser)
+        return;
+
+      try{
+
+        const [
+          q,
+          e,
+          w,
+          t,
+          s,
+          p,
+          b
+        ] =
+          await Promise.all([
+
+            supabaseClient
+              .from("questions")
+              .select("*")
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .order(
+                "date",
+                {
+                  ascending:false
+                }
+              ),
+
+            supabaseClient
+              .from("exams")
+              .select("*")
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .order(
+                "date",
+                {
+                  ascending:false
+                }
+              ),
+
+            supabaseClient
+              .from("wrongs")
+              .select("*")
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .order(
+                "date",
+                {
+                  ascending:false
+                }
+              ),
+
+            supabaseClient
+              .from("topics")
+              .select("*")
+              .eq(
+                "user_id",
+                currentUser.id
+              ),
+
+            supabaseClient
+              .from("study_sessions")
+              .select("*")
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .order(
+                "date",
+                {
+                  ascending:false
+                }
+              ),
+
+            supabaseClient
+              .from("daily_plans")
+              .select("*")
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+              .eq(
+                "plan_date",
+                today()
+              )
+              .maybeSingle(),
+
+            supabaseClient
+              .from("badges")
+              .select("*")
+              .eq(
+                "user_id",
+                currentUser.id
+              )
+
+          ]);
+
+        if(q.data)
+          questions = q.data;
+
+        if(e.data)
+          exams = e.data;
+
+        if(w.data)
+          wrongs = w.data;
+
+        if(t.data){
+
+          topics = {};
+
+          t.data.forEach(
+            row => {
+
+              topics[
+                row.subject +
+                "::" +
+                row.topic
+              ] =
+                row.state;
+
+            }
+          );
+
+        }
+
+        if(s.data)
+          studySessions = s.data;
+
+        if(p.data)
+          dailyPlan = p.data;
+
+        if(b.data)
+          badges = b.data;
+
+        loadPlanDraftLocal();
+
+        /*
+          Buluttan günlük plan geldiyse
+          ders seçimlerini de al.
+        */
+
+        if(
+          dailyPlan &&
+          Array.isArray(
+            dailyPlan.subjects
+          ) &&
+          dailyPlan.subjects.length
+        ){
+
+          selectedPlanSubjects =
+            dailyPlan.subjects;
+
+          savePlanSubjectsLocal();
+
+        }else{
+
+          loadPlanSubjects();
+
+        }
+
+        saveLocal();
+
+      }catch(error){
+
+        console.error(error);
+
+        toast(
+          "Bulut verileri yüklenirken sorun oldu."
+        );
+
+      }
+
+    }
+
+
+
+
     /* =====================================================
        PROFILE
     ===================================================== */
