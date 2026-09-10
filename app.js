@@ -3916,6 +3916,63 @@
 
 
     /* =====================================================
+       BOOT
+    ===================================================== */
+
+    async function bootApp(){
+
+      document
+        .getElementById("authScreen")
+        .classList
+        .add("hidden");
+
+      document
+        .getElementById("appScreen")
+        .classList
+        .remove("hidden");
+
+      try{
+
+        loadLocal();
+
+        await getRole();
+
+        await loadProfile();
+
+        await loadCloudData();
+
+        await createTodayPlanIfNeeded();
+
+        renderAll();
+
+        if(
+          currentRole === "admin" ||
+          currentRole === "coach"
+        ){
+          await loadAdminStats(false);
+        }
+
+      }catch(error){
+
+        console.error(error);
+
+        toast(
+          "Uygulama yüklenirken hata oluştu."
+        );
+
+      }finally{
+
+        document
+          .getElementById("loading")
+          .classList
+          .add("hidden");
+
+      }
+
+    }
+
+
+    /* =====================================================
        RENDER ALL
     ===================================================== */
 
