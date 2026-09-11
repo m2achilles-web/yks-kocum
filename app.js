@@ -1121,127 +1121,67 @@
 
     async function saveProfile(){
 
-      const updated = {
-
-        id:
-          currentUser.id,
-
-        username:
-          document
-            .getElementById(
-              "profileUsername"
-            )
-            .value
-            .trim() ||
-          "Öğrenci",
-
-        field:
-          document
-            .getElementById(
-              "profileField"
-            )
-            .value,
-
-        target_rank:
-          Number(
-            document
-              .getElementById(
-                "profileRank"
-              )
-              .value
-          ) || null,
-
-        daily_hours:
-          Number(
-            document
-              .getElementById(
-                "profileHours"
-              )
-              .value
-          ) || 0,
-
-        daily_questions:
-          Number(
-            document
-              .getElementById(
-                "profileQuestions"
-              )
-              .value
-          ) || 0,
-
-        university:
-          document
-            .getElementById(
-              "profileUniversity"
-            )
-            .value
-            .trim(),
-
-        department:
-          document
-            .getElementById(
-              "profileDepartment"
-            )
-            .value
-            .trim(),
-
-        exam_date:
-          document
-            .getElementById(
-              "profileExamDate"
-            )
-            .value ||
-          null
-
-      };
-
-      // Some older Supabase projects do not yet have the optional
-      // daily_hours / daily_questions columns. Save the main profile first,
-      // then retry without those optional fields if the schema is missing them.
-      let { error } = await supabaseClient
-        .from("profiles")
-        .upsert(updated);
-
-      if(error && /daily_hours|daily_questions|schema cache|column/i.test(error.message || "")){
-        console.warn("Profilde günlük hedef sütunları eksik; temel profil bilgileri kaydediliyor.", error);
-        const fallback = { ...updated };
-        delete fallback.daily_hours;
-        delete fallback.daily_questions;
-
-        const retry = await supabaseClient
-          .from("profiles")
-          .upsert(fallback);
-        error = retry.error || null;
-
-        if(!error){
-          toast("Profil kaydedildi. Günlük hedefler için Supabase migration'ını çalıştırman gerekiyor.");
-        }
-      }
-
-      if(error){
-        console.error(error);
-        toast(error.message);
+      if(!currentUser){
+        toast("Önce giriş yapmalısın.");
         return;
       }
 
+      const value = id => document.getElementById(id)?.value ?? "";
+      const updated = {
+        id: currentUser.id,
+        username: value("profileUsername").trim() || "Öğrenci",
+        field: value("profileField") || "Sayısal",
+        target_rank: Number(value("profileRank")) || null,
+        university: value("profileUniversity").trim(),
+        department: value("profileDepartment").trim(),
+        exam_date: value("profileExamDate") || null
+      };
+
+      const dailyHours = Number(value("profileHours")) || 0;
+      const dailyQuestions = Number(value("profileQuestions")) || 0;
+
+      // Önce temel profil alanlarını kaydet. Böylece eski Supabase şemasında
+      // günlük hedef sütunları eksik olsa bile profilin tamamı başarısız olmaz.
+      let { error } = await supabaseClient
+        .from("profiles")
+        .upsert(updated, { onConflict: "id" });
+
+      if(error){
+        console.error("Temel profil kaydedilemedi:", error);
+        toast("Profil kaydedilemedi: " + (error.message || "Bilinmeyen hata"));
+        return;
+      }
+
+      // Günlük hedefleri ayrı kaydet. Sütunlar eski veritabanında yoksa sadece
+      // bu iki alan atlanır; kullanıcıya migration gerektiği açıkça bildirilir.
+      let dailyError = null;
+      const dailyResult = await supabaseClient
+        .from("profiles")
+        .update({ daily_hours: dailyHours, daily_questions: dailyQuestions })
+        .eq("id", currentUser.id);
+      dailyError = dailyResult.error || null;
+
       profile = {
-
-        ...profile,
-
-        ...updated
-
+        ...(profile || {}),
+        ...updated,
+        daily_hours: dailyHours,
+        daily_questions: dailyQuestions
       };
 
       saveLocal();
-
       fillProfileUI();
-
-      toast(
-        "Profil kaydedildi ✅"
-      );
-
       renderHome();
 
+      if(dailyError){
+        console.warn("Günlük hedef sütunları güncellenemedi:", dailyError);
+        if(/daily_hours|daily_questions|schema cache|column/i.test(dailyError.message || "")){
+          toast("Profil kaydedildi ✅ Günlük hedefler için Supabase migration'ını çalıştır.");
+        }else{
+          toast("Profil kaydedildi ✅ Günlük hedefler güncellenemedi.");
+        }
+      }else{
+        toast("Profil kaydedildi ✅");
+      }
     }
 
 
@@ -1520,6 +1460,13 @@
 
         await loadProfile();
 
+        // Profil satırı artık elimizde; rolü tekrar kontrol ederek eski
+        // kurulumlarda profiles.role ile tanımlı koç/admin hesaplarını da yakala.
+        if(!isStaff() && profile?.role){
+          currentRole = String(profile.role).toLowerCase().trim();
+          updateAdminBadge();
+        }
+
         await loadCloudData();
 
         await createTodayPlanIfNeeded();
@@ -1650,8 +1597,15 @@
     }
 
 
-    function openCoachPanel(){
-      if(!isStaff()){ toast("Koç paneline erişim yetkin yok."); return; }
+    async function openCoachPanel(){
+      if(!isStaff()){
+        try{
+          if(profile?.role) currentRole = String(profile.role).toLowerCase().trim();
+          if(!isStaff()) await getRole();
+        }catch(e){ console.warn(e); }
+      }
+      if(!isStaff()){ toast("Koç paneline erişim yetkin yok. Supabase profiles.role alanında coach veya admin olmalı."); return; }
+      updateAdminBadge();
       showPage("profile");
       const admin = document.getElementById("adminSection");
       if(admin){
